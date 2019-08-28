@@ -1,0 +1,293 @@
+"File: HT66FM5440六步有hall方波demo方案.asm  Assembler  Version 2.98      Page 1
+
+
+   1  0000              include HT66FM5440.inc
+
+
+   2  0000              
+   3  0000              ds	.section	'data'
+   4  0000  00          flag_motor_rpm	dbit
+   5  0001              
+   6  0001  00          R_adcdatah		db		?
+   7  0002  00          r_status		db		?
+   8  0003  00          r_acc			db		?
+   9  0004  00          r_restarcnt		db		?
+  10  0005              
+  11  0000              cs	.section	at  000h	'code'
+  12  0000              		ORG		0000H
+  13  0000  283D        		JMP		STAR
+  14  0001              		org		0014h
+  15  0014  28E5        		jmp		isr_captmover
+  16  0015              		org		003ch
+  17  003C  2910        		jmp		isr_time_base
+  18  003D              
+  19  003D              STAR:
+  20  003D  3415        		clr		EMI
+  21  003E  0F01        		MOV		A,01H
+  22  003F  008F        		MOV		SMOD,A
+  23  0040  390F        		SNZ		HTO
+  24  0041  2840        		JMP		$-1				;wait for CLK	stable
+  25  0042  206A        		call	f_io_inital
+  26  0043  207C        		call	f_adc_inital
+  27  0044  2108        		call	f_time_baseinital
+  28  0045  20DA        		call	f_captm_inital
+  29  0046  20FC        		call	f_currentover_protect_inital
+  30  0047  208F        		call	f_motor_pwm_inital
+  31  0048  1F00     R  		clr		r_restarcnt
+  32  0049  3015        		set		EMI
+  33  004A              		
+  34  004A              mainloop:
+  35  004A  0001        		clr		WDT
+  36  004B  2052        		call	f_motor_rpm_control
+  37  004C  39BA        		SNZ		ISEOCB			;when adc Transfer finish will set ISEOCB high 
+  38  004D  284A        		JMP		mainloop
+  39  004E  8737 0001   		LMOV	A,ISRH0			;read	ADC data by pilling
+  40  0050  0080     R  		MOV		R_adcdatah,A
+  41  0051  284A        		jmp		mainloop
+  42  0052              		
+  43  0052              ;;-------------------
+  44  0052              ;;
+  45  0052              ;;-------------------
+  46  0052              f_motor_rpm_control:		
+  47  0052  0F20        		mov		a,20h
+  48  0053  0200     R  		sub		a,R_adcdatah
+  49  0054  3C0A        		sz		C
+  50  0055  2862        		jmp		clear_duty
+  51  0056  3800     R  		snz		flag_motor_rpm
+  52  0057  0003        		ret
+  53  0058  3400     R  		clr		flag_motor_rpm
+  54  0059  0700     R  		mov		a,R_adcdatah
+  55  005A  0258        		sub		a,DUTR0L
+  56  005B  3C0A        		sz		C
+  57  005C  2866        		jmp		inc_duty
+"File: HT66FM5440六步有hall方波demo方案.asm  Assembler  Version 2.98      Page 2
+
+  58  005D  0700     R  		mov		a,R_adcdatah
+  59  005E  00D8        		mov		DUTR0L,A
+  60  005F  00DA        		mov		DUTR1L,a
+  61  0060  00DC        		mov		DUTR2L,a		;motor Deceleration
+  62  0061  0003        		ret
+  63  0062              clear_duty:
+  64  0062  1F58        		clr		DUTR0L			;motor stop by vsp
+  65  0063  1F5A        		clr		DUTR1L
+  66  0064  1F5C        		clr		DUTR2L
+  67  0065  0003        		ret		
+  68  0066              inc_duty:
+  69  0066  14D8        		inc		DUTR0L			;motor accelerate slowly
+  70  0067  14DA        		inc		DUTR1L
+  71  0068  14DC        		inc		DUTR2L
+  72  0069              		
+  73  0069  0003        		ret				
+  74  006A              ;;-------------------
+  75  006A              ;;
+  76  006A              ;;-------------------
+  77  006A              f_io_inital:
+  78  006A  1F29        		clr		PC
+  79  006B  0F00        		mov		a,00h			;PC output
+  80  006C  00AA        		mov		PCC,A
+  81  006D  0FBA        		mov		a,10111010b		;vsp input and pa5,pa4,pa3 input hall signal，PA1 AS AP input detect currentover
+  82  006E  00A4        		mov		PAC,A
+  83  006F  0F04        		mov		a,00000100b
+  84  0070  80FA 0001   		lmov	PAPS0,A			;pa1 as ap inpout
+  85  0072  0F40        		mov		a,01000000b		;pa7 turn into an6  as vsp input
+  86  0073  80FB 0001   		lmov	PAPS1,A
+  87  0075  0FAA        		mov		a,10101010b		;pc turn into pwm output
+  88  0076  80FC 0001   		lmov	PCPS0,A
+  89  0078  0F0A        		mov		a,00001010b
+  90  0079  80FD 0001   		lmov	PCPS1,A		
+  91  007B  0003        		ret
+  92  007C              ;;-------------------
+  93  007C              ;;
+  94  007C              ;;-------------------
+  95  007C              f_adc_inital:
+  96  007C  0F07        		mov		a,00000111b
+  97  007D  00B8        		mov		ADCR0,a
+  98  007E  0F44        		mov		a,01000100b
+  99  007F  00B9        		mov		ADCR1,A
+ 100  0080  0F00        		mov		a,00000000b
+ 101  0081  00BA        		mov		ADCR2,A
+ 102  0082  0F00        		mov		a,00h
+ 103  0083  80C4 0001   		lmov	ADCR3,A
+ 104  0085  0F07        		mov		a,00000111b		;auto scan adc change olny one is an6 	
+ 105  0086  00BB        		mov		ADISG1,A
+ 106  0087  0F00        		mov		a,00h
+ 107  0088  00BC        		mov		ADISG2,A
+ 108  0089  0F14        		mov		a,20
+ 109  008A  00BD        		mov		ADDL,A			;adc aotu scan star delay register
+ 110  008B  0F10        		mov		a,10h
+ 111  008C  80C1 0001   		lmov	ADBYPS,A		;the switch must be open
+ 112  008E  0003        		ret
+ 113  008F              
+ 114  008F              ;;-------------------
+ 115  008F              ;;
+ 116  008F              ;;-------------------
+ 117  008F              f_motor_pwm_inital:
+"File: HT66FM5440六步有hall方波demo方案.asm  Assembler  Version 2.98      Page 3
+
+ 118  008F  0F01        		mov		a,00000001b
+ 119  0090  00D7        		mov		PWMC,A
+ 120  0091  0F00        		mov		a,00h
+ 121  0092  80D5 0001   		lmov	PWMCS,A
+ 122  0094  0F00        		mov		a,00H
+ 123  0095  00D9        		mov		DUTR0H,A		;write dutrnh must to earlier than dutrnl
+ 124  0096  0F00        		mov		a,00h
+ 125  0097  00D8        		mov		DUTR0L,A
+ 126  0098  0F00        		mov		a,00h
+ 127  0099  00DB        		mov		DUTR1H,A
+ 128  009A  0F00        		mov		a,00h
+ 129  009B  00DA        		mov		DUTR1L,A
+ 130  009C  0F00        		mov		a,00h
+ 131  009D  00DD        		mov		DUTR2H,A
+ 132  009E  0F00        		mov		a,00h
+ 133  009F  00DC        		mov		DUTR2L,A
+ 134  00A0  0F01        		mov		a,01h
+ 135  00A1  00DF        		mov		PRDRH,A
+ 136  00A2  0F00        		mov		a,00h
+ 137  00A3  00DE        		mov		PRDRL,A
+ 138  00A4  31D7        		set		PWMON
+ 139  00A5              		
+ 140  00A5  0F0D        		mov		a,00001101b		;hardware mask model,Non complementary ,pwm output enable
+ 141  00A6  00E4        		mov		MCF,A
+ 142  00A7  0F69        		mov		a,01101001b		;fdt=fsys/2,dead time=0.1us&[9+1]=1us
+ 143  00A8  00E6        		mov		DTS,A
+ 144  00A9  0F00        		mov		a,00h
+ 145  00AA  00E7        		mov		PLC,A
+ 146  00AB              		
+ 147  00AB  0F00        		mov		a,00h
+ 148  00AC  00C5        		mov		INTEG0,A
+ 149  00AD  0FDB        		mov		a,11011011b		;no delay,hall sensor 120 degree,hall decode by hardware and enable
+ 150  00AE  00C9        		mov		HDCR,A
+ 151  00AF  0F06        		mov		a,00000110B					;CT/BB(1)
+ 152  00B0  80E2 0001   		lmov	HDCT0,A
+ 153  00B2  0F24        		mov		a,00100100B					;AT/BB(3)
+ 154  00B3  80E3 0001   		lmov	HDCT1,A
+ 155  00B5  0F21        		mov		a,00100001B					;AT/CB(2)
+ 156  00B6  80E4 0001   		lmov	HDCT2,A
+ 157  00B8  0F09        		mov		a,00001001B					;BT/CB(6)
+ 158  00B9  80E5 0001   		lmov	HDCT3,A
+ 159  00BB  0F18        		mov		a,00011000B					;BT/AB(4)
+ 160  00BC  80E6 0001   		lmov	HDCT4,A
+ 161  00BE  0F12        		mov		a,00010010B					;CT/AB(5)
+ 162  00BF  80E7 0001   		lmov	HDCT5,A
+ 163  00C1              		
+ 164  00C1  0F09        		mov		a,00001001B					;BTCB(1)		
+ 165  00C2  80E8 0001   		lmov	HDCT6,A
+ 166  00C4  0F18        		mov		a,00011000B					;BTAB(3)
+ 167  00C5  80E9 0001   		lmov	HDCT7,A
+ 168  00C7  0F12        		mov		a,00010010B					;CTAB(2)
+ 169  00C8  80EA 0001   		lmov	HDCT8,A
+ 170  00CA  0F06        		mov		a,00000110B					;CTBB(6)
+ 171  00CB  80EB 0001   		lmov	HDCT9,A
+ 172  00CD  0F24        		mov		a,00100100B					;ATBB(4)
+ 173  00CE  80EC 0001   		lmov	HDCT10,A
+ 174  00D0  0F21        		mov		a,00100001B					;ATCB(5)
+ 175  00D1  80ED 0001   		lmov	HDCT11,A
+ 176  00D3              		
+ 177  00D3  0F28        		mov		a,00101000b					;motor protect model choose 
+"File: HT66FM5440六步有hall方波demo方案.asm  Assembler  Version 2.98      Page 4
+
+ 178  00D4  00CB        		mov		MPTC1,A
+ 179  00D5  0F05        		mov		a,00000101b
+ 180  00D6  00CC        		mov		MPTC2,A
+ 181  00D7  0F00        		mov		a,00h
+ 182  00D8  00C4        		mov		OCPS,A
+ 183  00D9              		
+ 184  00D9  0003        		ret
+ 185  00DA              		
+ 186  00DA              		
+ 187  00DA              ;;-------------------
+ 188  00DA              ;;
+ 189  00DA              ;;-------------------		
+ 190  00DA              f_captm_inital:
+ 191  00DA  0F70        		mov		a,01110000b				;FHA change,fh/128=6.4us
+ 192  00DB  00AE        		mov		CAPTC0,A
+ 193  00DC  0F72        		mov		a,01110010b				;rising edage avi
+ 194  00DD  00AF        		mov		CAPTC1,A
+ 195  00DE  0FF4        		mov		a,0f4h
+ 196  00DF  00B3        		mov		CAPTMAH,A
+ 197  00E0  0F24        		mov		a,24H
+ 198  00E1  00B2        		mov		CAPTMAL,A
+ 199  00E2  31AE        		set		CAPTON
+ 200  00E3  3096        		set		INT_PRI5E
+ 201  00E4              		
+ 202  00E4  0003        		ret
+ 203  00E5              ;;-------------------
+ 204  00E5              ;;
+ 205  00E5              ;;-------------------		
+ 206  00E5              isr_captmover:
+ 207  00E5  0080     R  		mov		R_acc,A
+ 208  00E6  070A        		mov		a,STATUS
+ 209  00E7  0080     R  		mov		r_status,A
+ 210  00E8  1480     R  		inc		r_restarcnt
+ 211  00E9  0700     R  		mov		a,r_restarcnt
+ 212  00EA  0A08        		sub		a,8
+ 213  00EB  390A        		snz		Z
+ 214  00EC  28F7        		jmp		captmend
+ 215  00ED  334B        		SET		PSWE
+ 216  00EE  324C        		SET		PSWPS
+ 217  00EF  37CB        		CLR		PSWD					;resatr motor
+ 218  00F0  0000        		NOP 
+ 219  00F1  0000        		NOP
+ 220  00F2  374B        		CLR		PSWE
+ 221  00F3  1F00     R  		CLR		r_restarcnt
+ 222  00F4  1F58        		clr		DUTR0L
+ 223  00F5  1F5A        		clr		DUTR1L
+ 224  00F6  1F5C        		clr		DUTR2L
+ 225  00F7              		
+ 226  00F7              captmend:
+ 227  00F7  3696        		clr		INT_PRI5F				
+ 228  00F8  0700     R  		mov		a,r_status
+ 229  00F9  008A        		mov		STATUS,A
+ 230  00FA  0700     R  		mov		a,R_acc		
+ 231  00FB  0004        		reti		
+ 232  00FC              		
+ 233  00FC              		
+ 234  00FC              ;;-------------------
+ 235  00FC              ;;
+ 236  00FC              ;;-------------------		
+ 237  00FC              f_currentover_protect_inital:
+"File: HT66FM5440六步有hall方波demo方案.asm  Assembler  Version 2.98      Page 5
+
+ 238  00FC  0F11        		mov		a,00010001b
+ 239  00FD  00F2        		mov		CMPC,A					;comp0 open
+ 240  00FE  0F43        		mov		a,01000011b				;opa gain is 20
+ 241  00FF  80EE 0001   		lmov	OPOMS,A
+ 242  0101  0F34        		mov		a,52					;currentover is 1A~102
+ 243  0102  80EF 0001   		lmov	OPCM,A
+ 244  0104  0F10        		mov		a,00010000b
+ 245  0105  80F0 0001   		lmov	OPA0CAL,A
+ 246  0107  0003        		RET		
+ 247  0108              		
+ 248  0108              						
+ 249  0108              ;;-------------------
+ 250  0108              ;;
+ 251  0108              ;;-------------------
+ 252  0108              f_time_baseinital:
+ 253  0108  0FF0        		mov		a,11110000b				
+ 254  0109  8093 0001   		lmov	TBC,A
+ 255  010B  37A0        		clr		TBF
+ 256  010C  31A0        		set		TBE
+ 257  010D  3798        		clr		INT_PRI15F
+ 258  010E  3198        		set		INT_PRI15E
+ 259  010F              
+ 260  010F  0003        		ret
+ 261  0110              ;;-------------------
+ 262  0110              ;;
+ 263  0110              ;;-------------------
+ 264  0110              isr_time_base:
+ 265  0110  0080     R  		mov		R_acc,A
+ 266  0111  070A        		mov		a,STATUS
+ 267  0112  0080     R  		mov		r_status,A
+ 268  0113              		
+ 269  0113  37A0        		clr		TBF
+ 270  0114  3000     R  		set		flag_motor_rpm
+ 271  0115  0700     R  		mov		a,r_status				;motro speed cintrol flag
+ 272  0116  008A        		mov		STATUS,A
+ 273  0117  0700     R  		mov		a,R_acc
+ 274  0118              		
+ 275  0118  0004        		reti				
+ 276  0119              		
+ 277  0119              end
+
+
+        0 Errors, 0 Warnings

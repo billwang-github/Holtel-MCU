@@ -1,0 +1,4 @@
+Removed Pin From Net: NetName=HA Pin=R20-2
+Removed Pin From Net: NetName=HC Pin=R32-2
+Added Pin To Net: NetName=HC Pin=R20-2
+Added Pin To Net: NetName=HA Pin=R32-2

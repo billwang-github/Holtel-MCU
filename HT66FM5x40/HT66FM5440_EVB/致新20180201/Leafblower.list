@@ -1,0 +1,4549 @@
+				;file C:\Users\steven.ho\Desktop\致新20180124\Leafblower.c
+				;1	//======================================================
+				;2	// File  : Leafblower.C
+				;3	// 
+				;4	// MCU setting:
+				;5	// 
+				;6	// PWM 16K use Centre-aligned mode 1.
+				;7	//
+				;8	// Auther : Chuansheng Pei/13312975887
+				;9	// Date   : 2016/08/08
+				;10	// version: 1.0
+				;11	// history: 
+				;12	//======================================================
+				;13	#include "HT66FM5440.h"
+				;14	asm(" include HT66FM5440.inc ");
+				;15	
+				;16	//===============================================
+				;17	#define DRAG_TIME 			20 //45	
+				;18	#define DRAG_TEMP_TIME 		1	
+				;19	#define DRAG_MIN_TIME 		10 //20	
+				;20	
+				;21	#define DRAG_PWM_Min		790	
+				;22	#define DRAG_PWM_MAX		DRAG_PWM_Min + 5
+				;23	#define DRAG_PWM_BaseInc	6	
+				;24	
+				;25	#define	PWM_MAX				800
+				;26	#define	PWM_MAX_Gear3		800 
+				;27	#define	PWM_MAX_Gear2		648	
+				;28	#define	PWM_MAX_Gear1		400	
+				;29	#define	PWM_MAX_Gear4		125		//1A
+				;30	#define PWM_MAX_LowVoltage	160
+				;31	
+				;32	//===============================================
+				;33	const unsigned char ucDealDragHall[6]={5,1,3,2,6,4};
+				;34	
+				;35	typedef struct{
+				;36		unsigned char	b0 : 1;
+				;37		unsigned char	b1 : 1;
+				;38		unsigned char	b2 : 1;
+				;39		unsigned char	b3 : 1;
+				;40		unsigned char	b4 : 1;
+				;41		unsigned char	b5 : 1;
+				;42		unsigned char	b6 : 1;
+				;43		unsigned char	b7 : 1;
+				;44	}_bits;
+				;45	
+				;46	static volatile	_bits bit_var_0	__attribute__	((at(0x80)));
+				;47	static volatile	_bits bit_var_1	__attribute__	((at(0x81)));
+				;48	static volatile	_bits bit_var_2	__attribute__	((at(0x82)));
+				;49	
+				;50	#define bDragFlag			bit_var_0.b0
+				;51	#define bStallFlag			bit_var_0.b1
+				;52	#define bFirstRunFlag		bit_var_0.b2
+				;53	#define bRestart			bit_var_0.b3
+				;54	#define bHadRun				bit_var_0.b4
+				;55	#define bStopMotor			bit_var_0.b5
+				;56	#define bPermitStart		bit_var_0.b6
+				;57	#define bAlarmFlag			bit_var_0.b7
+				;58	
+				;59	#define bVoiceFlag			bit_var_1.b0
+				;60	//#define bPermitStart		bit_var_1.b1
+				;61	#define bNmsFlag			bit_var_1.b2
+				;62	#define bOCP				bit_var_1.b3
+				;63	#define bVoltageUnder		bit_var_1.b4
+				;64	#define bCurrentLimit		bit_var_1.b5
+				;65	#define bVoltageOver		bit_var_1.b6
+				;66	#define bVRRefresh			bit_var_1.b7
+				;67	
+				;68	#define bVoltageErrorVoice	bit_var_2.b0
+				;69	#define bVoltageErrorFlag	bit_var_2.b1
+				;70	#define bVDC_WorkOK			bit_var_2.b2
+				;71	#define bKey_Press 			bit_var_2.b3
+				;72	#define bKey_Bounce			bit_var_2.b4
+				;73	#define bKey_NO				bit_var_2.b5
+				;74	#define bPWMUpdate			bit_var_2.b6
+				;75	#define bcaputre_speed			bit_var_2.b7
+				;76	
+				;77	volatile unsigned int	uiDragPWM_Max;
+				;78	volatile unsigned char	ucDragPWM_BaseInc;
+				;79	volatile unsigned char	ucHallCycle;
+				;80	volatile unsigned char	ucDragDelayTime;
+				;81	volatile unsigned char	ucTempDragDelayTime;
+				;82	volatile unsigned char	ucMinDragDelayTime;
+				;83	volatile unsigned int	uiDragPWM;
+				;84	volatile unsigned char	uiCount1ms;
+				;85	volatile unsigned char	ucHallCnt;
+				;86	volatile unsigned int	uiLastHallTime;
+				;87	volatile unsigned int	uiVR_Value;
+				;88	volatile unsigned int	uiTempPWM;
+				;89	volatile unsigned char	ValueTemp;
+				;90	volatile unsigned char	ucHallStep;
+				;91	volatile unsigned int	uiHallTimeCnt;
+				;92	volatile unsigned char	ucVoiceStep;
+				;93	volatile unsigned int	uiVoiceTimeCnt;
+				;94	volatile unsigned char	ucDragCnt;
+				;95	
+				;96	volatile unsigned char	ucReadADCNT;
+				;97	volatile unsigned int	uiADC_ValueTemp;
+				;98	volatile unsigned int	uiADCSum;
+				;99	volatile unsigned char	ucVRIndex;
+				;100	volatile unsigned int	uiVRValue_Final;
+				;101	volatile unsigned int	uiVRValue[4];
+				;102	volatile unsigned char	ucVDC_Temp;
+				;103	volatile unsigned int	uiVDCADCSum;
+				;104	volatile unsigned char	ucVDCIndex;
+				;105	volatile unsigned int	uiVDCValue_Final;
+				;106	volatile unsigned int	uiVDCValue[4];
+				;107	volatile unsigned int	uiCurrentADCSum;
+				;108	volatile unsigned char	ucCurrentIndex;
+				;109	volatile unsigned int	uiCurrentValue_Final;
+				;110	volatile unsigned int	uiCurrentValue[4];
+				;111	volatile unsigned int	uiVoltageCheckCnt;
+				;112	volatile unsigned char	ucMTR_State;
+				;113	volatile unsigned int	uiReleaseKey_CNT;
+				;114	volatile unsigned char	ucPWMUpdateCNT;
+				;115	
+				;116	static volatile unsigned int	uiVoiceTime	__attribute__ ((at(0x180)));
+				;117	static volatile unsigned char	ucLostCommandVoice __attribute__ ((at(0x182)));
+				;118	static volatile unsigned char	ucVoiceCnt __attribute__ ((at(0x194)));
+				;119	
+				;120	
+				;121	//===============================================
+				;122	void 	IO_Init(void);
+				;123	void 	PWM_Init(void);
+				;124	void 	ADC_Init(void);
+				;125	void 	TM1_Init(void);
+				;126	void	PWMInit(void);
+				;127	void 	Hall_Init(void);
+				;128	void 	INT_Init(void);
+				;129	void 	System_Init(void);
+				;130	void 	Varitate_Init(void);
+				;131	void 	Drag_Motor(void);
+				;132	void 	delay(unsigned int);
+				;133	void 	Comparator_Init(void);
+				;134	void 	CAPTM_Init(void);
+				;135	void 	Motor_Stop(void);
+				;136	void 	VoiceSpeakInit(void);
+				;137	void 	Init_TM3(void);
+				;138	void 	AD_Init(void);
+				;139	void 	CommandOK(void);
+				;140	void 	commutation(void);
+				;141	void 	TimeBaseInit(void);
+				;142	void 	delay1(unsigned char x);
+				;143	void	ReadVR(void);
+				;144	void	ReadMTRState(void);
+				;145	void	ReadVDC(void);
+				;146	void	ReadCurrent(void);
+				;147	void	ReadVDC_PowerON(void);
+				;148	void	KeyCheck(void);
+				;149	void	get_drag_pwm(void);
+				;150	
+				;151	//===============================================
+				;152	//
+				;153	//===============================================
+				;154	void main()
+				;155	{
+				@code .SECTION 'CODE'
+				include HT66FM5440.inc
+0000	2840	jmp     begin_startup_value
+0001	0105	cpla    ACC
+0002	0203	sub     a, MP1L
+0003	0406	xor     a, PCL
+				startupend3:
+				@start .SECTION 'CODE'
+007A	287B	jmp     _main
+				;156		asm("NOP");
+				_main:
+				_main:
+007B	0000	nop
+				;157		asm("NOP");
+007C	0000	nop
+				;158		asm("NOP");
+007D	0000	nop
+				;159		_emi = 0;
+007E	3415	clr     EMI
+				;160		IO_Init();
+007F	200C	call    _IO_Init
+				;161		System_Init();
+0080	2231	call    _System_Init
+				;162		TM1_Init();
+0081	2620	call    _TM1_Init
+				;163		PWMInit();
+0082	2287	call    _PWMInit
+				;164		Hall_Init();
+0083	22A3	call    _Hall_Init
+				;165		ADC_Init();
+0084	2262	call    _ADC_Init
+				;166		Comparator_Init();
+0085	2277	call    _Comparator_Init
+				;167		CAPTM_Init();
+0086	22D2	call    _CAPTM_Init
+				;168		Init_TM3();
+0087	2636	call    _Init_TM3
+				;169		TimeBaseInit();
+0088	26B0	call    _TimeBaseInit
+				;170		INT_Init();
+0089	2028	call    _INT_Init
+				;171		Varitate_Init();
+008A	22DA	call    _Varitate_Init
+				;172		_lvden=1;
+008B	3210	set     LVDEN
+				;173		_lve=1;
+008C	3120	set     LVE
+				;174		_lvf=0;
+008D	3720	clr     LVF
+				;175		_emi = 1;
+008E	3015	set     EMI
+				;176		delay(1000);
+008F	0FE8	mov     a, E8H
+0090	40AB	mov     x, a
+0091	0F03	mov     a, 3H
+0092	40AC	mov     x[1], a
+0093	2312	call    _delay
+				;177		uiReleaseKey_CNT = 10001;
+0094	0F11	mov     a, 11H
+0095	40C1	mov     uiReleaseKey_CNT[0], a
+0096	0F27	mov     a, 27H
+0097	40C2	mov     uiReleaseKey_CNT[1], a
+				;178		ucMTR_State = 0;
+0098	5F58	clr     ucMTR_State[0]
+				;179		ReadVDC_PowerON();
+0099	603E	call    _ReadVDC_PowerON
+				;180		delay(2000);			//開機後先DELAY一段時間
+009A	0FD0	mov     a, D0H
+009B	40AB	mov     x, a
+009C	0F07	mov     a, 7H
+009D	40AC	mov     x[1], a
+009E	2312	call    _delay
+				;181		
+				;182	//	VoiceSpeakInit();
+				;183	//	ucVoiceStep = 0;
+				;184		CommandOK();
+009F	24D9	call    _CommandOK
+				;185	//***********************************************
+				;186	//main loop
+				;187	//***********************************************
+				;188		while(1)
+				;189		{
+				;190			if(ucReadADCNT > 20)
+				_L27:
+00A0	4751	mov     a, ucReadADCNT[0]
+00A1	4083	mov     ra, a
+00A2	0F14	mov     a, 14H
+00A3	4203	sub     a, ra
+00A4	3C0A	sz      C
+00A5	28AB	jmp     _L2
+				;191			{
+				;192				ucReadADCNT = 0;
+00A6	5F51	clr     ucReadADCNT[0]
+				;193				KeyCheck();
+00A7	2769	call    _KeyCheck
+				;194				ReadMTRState();
+00A8	27AA	call    _ReadMTRState
+				;195				ReadVDC();		
+00A9	6075	call    _ReadVDC
+				;196				ReadCurrent();	
+00AA	6180	call    _ReadCurrent
+				;197			}
+				;198			
+				;199			if(bPermitStart)
+				_L2:
+00AB	4700	mov     a, bit_var_0[0]
+00AC	4083	mov     ra, a
+00AD	0F40	mov     a, 40H
+00AE	4683	andm    a, ra
+00AF	5E03	snz     ra
+00B0	28F1	jmp     _L3
+				;200			{
+				;201				if(bStopMotor || bVoltageOver || bVoltageUnder || bOCP)
+00B1	4700	mov     a, bit_var_0[0]
+00B2	4083	mov     ra, a
+00B3	0F20	mov     a, 20H
+00B4	4683	andm    a, ra
+00B5	5083	sz      ra
+00B6	28C9	jmp     _L4
+00B7	4701	mov     a, bit_var_1[0]
+00B8	4083	mov     ra, a
+00B9	0F40	mov     a, 40H
+00BA	4683	andm    a, ra
+00BB	5083	sz      ra
+00BC	28C9	jmp     _L4
+00BD	4701	mov     a, bit_var_1[0]
+00BE	4083	mov     ra, a
+00BF	0F10	mov     a, 10H
+00C0	4683	andm    a, ra
+00C1	5083	sz      ra
+00C2	28C9	jmp     _L4
+00C3	4701	mov     a, bit_var_1[0]
+00C4	4083	mov     ra, a
+00C5	0F08	mov     a, 8H
+00C6	4683	andm    a, ra
+00C7	5E03	snz     ra
+00C8	28CA	jmp     _L5
+				;202				{
+				;203				    Motor_Stop();
+				_L4:
+00C9	24CA	call    _Motor_Stop
+				;204				}
+				;205				
+				;206				if(bHadRun)
+				_L5:
+00CA	4700	mov     a, bit_var_0[0]
+00CB	4083	mov     ra, a
+00CC	0F10	mov     a, 10H
+00CD	4683	andm    a, ra
+00CE	5E03	snz     ra
+00CF	28F1	jmp     _L3
+				;207			    {
+				;208				    if(uiVR_Value < 50)   
+00D0	4739	mov     a, uiVR_Value[0]
+00D1	4083	mov     ra, a
+00D2	473A	mov     a, uiVR_Value[1]
+00D3	4084	mov     rb, a
+00D4	0F31	mov     a, 31H
+00D5	4203	sub     a, ra
+00D6	0F00	mov     a, 0H
+00D7	5204	sbc     a, rb
+00D8	380A	snz     C
+00D9	28F1	jmp     _L3
+				;209				    {
+				;210				        if((uiTempPWM < 50) && (uiHallTimeCnt > 5))
+00DA	4735	mov     a, uiTempPWM[0]
+00DB	4083	mov     ra, a
+00DC	4736	mov     a, uiTempPWM[1]
+00DD	4084	mov     rb, a
+00DE	0F31	mov     a, 31H
+00DF	4203	sub     a, ra
+00E0	0F00	mov     a, 0H
+00E1	5204	sbc     a, rb
+00E2	380A	snz     C
+00E3	28F1	jmp     _L3
+00E4	4747	mov     a, uiHallTimeCnt[0]
+00E5	4083	mov     ra, a
+00E6	4748	mov     a, uiHallTimeCnt[1]
+00E7	4084	mov     rb, a
+00E8	0F05	mov     a, 5H
+00E9	4203	sub     a, ra
+00EA	0F00	mov     a, 0H
+00EB	5204	sbc     a, rb
+00EC	3C0A	sz      C
+00ED	28F1	jmp     _L3
+				;211				        {
+				;212				            bRestart=1;
+00EE	7180	set     bit_var_0[0].3
+				;213					        Motor_Stop();
+00EF	24CA	call    _Motor_Stop
+				;214							Varitate_Init();
+00F0	22DA	call    _Varitate_Init
+				;215				        }
+				;216				    }
+				;217			    }
+				;218		    }
+				;219		    
+				;220			if(bNmsFlag)
+				_L3:
+00F1	4701	mov     a, bit_var_1[0]
+00F2	4083	mov     ra, a
+00F3	0F04	mov     a, 4H
+00F4	4683	andm    a, ra
+00F5	5E03	snz     ra
+00F6	2A2E	jmp     _L6
+				;221			{
+				;222				bNmsFlag = 0;
+00F7	7501	clr     bit_var_1[0].2
+				;223				
+				;224			    if(bPermitStart && (!bVoltageOver) && (!bVoltageUnder))
+00F8	4700	mov     a, bit_var_0[0]
+00F9	4083	mov     ra, a
+00FA	0F40	mov     a, 40H
+00FB	4683	andm    a, ra
+00FC	5E03	snz     ra
+00FD	2A23	jmp     _L7
+00FE	4701	mov     a, bit_var_1[0]
+00FF	4083	mov     ra, a
+0100	0F40	mov     a, 40H
+0101	4683	andm    a, ra
+0102	5083	sz      ra
+0103	2A23	jmp     _L7
+0104	4701	mov     a, bit_var_1[0]
+0105	4083	mov     ra, a
+0106	0F10	mov     a, 10H
+0107	4683	andm    a, ra
+0108	5083	sz      ra
+0109	2A23	jmp     _L7
+				;225			    {
+				;226					if(uiVRValue_Final > 120)
+010A	475C	mov     a, uiVRValue_Final[0]
+010B	4083	mov     ra, a
+010C	475D	mov     a, uiVRValue_Final[1]
+010D	4084	mov     rb, a
+010E	0F78	mov     a, 78H
+010F	4203	sub     a, ra
+0110	0F00	mov     a, 0H
+0111	5204	sbc     a, rb
+0112	3C0A	sz      C
+0113	2916	jmp     _L8
+				;227					{
+				;228						bVRRefresh = 1;	
+0114	7381	set     bit_var_1[0].7
+0115	2925	jmp     _L9
+				;229						
+				;230					}
+				;231					else if(uiVRValue_Final < 70)
+				_L8:
+0116	475C	mov     a, uiVRValue_Final[0]
+0117	4083	mov     ra, a
+0118	475D	mov     a, uiVRValue_Final[1]
+0119	4084	mov     rb, a
+011A	0F45	mov     a, 45H
+011B	4203	sub     a, ra
+011C	0F00	mov     a, 0H
+011D	5204	sbc     a, rb
+011E	380A	snz     C
+011F	2925	jmp     _L9
+				;232					{
+				;233						bVRRefresh = 0;
+0120	7781	clr     bit_var_1[0].7
+				;234						bOCP = 0;
+0121	7581	clr     bit_var_1[0].3
+				;235						_ocpse = 1;
+0122	304B	set     OCPSE
+				;236						_ocpse = 0;
+0123	344B	clr     OCPSE
+				;237						_ocpse = 1;	
+0124	304B	set     OCPSE
+				;238					}
+				;239					
+				;240					if(bVRRefresh)
+				_L9:
+0125	4701	mov     a, bit_var_1[0]
+0126	4083	mov     ra, a
+0127	0F80	mov     a, 80H
+0128	4683	andm    a, ra
+0129	5E03	snz     ra
+012A	2956	jmp     _L10
+				;241			        {
+				;242						uiVR_Value = uiVRValue_Final;
+012B	475C	mov     a, uiVRValue_Final[0]
+012C	4083	mov     ra, a
+012D	475D	mov     a, uiVRValue_Final[1]
+012E	4084	mov     rb, a
+012F	4703	mov     a, ra
+0130	40B9	mov     uiVR_Value[0], a
+0131	4704	mov     a, rb
+0132	40BA	mov     uiVR_Value[1], a
+				;243						if(bVDC_WorkOK)
+0133	4702	mov     a, bit_var_2[0]
+0134	4083	mov     ra, a
+0135	0F04	mov     a, 4H
+0136	4683	andm    a, ra
+0137	5E03	snz     ra
+0138	2948	jmp     _L11
+				;244						{
+				;245							if(uiVR_Value > PWM_MAX)
+0139	4739	mov     a, uiVR_Value[0]
+013A	4083	mov     ra, a
+013B	473A	mov     a, uiVR_Value[1]
+013C	4084	mov     rb, a
+013D	0F20	mov     a, 20H
+013E	4203	sub     a, ra
+013F	0F03	mov     a, 3H
+0140	5204	sbc     a, rb
+0141	3C0A	sz      C
+0142	2958	jmp     _L14
+				;246							{
+				;247								uiVR_Value = PWM_MAX;	
+0143	0F20	mov     a, 20H
+0144	40B9	mov     uiVR_Value[0], a
+0145	0F03	mov     a, 3H
+0146	40BA	mov     uiVR_Value[1], a
+0147	2958	jmp     _L14
+				;248							}
+				;249						}
+				;250						else
+				;251						{
+				;252							if(uiVR_Value > PWM_MAX_LowVoltage)
+				_L11:
+0148	4739	mov     a, uiVR_Value[0]
+0149	4083	mov     ra, a
+014A	473A	mov     a, uiVR_Value[1]
+014B	4084	mov     rb, a
+014C	0FA0	mov     a, A0H
+014D	4203	sub     a, ra
+014E	0F00	mov     a, 0H
+014F	5204	sbc     a, rb
+0150	3C0A	sz      C
+0151	2958	jmp     _L14
+				;253							{
+				;254								uiVR_Value = PWM_MAX_LowVoltage;
+0152	0FA0	mov     a, A0H
+0153	40B9	mov     uiVR_Value[0], a
+0154	5F3A	clr     uiVR_Value[1]
+0155	2958	jmp     _L14
+				;255							}
+				;256						}
+				;257			        }
+				;258			        else
+				;259			        {
+				;260						uiVR_Value = 0;
+				_L10:
+0156	5F39	clr     uiVR_Value[0]
+0157	5F3A	clr     uiVR_Value[1]
+				;261			        }
+				;262					
+				;263			        
+				;264					if(uiVR_Value > 120)
+				_L14:
+0158	4739	mov     a, uiVR_Value[0]
+0159	4083	mov     ra, a
+015A	473A	mov     a, uiVR_Value[1]
+015B	4084	mov     rb, a
+015C	0F78	mov     a, 78H
+015D	4203	sub     a, ra
+015E	0F00	mov     a, 0H
+015F	5204	sbc     a, rb
+0160	3C0A	sz      C
+0161	29A4	jmp     _L15
+				;265					{
+				;266						
+				;267						if((bHadRun&&(uiHallTimeCnt > 100)) || bStallFlag)
+0162	4700	mov     a, bit_var_0[0]
+0163	4083	mov     ra, a
+0164	0F10	mov     a, 10H
+0165	4683	andm    a, ra
+0166	5E03	snz     ra
+0167	2972	jmp     _L16
+0168	4747	mov     a, uiHallTimeCnt[0]
+0169	4083	mov     ra, a
+016A	4748	mov     a, uiHallTimeCnt[1]
+016B	4084	mov     rb, a
+016C	0F64	mov     a, 64H
+016D	4203	sub     a, ra
+016E	0F00	mov     a, 0H
+016F	5204	sbc     a, rb
+0170	380A	snz     C
+0171	2978	jmp     _L17
+				_L16:
+0172	4700	mov     a, bit_var_0[0]
+0173	4083	mov     ra, a
+0174	0F02	mov     a, 2H
+0175	4683	andm    a, ra
+0176	5E03	snz     ra
+0177	2981	jmp     _L18
+				;268						{
+				;269							if(bStopMotor == 0)
+				_L17:
+0178	4700	mov     a, bit_var_0[0]
+0179	4083	mov     ra, a
+017A	0F20	mov     a, 20H
+017B	4683	andm    a, ra
+017C	5083	sz      ra
+017D	2981	jmp     _L18
+				;270							{
+				;271								bStallFlag = 0;
+017E	7480	clr     bit_var_0[0].1
+				;272								Motor_Stop();
+017F	24CA	call    _Motor_Stop
+				;273								Varitate_Init(); 
+0180	22DA	call    _Varitate_Init
+				;274							}
+				;275						}
+				;276					    
+				;277					    if(bRestart && (!bOCP))
+				_L18:
+0181	4700	mov     a, bit_var_0[0]
+0182	4083	mov     ra, a
+0183	0F08	mov     a, 8H
+0184	4683	andm    a, ra
+0185	5E03	snz     ra
+0186	29AD	jmp     _L21
+0187	4701	mov     a, bit_var_1[0]
+0188	4083	mov     ra, a
+0189	0F08	mov     a, 8H
+018A	4683	andm    a, ra
+018B	5083	sz      ra
+018C	29AD	jmp     _L21
+				;278						{
+				;279						    bRestart = 0;
+018D	7580	clr     bit_var_0[0].3
+				;280						    if(bFirstRunFlag == 0)
+018E	4700	mov     a, bit_var_0[0]
+018F	4083	mov     ra, a
+0190	0F04	mov     a, 4H
+0191	4683	andm    a, ra
+0192	5083	sz      ra
+0193	29A2	jmp     _L20
+				;281						    {
+				;282								get_drag_pwm();
+0194	6243	call    _get_drag_pwm
+				;283								uiDragPWM_Max = uiDragPWM + 5;
+0195	4737	mov     a, uiDragPWM[0]
+0196	4083	mov     ra, a
+0197	4738	mov     a, uiDragPWM[1]
+0198	4084	mov     rb, a
+0199	0F05	mov     a, 5H
+019A	4383	addm    a, ra
+019B	0F00	mov     a, 0H
+019C	5384	adcm    a, rb
+019D	4703	mov     a, ra
+019E	40D9	mov     uiDragPWM_Max[0], a
+019F	4704	mov     a, rb
+01A0	40DA	mov     uiDragPWM_Max[1], a
+				;284								bDragFlag = 1;
+01A1	7000	set     bit_var_0[0].0
+				;285						    }
+				;286						    bFirstRunFlag = 1;
+				_L20:
+01A2	7100	set     bit_var_0[0].2
+01A3	29AD	jmp     _L21
+				;287						}
+				;288					}
+				;289					else if(bDragFlag)
+				_L15:
+01A4	4700	mov     a, bit_var_0[0]
+01A5	4083	mov     ra, a
+01A6	0F01	mov     a, 1H
+01A7	4683	andm    a, ra
+01A8	5E03	snz     ra
+01A9	29AD	jmp     _L21
+				;290					{
+				;291					    bRestart = 1;
+01AA	7180	set     bit_var_0[0].3
+				;292						Motor_Stop();
+01AB	24CA	call    _Motor_Stop
+				;293						Varitate_Init();
+01AC	22DA	call    _Varitate_Init
+				;294					}
+				;295					
+				;296					if(bHadRun)
+				_L21:
+01AD	4700	mov     a, bit_var_0[0]
+01AE	4083	mov     ra, a
+01AF	0F10	mov     a, 10H
+01B0	4683	andm    a, ra
+01B1	5E03	snz     ra
+01B2	2A23	jmp     _L7
+				;297					{
+				;298						if(!bCurrentLimit)
+01B3	4701	mov     a, bit_var_1[0]
+01B4	4083	mov     ra, a
+01B5	0F20	mov     a, 20H
+01B6	4683	andm    a, ra
+01B7	5083	sz      ra
+01B8	29F4	jmp     _L22
+				;299						{
+				;300							if(uiTempPWM < uiVR_Value)
+01B9	4735	mov     a, uiTempPWM[0]
+01BA	4085	mov     rc, a
+01BB	4736	mov     a, uiTempPWM[1]
+01BC	4086	mov     rd, a
+01BD	4739	mov     a, uiVR_Value[0]
+01BE	4083	mov     ra, a
+01BF	473A	mov     a, uiVR_Value[1]
+01C0	4084	mov     rb, a
+01C1	4705	mov     a, rc
+01C2	4203	sub     a, ra
+01C3	4706	mov     a, rd
+01C4	5204	sbc     a, rb
+01C5	3C0A	sz      C
+01C6	29D4	jmp     _L23
+				;301							{
+				;302								uiTempPWM += 5;
+01C7	4735	mov     a, uiTempPWM[0]
+01C8	4083	mov     ra, a
+01C9	4736	mov     a, uiTempPWM[1]
+01CA	4084	mov     rb, a
+01CB	0F05	mov     a, 5H
+01CC	4383	addm    a, ra
+01CD	0F00	mov     a, 0H
+01CE	5384	adcm    a, rb
+01CF	4703	mov     a, ra
+01D0	40B5	mov     uiTempPWM[0], a
+01D1	4704	mov     a, rb
+01D2	40B6	mov     uiTempPWM[1], a
+01D3	2A0A	jmp     _L26
+				;303							}
+				;304							else 
+				;305							{
+				;306								if(uiVR_Value >= 150)
+				_L23:
+01D4	4739	mov     a, uiVR_Value[0]
+01D5	4083	mov     ra, a
+01D6	473A	mov     a, uiVR_Value[1]
+01D7	4084	mov     rb, a
+01D8	0F95	mov     a, 95H
+01D9	4203	sub     a, ra
+01DA	0F00	mov     a, 0H
+01DB	5204	sbc     a, rb
+01DC	3C0A	sz      C
+01DD	29EB	jmp     _L25
+				;307								{
+				;308									uiTempPWM --;
+01DE	4735	mov     a, uiTempPWM[0]
+01DF	4083	mov     ra, a
+01E0	4736	mov     a, uiTempPWM[1]
+01E1	4084	mov     rb, a
+01E2	0FFF	mov     a, FFH
+01E3	4383	addm    a, ra
+01E4	0FFF	mov     a, FFH
+01E5	5384	adcm    a, rb
+01E6	4703	mov     a, ra
+01E7	40B5	mov     uiTempPWM[0], a
+01E8	4704	mov     a, rb
+01E9	40B6	mov     uiTempPWM[1], a
+01EA	2A0A	jmp     _L26
+				;309								}
+				;310								else
+				;311								{
+				;312									uiTempPWM = uiVR_Value;	
+				_L25:
+01EB	4739	mov     a, uiVR_Value[0]
+01EC	4083	mov     ra, a
+01ED	473A	mov     a, uiVR_Value[1]
+01EE	4084	mov     rb, a
+01EF	4703	mov     a, ra
+01F0	40B5	mov     uiTempPWM[0], a
+01F1	4704	mov     a, rb
+01F2	40B6	mov     uiTempPWM[1], a
+01F3	2A0A	jmp     _L26
+				;313								}
+				;314							}
+				;315						}
+				;316						else if(uiTempPWM > uiVR_Value)
+				_L22:
+01F4	4735	mov     a, uiTempPWM[0]
+01F5	4085	mov     rc, a
+01F6	4736	mov     a, uiTempPWM[1]
+01F7	4086	mov     rd, a
+01F8	4739	mov     a, uiVR_Value[0]
+01F9	4083	mov     ra, a
+01FA	473A	mov     a, uiVR_Value[1]
+01FB	4084	mov     rb, a
+01FC	4703	mov     a, ra
+01FD	4205	sub     a, rc
+01FE	4704	mov     a, rb
+01FF	5206	sbc     a, rd
+0200	3C0A	sz      C
+0201	2A0A	jmp     _L26
+				;317						{
+				;318							uiTempPWM = uiVR_Value;
+0202	4739	mov     a, uiVR_Value[0]
+0203	4083	mov     ra, a
+0204	473A	mov     a, uiVR_Value[1]
+0205	4084	mov     rb, a
+0206	4703	mov     a, ra
+0207	40B5	mov     uiTempPWM[0], a
+0208	4704	mov     a, rb
+0209	40B6	mov     uiTempPWM[1], a
+				;319						}
+				;320						
+				;321					    ValueTemp = (unsigned char)(uiTempPWM >> 8);
+				_L26:
+020A	4735	mov     a, uiTempPWM[0]
+020B	4083	mov     ra, a
+020C	4736	mov     a, uiTempPWM[1]
+020D	4084	mov     rb, a
+020E	4704	mov     a, rb
+020F	4083	mov     ra, a
+0210	5F04	clr     rb
+0211	4703	mov     a, ra
+0212	40BE	mov     ValueTemp[0], a
+				;322					    _dutr0h = ValueTemp;
+0213	473E	mov     a, ValueTemp[0]
+0214	4083	mov     ra, a
+0215	4703	mov     a, ra
+0216	00D9	mov     DUTR0H, a
+				;323					    ValueTemp = (unsigned char)uiTempPWM;
+0217	4735	mov     a, uiTempPWM[0]
+0218	4083	mov     ra, a
+0219	4736	mov     a, uiTempPWM[1]
+021A	4084	mov     rb, a
+021B	4703	mov     a, ra
+021C	40BE	mov     ValueTemp[0], a
+				;324						_dutr0l = ValueTemp;
+021D	473E	mov     a, ValueTemp[0]
+021E	4083	mov     ra, a
+021F	4703	mov     a, ra
+0220	00D8	mov     DUTR0L, a
+				;325						_pwmsuf = 1;
+0221	B155	lset    PWMSUF
+				;326					}
+				;327				}
+				;328				
+				;329				if(bVoltageErrorVoice)
+				_L7:
+0223	4702	mov     a, bit_var_2[0]
+0224	4083	mov     ra, a
+0225	0F01	mov     a, 1H
+0226	4683	andm    a, ra
+0227	5E03	snz     ra
+0228	2A2E	jmp     _L6
+				;330				{
+				;331					VoiceSpeakInit();
+0229	24FE	call    _VoiceSpeakInit
+				;332					ucVoiceStep = 6;
+022A	0F06	mov     a, 6H
+022B	40BD	mov     ucVoiceStep[0], a
+				;333					bAlarmFlag = 1;
+022C	7380	set     bit_var_0[0].7
+				;334					bVoltageErrorVoice = 0;
+022D	7402	clr     bit_var_2[0].0
+				;335				}
+				;336			}
+				;337			asm("CLR	WDT");
+				_L6:
+022E	0001	clr     wdt
+				;338		}
+022F	28A0	jmp     _L27
+0230	2A30	jmp     $
+				;339	}
+				;340	
+				;341	
+				;342	
+				;343	//===============================================
+				;344	//
+				;345	//===============================================
+				;346	void System_Init(void)
+				;347	{
+				;348		_smod = 0b00000001;
+				_System_Init:
+				_System_Init:
+				@dummy .SECTION 'CODE'
+0231	0F01	mov     a, 1H
+0232	008F	mov     SMOD, a
+				;349		for(_mp0 = 0x80;_mp0 != 0x00;_mp0 ++)_iar0 = 0x00;		//clear RAM  
+0233	0F80	mov     a, 80H
+0234	0081	mov     MP0, a
+0235	2A3C	jmp     _L29
+				_L30:
+0236	1F00	clr     __iar0[0]
+0237	0701	mov     a, MP0
+0238	4083	mov     ra, a
+0239	5483	inc     ra
+023A	4703	mov     a, ra
+023B	0081	mov     MP0, a
+				_L29:
+023C	0701	mov     a, MP0
+023D	4083	mov     ra, a
+023E	5083	sz      ra
+023F	2A36	jmp     _L30
+				;350		_mp1h = 1;
+0240	0F01	mov     a, 1H
+0241	0084	mov     MP1H, a
+				;351		for(_mp1l = 0x80;_mp1l != 0x00;_mp1l++)_iar1 = 0x00;	//clear RAM  
+0242	0F80	mov     a, 80H
+0243	0083	mov     MP1L, a
+0244	2A4B	jmp     _L31
+				_L32:
+0245	1F02	clr     __iar1[0]
+0246	0703	mov     a, MP1L
+0247	4083	mov     ra, a
+0248	5483	inc     ra
+0249	4703	mov     a, ra
+024A	0083	mov     MP1L, a
+				_L31:
+024B	0703	mov     a, MP1L
+024C	4083	mov     ra, a
+024D	5083	sz      ra
+024E	2A45	jmp     _L32
+				;352		_mp2h = 2;
+024F	0F02	mov     a, 2H
+0250	008E	mov     MP2H, a
+				;353		for(_mp2l = 0x80;_mp2l != 0x00;_mp2l++)_iar1 = 0x00;	//clear RAM  
+0251	0F80	mov     a, 80H
+0252	008D	mov     MP2L, a
+0253	2A5A	jmp     _L33
+				_L34:
+0254	1F02	clr     __iar1[0]
+0255	070D	mov     a, MP2L
+0256	4083	mov     ra, a
+0257	5483	inc     ra
+0258	4703	mov     a, ra
+0259	008D	mov     MP2L, a
+				_L33:
+025A	070D	mov     a, MP2L
+025B	4083	mov     ra, a
+025C	5083	sz      ra
+025D	2A54	jmp     _L34
+				;354		_mp1h = 0;
+025E	1F04	clr     MP1H
+				;355		_mp2h = 0;
+025F	1F0E	clr     MP2H
+				;356		asm("CLR	WDT");
+0260	0001	clr     wdt
+0261	0003	ret
+				;357	
+				;358	}
+				;359	
+				;360	
+				;361	//===============================================
+				;362	//
+				;363	//===============================================
+				;364	void IO_Init(void)
+				;365	{
+				;366		_pc   = 0x00;	
+				@dummy8 .SECTION 'CODE'
+				_IO_Init:
+				_IO_Init:
+000C	1F29	clr     PC
+				;367		_pcc  = 0x00;		
+000D	1F2A	clr     PCC
+				;368		
+				;369		_pac = 0B11111010;	
+000E	0FFA	mov     a, FAH
+000F	00A4	mov     PAC, a
+				;370		_pa  = 0x00;
+0010	1F23	clr     PA
+				;371		
+				;372		_pbc = 0B11001000;		
+0011	0FC8	mov     a, C8H
+0012	00A7	mov     PBC, a
+				;373		_pb  = 0x00;			
+0013	1F26	clr     PB
+				;374		_pbpu = 0B11000000;
+0014	0FC0	mov     a, C0H
+0015	00A5	mov     PBPU, a
+				;375		
+				;376		_paps0 = 0x44;		
+0016	0F44	mov     a, 44H
+0017	80FA	lmov    PAPS0, a
+				;377		_paps1 = 0x2a;		
+0019	0F2A	mov     a, 2AH
+001A	80FB	lmov    PAPS1, a
+				;378		_pbps0 = 0b10010000;
+001C	0F90	mov     a, 90H
+001D	00C2	mov     PBPS0, a
+				;379		
+				;380		_pbps1 = 0x00;
+001E	1F43	clr     PBPS1
+				;381		_pcps0 = 0x00;
+001F	9F7C	lclr    PCPS0
+				;382		_pcps1 = 0x00;
+0021	9F7D	lclr    PCPS1
+0023	0003	ret
+				;383	
+				;384	}
+				;385	
+				;386	
+				;387	
+				;388	//===============================================
+				;389	//
+				;390	//===============================================
+				;391	void ADC_Init(void)
+				;392	{
+				;393		_adcr0 = 0b00010000;
+				_ADC_Init:
+				_ADC_Init:
+0262	0F10	mov     a, 10H
+0263	00B8	mov     ADCR0, a
+				;394		_adcr1 = 0b00000100;		
+0264	0F04	mov     a, 4H
+0265	00B9	mov     ADCR1, a
+				;395		_adcr2 = 0b01010011;	
+0266	0F53	mov     a, 53H
+0267	00BA	mov     ADCR2, a
+				;396		_adcr3 = 0b00000001;	
+0268	0F01	mov     a, 1H
+0269	80C4	lmov    ADCR3, a
+				;397		_adisg1 = 0b10000110;	
+026B	0F86	mov     a, 86H
+026C	00BB	mov     ADISG1, a
+				;398		_adisg2 = 0b11111111;	
+026D	1FBC	set     ADISG2
+				;399		_adbyps = 0x80;		
+026E	0F80	mov     a, 80H
+026F	80C1	lmov    ADBYPS, a
+				;400		_addl   = 20;		
+0271	0F14	mov     a, 14H
+0272	00BD	mov     ADDL, a
+				;401		
+				;402		_dlstr  = 1;		
+0273	3339	set     DLSTR
+				;403		_adoff  = 0;		
+0274	36B8	clr     ADOFF
+				;404		asm("CLR	WDT");
+0275	0001	clr     wdt
+0276	0003	ret
+				;405	}
+				;406	
+				;407	
+				;408	
+				;409	//===============================================
+				;410	//
+				;411	//===============================================
+				;412	void Comparator_Init(void)
+				;413	{
+				;414		_opoms = 0b01000011;	
+				_Comparator_Init:
+				_Comparator_Init:
+0277	0F43	mov     a, 43H
+0278	80EE	lmov    OPOMS, a
+				;415		_opa0cal = 0b00010000;
+027A	0F10	mov     a, 10H
+027B	80F0	lmov    OPA0CAL, a
+				;416		_opcm = 165;			
+027D	0FA5	mov     a, A5H
+027E	80EF	lmov    OPCM, a
+				;417		_cmpc = 0xff;
+0280	1FF2	set     CMPC
+				;418		_ishe = 1;			
+0281	31CB	set     ISHE
+				;419		_ocpse = 1;			
+0282	304B	set     OCPSE
+				;420		_ocps = 0;			
+0283	1F44	clr     OCPS
+				;421		_int_pri2e = 1;
+0284	3115	set     INT_PRI2E
+				;422		_int_pri2f = 0;
+0285	3695	clr     INT_PRI2F
+0286	0003	ret
+				;423	}
+				;424	
+				;425	
+				;426	//===============================================
+				;427	//
+				;428	//===============================================
+				;429	void __attribute ((interrupt(0x08))) ISR_OCP(void)
+				;430	{
+				@dummy4 .SECTION 'CODE'
+				@ISR_OCP_code .SECTION 'CODE'
+0008	4087	mov     r108, a
+0009	070A	mov     a, STATUS
+000A	4088	mov     r208, a
+000B	2830	jmp     _ISR_OCP
+				;431		_int_pri2f = 0;
+				@dummy44 .SECTION 'CODE'
+				_ISR_OCP:
+				_ISR_OCP:
+0030	3695	clr     INT_PRI2F
+				;432		bOCP = 1;
+0031	7181	set     bit_var_1[0].3
+0032	4708	mov     a, r208
+0033	008A	mov     STATUS, a
+0034	4707	mov     a, r108
+0035	0004	reti
+0036	0000	nop
+0037	0000	nop
+				;433	}
+				;434	
+				;435	
+				;436	//===============================================
+				;437	//
+				;438	//===============================================
+				;439	void	PWMInit(void)
+				;440	{
+				;441	    _pwmc = 0b00110001;		
+				_PWMInit:
+				_PWMInit:
+0287	0F31	mov     a, 31H
+0288	00D7	mov     PWMC, a
+				;442		_pwmcs  = 0b00000111;	
+0289	0F07	mov     a, 7H
+028A	80D5	lmov    PWMCS, a
+				;443		_prdrh  = 0x03;
+028C	0F03	mov     a, 3H
+028D	00DF	mov     PRDRH, a
+				;444		_prdrl  = 0xff;		
+028E	1FDE	set     PRDRL
+				;445		_dutr3h = 1;
+028F	0F01	mov     a, 1H
+0290	00CE	mov     DUTR3H, a
+				;446		_dutr3l = 0xff;
+0291	1FCD	set     DUTR3L
+				;447		_dutr0h = 0;
+0292	1F59	clr     DUTR0H
+				;448		_dutr0l = 0x27;
+0293	0F27	mov     a, 27H
+0294	00D8	mov     DUTR0L, a
+				;449		_pwmsuf = 1;
+0295	B155	lset    PWMSUF
+				;450		
+				;451		_mcf = 0b00001101;	
+0297	0F0D	mov     a, DH
+0298	00E4	mov     MCF, a
+				;452		_dts = 0B11100110;   
+0299	0FE6	mov     a, E6H
+029A	00E6	mov     DTS, a
+				;453		_hdcr = 0b11010001; 
+029B	0FD1	mov     a, D1H
+029C	00C9	mov     HDCR, a
+				;454		_integ0 = 0x00;
+029D	1F45	clr     INTEG0
+				;455		_hdcd = 0;
+029E	1F4A	clr     HDCD
+				;456		_pwmme = 0xff;
+029F	1FE2	set     PWMME
+				;457		_pwmmd = 0x00;
+02A0	1F63	clr     PWMMD
+				;458		_pwmon = 1;
+02A1	31D7	set     PWMON
+02A2	0003	ret
+				;459	}
+				;460	
+				;461	
+				;462	
+				;463	//===============================================
+				;464	//
+				;465	//===============================================
+				;466	void Hall_Init(void)
+				;467	{
+				;468	    _hdcr = 0b11010001;
+				_Hall_Init:
+				_Hall_Init:
+02A3	0FD1	mov     a, D1H
+02A4	00C9	mov     HDCR, a
+				;469		_hdcd = 0b00000000;
+02A5	1F4A	clr     HDCD
+				;470		_hnf_msel = 0b00001011;	
+02A6	0F0B	mov     a, BH
+02A7	80D9	lmov    HNF_MSEL, a
+				;471		_hchk_num = 15; //12;
+02A9	0F0F	mov     a, FH
+02AA	80D8	lmov    HCHK_NUM, a
+				;472		
+				;473		_hdct0 = 0B00100101;	//SC SB SA(001) CT BB     	1
+02AC	0F25	mov     a, 25H
+02AD	80E2	lmov    HDCT0, a
+				;474		_hdct1 = 0B00000000;	//SC SB SA(011) AT BB		3
+02AF	9F63	lclr    HDCT1
+				;475			
+				;476		_hdct2 = 0B00010010;	//SC SB SA(010) AT CB		2
+02B1	0F12	mov     a, 12H
+02B2	80E4	lmov    HDCT2, a
+				;477		_hdct3 = 0B00000110;	//SC SB SA(110) BT CB		6
+02B4	0F06	mov     a, 6H
+02B5	80E5	lmov    HDCT3, a
+				;478		_hdct4 = 0B00100100;	//SC SB SA(100) BT AB		4
+02B7	0F24	mov     a, 24H
+02B8	80E6	lmov    HDCT4, a
+				;479		_hdct5 = 0B00100001;	//SC SB SA(101) CT AB		5	
+02BA	0F21	mov     a, 21H
+02BB	80E7	lmov    HDCT5, a
+				;480		
+				;481		_hdct6 = 0B00011000;	//SC SB SA(001) CT AB 
+02BD	0F18	mov     a, 18H
+02BE	80E8	lmov    HDCT6, a
+				;482		_hdct7 = 0B00010010;	//SC SB SA(011) CT BB 
+02C0	0F12	mov     a, 12H
+02C1	80E9	lmov    HDCT7, a
+				;483		_hdct8 = 0B00000110;	//SC SB SA(010) AT BB
+02C3	0F06	mov     a, 6H
+02C4	80EA	lmov    HDCT8, a
+				;484		_hdct9 = 0B00100100;	//SC SB SA(110) AT CB
+02C6	0F24	mov     a, 24H
+02C7	80EB	lmov    HDCT9, a
+				;485		_hdct10 =0B00100001;	//SC SB SA(100) BT CB
+02C9	0F21	mov     a, 21H
+02CA	80EC	lmov    HDCT10, a
+				;486		_hdct11 =0B00001001;	//SC SB SA(101) BT AB
+02CC	0F09	mov     a, 9H
+02CD	80ED	lmov    HDCT11, a
+				;487		
+				;488		_hdms = 0;
+02CF	35C9	clr     HDMS
+				;489		asm("CLR	WDT");
+02D0	0001	clr     wdt
+02D1	0003	ret
+				;490	}
+				;491	
+				;492	
+				;493	
+				;494	//===============================================
+				;495	//
+				;496	//===============================================
+				;497	void CAPTM_Init(void)
+				;498	{
+				;499	    _captc0 = 0b01100000;	
+				_CAPTM_Init:
+				_CAPTM_Init:
+02D2	0F60	mov     a, 60H
+02D3	00AE	mov     CAPTC0, a
+				;500		_captc1 = 0b11101111;	
+02D4	0FEF	mov     a, EFH
+02D5	00AF	mov     CAPTC1, a
+				;501		
+				;502		_captmal = 0x00;
+02D6	1F32	clr     CAPTMAL
+				;503		_captmah = 0xff;
+02D7	1FB3	set     CAPTMAH
+				;504	    _capton = 1;
+02D8	31AE	set     CAPTON
+02D9	0003	ret
+				;505	}
+				;506	
+				;507	
+				;508	
+				;509	//===============================================
+				;510	//
+				;511	//===============================================
+				;512	void INT_Init(void)
+				;513	{
+				;514		_int_pri3e = 1;		
+				@dummy36 .SECTION 'CODE'
+				_INT_Init:
+				_INT_Init:
+0028	3195	set     INT_PRI3E
+				;515		_int_pri3f = 0;	
+0029	3715	clr     INT_PRI3F
+002A	0003	ret
+002B	0000	nop
+				;516	}
+				;517	
+				;518	
+				;519	//===============================================
+				;520	//
+				;521	//===============================================
+				;522	void Varitate_Init(void)
+				;523	{
+				;524		ucDragDelayTime     = DRAG_TIME;
+				_Varitate_Init:
+				_Varitate_Init:
+02DA	0F14	mov     a, 14H
+02DB	40CC	mov     ucDragDelayTime[0], a
+				;525		ucTempDragDelayTime = DRAG_TEMP_TIME;
+02DC	0F01	mov     a, 1H
+02DD	40CD	mov     ucTempDragDelayTime[0], a
+				;526		ucMinDragDelayTime  = DRAG_MIN_TIME;
+02DE	0F0A	mov     a, AH
+02DF	40DF	mov     ucMinDragDelayTime[0], a
+				;527		ucDragPWM_BaseInc	= DRAG_PWM_BaseInc;
+02E0	0F06	mov     a, 6H
+02E1	40E2	mov     ucDragPWM_BaseInc[0], a
+				;528		uiDragPWM_Max		= DRAG_PWM_MAX;
+02E2	0F1B	mov     a, 1BH
+02E3	40D9	mov     uiDragPWM_Max[0], a
+02E4	0F03	mov     a, 3H
+02E5	40DA	mov     uiDragPWM_Max[1], a
+				;529		
+				;530		_hchk_num = 12;
+02E6	0F0C	mov     a, CH
+02E7	80D8	lmov    HCHK_NUM, a
+				;531		uiDragPWM = 0;
+02E9	5F37	clr     uiDragPWM[0]
+02EA	5F38	clr     uiDragPWM[1]
+				;532		bHadRun = 0;
+02EB	7600	clr     bit_var_0[0].4
+				;533		ucHallCnt = 0;
+02EC	5F4E	clr     ucHallCnt[0]
+				;534		bFirstRunFlag = 0;
+02ED	7500	clr     bit_var_0[0].2
+				;535		bDragFlag = 0;
+02EE	7400	clr     bit_var_0[0].0
+				;536		ucHallCycle = 0;
+02EF	5F45	clr     ucHallCycle[0]
+				;537		bStopMotor = 0;
+02F0	7680	clr     bit_var_0[0].5
+				;538		bStallFlag = 0;
+02F1	7480	clr     bit_var_0[0].1
+				;539		bRestart = 1;
+02F2	7180	set     bit_var_0[0].3
+				;540		uiLastHallTime = 800;
+02F3	0F20	mov     a, 20H
+02F4	40CF	mov     uiLastHallTime[0], a
+02F5	0F03	mov     a, 3H
+02F6	40D0	mov     uiLastHallTime[1], a
+				;541		_ptm3al = 250;
+02F7	0FFA	mov     a, FAH
+02F8	80F5	lmov    PTM3AL, a
+				;542		_ptm3ah = 0x00;	
+02FA	9F76	lclr    PTM3AH
+				;543	    
+				;544		_halae = 0;	
+02FC	3419	clr     HALAE
+				;545		_halbe = 0;	
+02FD	3499	clr     HALBE
+				;546		_halce = 0;	
+02FE	3519	clr     HALCE
+				;547		_int_pri1e = 1;	
+02FF	3095	set     INT_PRI1E
+				;548		_halaf = 0;
+0300	3619	clr     HALAF
+				;549		_halbf = 0;
+0301	3699	clr     HALBF
+				;550		_halcf = 0;	
+0302	3719	clr     HALCF
+				;551		_int_pri1f = 0;
+0303	3615	clr     INT_PRI1F
+0304	0003	ret
+				;552	}
+				;553	
+				;554	
+				;555	//===============================================
+				;556	//
+				;557	//===============================================
+				;558	void delay1(unsigned char n)
+				;559	{
+				_delay1:
+				_delay1:
+0305	40A4	mov     n[0], a
+				;560	    unsigned char j;
+				;561	    for(j=0;j<n;j++)
+0306	5F23	clr     j[0]
+0307	2B0D	jmp     L030D
+0309	4723	mov     a, j[0]
+030A	408B	mov     ra04, a
+030B	540B	inca    ra04
+030C	40A3	mov     j[0], a
+				L030D:
+030D	4723	mov     a, j[0]
+030E	4224	sub     a, n[0]
+030F	380A	snz     C
+0310	2B08	jmp     L0308
+0311	0003	ret
+				;562	    asm("CLR	WDT");		
+				L0308:
+0308	0001	clr     wdt
+				;563	}
+				;564	
+				;565	
+				;566	//===============================================
+				;567	//
+				;568	//===============================================
+				;569	void delay(unsigned int x)
+				;570	{
+				;571	    unsigned int i;
+				;572	    unsigned char j;  
+				;573	    unsigned char k;  
+				;574	    for(i=0;i<x;i++)
+				_delay:
+				_delay:
+0312	5F2D	clr     i[0]
+0313	5F2E	clr     i[1]
+0314	2B2D	jmp     _L48
+032A	54AD	inc     i[0]
+032B	3D0A	sz      Z
+032C	54AE	inc     i[1]
+				_L48:
+032D	472D	mov     a, i[0]
+032E	422B	sub     a, x[0]
+032F	472E	mov     a, i[1]
+0330	522C	sbc     a, x[1]
+0331	380A	snz     C
+0332	2B15	jmp     _L53
+0333	0003	ret
+				;575	    for(j=0;j<11;j++)
+				_L53:
+0315	5F2F	clr     j[0]
+0316	2B26	jmp     _L49
+0322	472F	mov     a, j[0]
+0323	4083	mov     ra, a
+0324	5403	inca    ra
+0325	40AF	mov     j[0], a
+				_L49:
+0326	0F0A	mov     a, AH
+0327	422F	sub     a, j[0]
+0328	3C0A	sz      C
+0329	2B17	jmp     _L52
+				;576	    for(k=0;k<30;k++)
+				_L52:
+0317	5F30	clr     k[0]
+0318	2B1E	jmp     _L50
+031A	4730	mov     a, k[0]
+031B	4083	mov     ra, a
+031C	5403	inca    ra
+031D	40B0	mov     k[0], a
+				_L50:
+031E	0F1D	mov     a, 1DH
+031F	4230	sub     a, k[0]
+0320	3C0A	sz      C
+0321	2B19	jmp     _L51
+				;577	   	asm("CLR	WDT");	
+				_L51:
+0319	0001	clr     wdt
+				;578		
+				;579	}
+				;580	
+				;581	
+				;582	//===============================================
+				;583	//
+				;584	//===============================================
+				;585	void Drag_Motor(void)
+				;586	{
+				;587		unsigned char temp;
+				;588		if(uiDragPWM < uiVR_Value)
+				_Drag_Motor:
+				_Drag_Motor:
+0334	4737	mov     a, uiDragPWM[0]
+0335	408C	mov     rc3c, a
+0336	4738	mov     a, uiDragPWM[1]
+0337	408D	mov     rd3c, a
+0338	4739	mov     a, uiVR_Value[0]
+0339	4089	mov     ra3c, a
+033A	473A	mov     a, uiVR_Value[1]
+033B	408E	mov     rb3c, a
+033C	470C	mov     a, rc3c
+033D	4209	sub     a, ra3c
+033E	470D	mov     a, rd3c
+033F	520E	sbc     a, rb3c
+0340	3C0A	sz      C
+0341	2B4A	jmp     _L55
+				;589		{
+				;590			uiDragPWM = uiVR_Value;
+0342	4739	mov     a, uiVR_Value[0]
+0343	4089	mov     ra3c, a
+0344	473A	mov     a, uiVR_Value[1]
+0345	408E	mov     rb3c, a
+0346	4709	mov     a, ra3c
+0347	40B7	mov     uiDragPWM[0], a
+0348	470E	mov     a, rb3c
+0349	40B8	mov     uiDragPWM[1], a
+				;591		}
+				;592		uiDragPWM += DRAG_PWM_BaseInc;	
+				_L55:
+034A	4737	mov     a, uiDragPWM[0]
+034B	4089	mov     ra3c, a
+034C	4738	mov     a, uiDragPWM[1]
+034D	408E	mov     rb3c, a
+034E	0F06	mov     a, 6H
+034F	4389	addm    a, ra3c
+0350	0F00	mov     a, 0H
+0351	538E	adcm    a, rb3c
+0352	4709	mov     a, ra3c
+0353	40B7	mov     uiDragPWM[0], a
+0354	470E	mov     a, rb3c
+0355	40B8	mov     uiDragPWM[1], a
+				;593		if(uiDragPWM > uiDragPWM_Max)	
+0356	4737	mov     a, uiDragPWM[0]
+0357	408C	mov     rc3c, a
+0358	4738	mov     a, uiDragPWM[1]
+0359	408D	mov     rd3c, a
+035A	4759	mov     a, uiDragPWM_Max[0]
+035B	4089	mov     ra3c, a
+035C	475A	mov     a, uiDragPWM_Max[1]
+035D	408E	mov     rb3c, a
+035E	4709	mov     a, ra3c
+035F	420C	sub     a, rc3c
+0360	470E	mov     a, rb3c
+0361	520D	sbc     a, rd3c
+0362	3C0A	sz      C
+0363	2B6C	jmp     _L56
+				;594		{
+				;595			uiDragPWM = uiDragPWM_Max;
+0364	4759	mov     a, uiDragPWM_Max[0]
+0365	4089	mov     ra3c, a
+0366	475A	mov     a, uiDragPWM_Max[1]
+0367	408E	mov     rb3c, a
+0368	4709	mov     a, ra3c
+0369	40B7	mov     uiDragPWM[0], a
+036A	470E	mov     a, rb3c
+036B	40B8	mov     uiDragPWM[1], a
+				;596		}
+				;597		temp=(unsigned char)(uiDragPWM >> 8);
+				_L56:
+036C	4737	mov     a, uiDragPWM[0]
+036D	4089	mov     ra3c, a
+036E	4738	mov     a, uiDragPWM[1]
+036F	408E	mov     rb3c, a
+0370	470E	mov     a, rb3c
+0371	4089	mov     ra3c, a
+0372	5F0E	clr     rb3c
+0373	4709	mov     a, ra3c
+0374	40A5	mov     temp[0], a
+				;598		_dutr0h = temp;
+0375	4725	mov     a, temp[0]
+0376	00D9	mov     DUTR0H, a
+				;599		
+				;600		temp = (unsigned char)uiDragPWM;
+0377	4737	mov     a, uiDragPWM[0]
+0378	4089	mov     ra3c, a
+0379	4738	mov     a, uiDragPWM[1]
+037A	408E	mov     rb3c, a
+037B	4709	mov     a, ra3c
+037C	40A5	mov     temp[0], a
+				;601		_dutr0l = temp;
+037D	4725	mov     a, temp[0]
+037E	00D8	mov     DUTR0L, a
+				;602		_pwmsuf = 1;
+037F	B155	lset    PWMSUF
+				;603		_halae = 1;	
+0381	3019	set     HALAE
+				;604		_halbe = 1;	
+0382	3099	set     HALBE
+				;605		_halce = 1;	
+0383	3119	set     HALCE
+				;606		
+				;607		commutation();
+0384	245B	call    _commutation
+				;608		_pt3on=1;
+0385	B1F1	lset    PT3ON
+				;609		
+				;610		if(ucDragDelayTime > ucMinDragDelayTime)
+0387	474C	mov     a, ucDragDelayTime[0]
+0388	408E	mov     rb3c, a
+0389	475F	mov     a, ucMinDragDelayTime[0]
+038A	4089	mov     ra3c, a
+038B	4709	mov     a, ra3c
+038C	420E	sub     a, rb3c
+038D	3C0A	sz      C
+038E	2BA2	jmp     _L54
+				;611		{
+				;612			ucDragDelayTime -= ucTempDragDelayTime;
+038F	474C	mov     a, ucDragDelayTime[0]
+0390	408E	mov     rb3c, a
+0391	474D	mov     a, ucTempDragDelayTime[0]
+0392	4089	mov     ra3c, a
+0393	470E	mov     a, rb3c
+0394	4289	subm    a, ra3c
+0395	4709	mov     a, ra3c
+0396	40CC	mov     ucDragDelayTime[0], a
+				;613			if(ucTempDragDelayTime < 4)
+0397	474D	mov     a, ucTempDragDelayTime[0]
+0398	4089	mov     ra3c, a
+0399	0F03	mov     a, 3H
+039A	4209	sub     a, ra3c
+039B	380A	snz     C
+039C	2BA2	jmp     _L54
+				;614			{
+				;615				ucTempDragDelayTime ++;
+039D	474D	mov     a, ucTempDragDelayTime[0]
+039E	4089	mov     ra3c, a
+039F	5489	inc     ra3c
+03A0	4709	mov     a, ra3c
+03A1	40CD	mov     ucTempDragDelayTime[0], a
+				_L54:
+03A2	0003	ret
+				;616			}
+				;617		}
+				;618	}
+				;619	
+				;620	
+				;621	//===============================================
+				;622	//
+				;623	//===============================================
+				;624	volatile unsigned int uiHallTimeNew = 0;	
+				;625	void __attribute ((interrupt(0x04))) ISR_HALL(void)
+				;626	{
+				@ISR_HALL_code .SECTION 'CODE'
+0004	408F	mov     r104, a
+0005	070B	mov     a, __mp1h[7]
+0006	4090	mov     r204, a
+0007	2BA3	jmp     _ISR_HALL
+				_ISR_HALL:
+				_ISR_HALL:
+03A3	070A	mov     a, STATUS
+03A4	40FD	mov     r304, a
+03A5	0703	mov     a, MP1L
+03A6	40FE	mov     r404, a
+03A7	0704	mov     a, MP1H
+03A8	40FF	mov     r504, a
+03A9	0707	mov     a, TBLP
+03AA	C083	lmov    r604, a
+03AC	0709	mov     a, TBHP
+03AD	C084	lmov    r704, a
+				;627		unsigned char ucHallTimeTemp;
+				;628		unsigned int uiHallTimeNewTemp; 
+				;629		unsigned int uiHallCheckDelay; 
+				;630		_int_pri1f = 0;
+03AF	3615	clr     INT_PRI1F
+				;631		
+				;632	    _mfi0 = 0x07;
+03B0	0F07	mov     a, 7H
+03B1	0099	mov     MFI0, a
+				;633	    _pt1on = 0;
+03B2	B5C7	lclr    PT1ON
+				;634	    
+				;635	    uiHallTimeNewTemp = _ptm1dh;    
+03B4	874A	lmov    a, PTM1DH
+03B6	408B	mov     ra04, a
+03B7	470B	mov     a, ra04
+03B8	40A6	mov     uiHallTimeNewTemp[0], a
+03B9	5F27	clr     uiHallTimeNewTemp[1]
+				;636	    ucHallTimeTemp = _ptm1dl;
+03BA	8749	lmov    a, PTM1DL
+03BC	40A8	mov     ucHallTimeTemp[0], a
+				;637	    
+				;638	    uiHallTimeNewTemp = uiHallTimeNewTemp << 8;
+03BD	4726	mov     a, uiHallTimeNewTemp[0]
+03BE	40A7	mov     uiHallTimeNewTemp[1], a
+03BF	5F26	clr     uiHallTimeNewTemp[0]
+				;639	    uiHallTimeNewTemp = uiHallTimeNewTemp | ucHallTimeTemp;
+03C0	4728	mov     a, ucHallTimeTemp[0]
+03C1	408B	mov     ra04, a
+03C2	5F11	clr     rb04
+03C3	4711	mov     a, rb04
+03C4	45A7	orm     a, uiHallTimeNewTemp[1]
+03C5	470B	mov     a, ra04
+03C6	45A6	orm     a, uiHallTimeNewTemp[0]
+				;640	    uiHallTimeNew = uiHallTimeNewTemp;
+03C7	4726	mov     a, uiHallTimeNewTemp[0]
+03C8	40B1	mov     uiHallTimeNew[0], a
+03C9	4727	mov     a, uiHallTimeNewTemp[1]
+03CA	40B2	mov     uiHallTimeNew[1], a
+				;641	     _pt1on = 1;      
+03CB	B1C7	lset    PT1ON
+				;642	     
+				;643	    if(bHadRun)
+03CD	4700	mov     a, bit_var_0[0]
+03CE	408B	mov     ra04, a
+03CF	0F10	mov     a, 10H
+03D0	468B	andm    a, ra04
+03D1	5E0B	snz     ra04
+03D2	2C1C	jmp     L041C
+				;644	    {
+				;645	    	if(ucHallCnt > 50)
+03D3	474E	mov     a, ucHallCnt[0]
+03D4	408B	mov     ra04, a
+03D5	0F32	mov     a, 32H
+03D6	420B	sub     a, ra04
+03D7	3C0A	sz      C
+03D8	2BF0	jmp     L03F0
+				;646		    if(uiLastHallTime > (uiHallTimeNew << 2)/*(uiHallTimeNew+uiHallTimeNew+uiHallTimeNew)*/)
+03D9	4731	mov     a, uiHallTimeNew[0]
+03DA	408B	mov     ra04, a
+03DB	4732	mov     a, uiHallTimeNew[1]
+03DC	4091	mov     rb04, a
+03DD	340A	clr     C
+03DE	5A0B	rlca    ra04
+03DF	4092	mov     rc04, a
+03E0	5A11	rlca    rb04
+03E1	4093	mov     rd04, a
+03E2	340A	clr     C
+03E3	5A92	rlc     rc04
+03E4	5A93	rlc     rd04
+03E5	474F	mov     a, uiLastHallTime[0]
+03E6	408B	mov     ra04, a
+03E7	4750	mov     a, uiLastHallTime[1]
+03E8	4091	mov     rb04, a
+03E9	4712	mov     a, rc04
+03EA	420B	sub     a, ra04
+03EB	4713	mov     a, rd04
+03EC	5211	sbc     a, rb04
+03ED	3C0A	sz      C
+03EE	2BF0	jmp     L03F0
+				;647		    {
+				;648		        bStallFlag = 1;	
+03EF	7080	set     bit_var_0[0].1
+				;649		    }
+				;650		    uiHallCheckDelay = uiLastHallTime >> 3;
+				L03F0:
+03F0	474F	mov     a, uiLastHallTime[0]
+03F1	408B	mov     ra04, a
+03F2	4750	mov     a, uiLastHallTime[1]
+03F3	4091	mov     rb04, a
+03F4	470B	mov     a, ra04
+03F5	4092	mov     rc04, a
+03F6	4711	mov     a, rb04
+03F7	4093	mov     rd04, a
+03F8	0F03	mov     a, 3H
+				L03F9:
+03F9	340A	clr     C
+03FA	5B93	rrc     rd04
+03FB	5B92	rrc     rc04
+03FC	1785	sdz     ACC
+03FD	2BF9	jmp     L03F9
+03FE	4712	mov     a, rc04
+03FF	40A9	mov     uiHallCheckDelay[0], a
+0400	4713	mov     a, rd04
+0401	40AA	mov     uiHallCheckDelay[1], a
+				;651	    	_ptm3al = /*(unsigned char)*/uiHallCheckDelay;
+0402	4729	mov     a, uiHallCheckDelay[0]
+0403	408B	mov     ra04, a
+0404	470B	mov     a, ra04
+0405	80F5	lmov    PTM3AL, a
+				;652			_ptm3ah = /*(unsigned char)*/(uiHallCheckDelay >> 8);
+0407	4729	mov     a, uiHallCheckDelay[0]
+0408	408B	mov     ra04, a
+0409	472A	mov     a, uiHallCheckDelay[1]
+040A	4091	mov     rb04, a
+040B	4711	mov     a, rb04
+040C	408B	mov     ra04, a
+040D	5F11	clr     rb04
+040E	470B	mov     a, ra04
+040F	80F6	lmov    PTM3AH, a
+				;653			
+				;654			if(ucHallCnt < 200)
+0411	474E	mov     a, ucHallCnt[0]
+0412	408B	mov     ra04, a
+0413	0FC7	mov     a, C7H
+0414	420B	sub     a, ra04
+0415	380A	snz     C
+0416	2C1C	jmp     L041C
+				;655			ucHallCnt ++;
+0417	474E	mov     a, ucHallCnt[0]
+0418	408B	mov     ra04, a
+0419	548B	inc     ra04
+041A	470B	mov     a, ra04
+041B	40CE	mov     ucHallCnt[0], a
+				;656	    }
+				;657	    
+				;658		uiLastHallTime = uiHallTimeNew;
+				L041C:
+041C	4731	mov     a, uiHallTimeNew[0]
+041D	408B	mov     ra04, a
+041E	4732	mov     a, uiHallTimeNew[1]
+041F	4091	mov     rb04, a
+0420	470B	mov     a, ra04
+0421	40CF	mov     uiLastHallTime[0], a
+0422	4711	mov     a, rb04
+0423	40D0	mov     uiLastHallTime[1], a
+				;659		uiHallTimeCnt = 0;
+0424	5F47	clr     uiHallTimeCnt[0]
+0425	5F48	clr     uiHallTimeCnt[1]
+				;660		commutation(); 
+0426	245B	call    _commutation
+				;661		
+				;662		if(bHadRun == 0)
+0427	4700	mov     a, bit_var_0[0]
+0428	408B	mov     ra04, a
+0429	0F10	mov     a, 10H
+042A	468B	andm    a, ra04
+042B	508B	sz      ra04
+042C	2C41	jmp     L0441
+				;663		{
+				;664			if(ucHallCycle > 1)    
+042D	4745	mov     a, ucHallCycle[0]
+042E	408B	mov     ra04, a
+042F	0F01	mov     a, 1H
+0430	420B	sub     a, ra04
+0431	3C0A	sz      C
+0432	2C41	jmp     L0441
+				;665			{
+				;666				ucHallCycle = 0;
+0433	5F45	clr     ucHallCycle[0]
+				;667				bDragFlag = 0;  
+0434	7400	clr     bit_var_0[0].0
+				;668				uiTempPWM = uiDragPWM;
+0435	4737	mov     a, uiDragPWM[0]
+0436	408B	mov     ra04, a
+0437	4738	mov     a, uiDragPWM[1]
+0438	4091	mov     rb04, a
+0439	470B	mov     a, ra04
+043A	40B5	mov     uiTempPWM[0], a
+043B	4711	mov     a, rb04
+043C	40B6	mov     uiTempPWM[1], a
+				;669				bHadRun = 1;
+043D	7200	set     bit_var_0[0].4
+				;670				_hchk_num = 8;
+043E	0F08	mov     a, 8H
+043F	80D8	lmov    HCHK_NUM, a
+				;671				
+				;672			}
+				;673	    }
+				;674	    
+				;675		_pt3on = 0;
+				L0441:
+0441	B5F1	lclr    PT3ON
+				;676		_pt3on = 1;
+0443	B1F1	lset    PT3ON
+				;677		
+				;678		_int_pri14f = 0;
+0445	3718	clr     INT_PRI14F
+				;679		_tm3af = 0;
+0446	369F	clr     TM3AF
+				;680	    
+				;681		_int_pri1f = 0;
+0447	3615	clr     INT_PRI1F
+				;682		_mfi0 = 0x07;
+0448	0F07	mov     a, 7H
+0449	0099	mov     MFI0, a
+044A	4710	mov     a, r204
+044B	008B	mov     __mp1h[7], a
+044C	477D	mov     a, r304
+044D	008A	mov     STATUS, a
+044E	477E	mov     a, r404
+044F	0083	mov     MP1L, a
+0450	477F	mov     a, r504
+0451	0084	mov     MP1H, a
+0452	C703	lmov    a, r604
+0454	0087	mov     TBLP, a
+0455	C704	lmov    a, r704
+0457	0089	mov     TBHP, a
+0458	1D05	tabrd   ACC
+0459	470F	mov     a, r104
+045A	0004	reti
+				;683	}
+				;684	
+				;685	
+				;686	//===============================================
+				;687	//
+				;688	//===============================================
+				;689	void commutation(void)
+				;690	{
+				;691		_int_pri1e = 0;	
+				_commutation:
+				_commutation:
+045B	3495	clr     INT_PRI1E
+				;692	
+				;693	_pb0 = 1;
+045C	3026	set     PB0
+				;694	
+				;695		switch (ucHallStep)
+045D	4746	mov     a, ucHallStep[0]
+045E	408B	mov     ra04, a
+045F	5F11	clr     rb04
+0460	470B	mov     a, ra04
+0461	4511	or      a, rb04
+0462	3D0A	sz      Z
+0463	2C7E	jmp     _L64
+0464	470B	mov     a, ra04
+0465	0C01	xor     a, 1H
+0466	4511	or      a, rb04
+0467	3D0A	sz      Z
+0468	2C8A	jmp     _L65
+0469	470B	mov     a, ra04
+046A	0C02	xor     a, 2H
+046B	4511	or      a, rb04
+046C	3D0A	sz      Z
+046D	2C91	jmp     _L66
+046E	470B	mov     a, ra04
+046F	0C03	xor     a, 3H
+0470	4511	or      a, rb04
+0471	3D0A	sz      Z
+0472	2C9B	jmp     _L67
+0473	470B	mov     a, ra04
+0474	0C04	xor     a, 4H
+0475	4511	or      a, rb04
+0476	3D0A	sz      Z
+0477	2CA2	jmp     _L68
+0478	470B	mov     a, ra04
+0479	0C05	xor     a, 5H
+047A	4511	or      a, rb04
+047B	3D0A	sz      Z
+047C	2CAA	jmp     _L69
+				;696		{
+				;697		 case 0:	//CT,AB	
+				;698			delay1(100);
+				_L64:
+047E	0F64	mov     a, 64H
+047F	2305	call    _delay1
+				;699			_pc     = 0b00000010;	
+0480	0F02	mov     a, 2H
+0481	00A9	mov     PC, a
+				;700			_pcps0  = 0x00;
+0482	9F7C	lclr    PCPS0
+				;701			_pcps1  = 0b00000010;	
+0484	0F02	mov     a, 2H
+0485	80FD	lmov    PCPS1, a
+				;702		//	delay1(50);
+				;703		//	_pb ^= 2;
+				;704		    _integ0 = 0b00100000;	//PHASE B DOWN = C3P DOWN
+0487	0F20	mov     a, 20H
+0488	00C5	mov     INTEG0, a
+				;705		 break;
+0489	2CB0	jmp     _L70
+				;706		
+				;707		 case 1:	//CT,BB
+				;708			delay1(100);
+				_L65:
+048A	0F64	mov     a, 64H
+048B	2305	call    _delay1
+				;709			_pc     = 0b00001000;
+048C	0F08	mov     a, 8H
+048D	00A9	mov     PC, a
+				;710		//	delay1(50);
+				;711		//	_pb ^= 2;
+				;712		    _integ0 = 0b00000100;	//PHASE A UP = C2P UP	
+048E	0F04	mov     a, 4H
+048F	00C5	mov     INTEG0, a
+				;713		 break;
+0490	2CB0	jmp     _L70
+				;714		 
+				;715		 case 2:	//AT,BB
+				;716			delay1(100);
+				_L66:
+0491	0F64	mov     a, 64H
+0492	2305	call    _delay1
+				;717			_pcps1  = 0b00000000;
+0493	9F7D	lclr    PCPS1
+				;718			_pcps0  = 0b00000010;
+0495	0F02	mov     a, 2H
+0496	80FC	lmov    PCPS0, a
+				;719		//	delay1(50);
+				;720		//	_pb ^= 2;
+				;721		    _integ0 = 0b00000010;	//PHASE C DOWN = C1P DOWN
+0498	0F02	mov     a, 2H
+0499	00C5	mov     INTEG0, a
+				;722		 break;
+049A	2CB0	jmp     _L70
+				;723		 
+				;724		 case 3:	//AT,CB
+				;725			delay1(100);
+				_L67:
+049B	0F64	mov     a, 64H
+049C	2305	call    _delay1
+				;726			_pc     = 0b00100000;
+049D	0F20	mov     a, 20H
+049E	00A9	mov     PC, a
+				;727		//	delay1(50);
+				;728		//	_pb ^= 2;
+				;729		    _integ0 = 0b00010000;	//PHASE B UP = C3P UP	
+049F	0F10	mov     a, 10H
+04A0	00C5	mov     INTEG0, a
+				;730		 break;
+04A1	2CB0	jmp     _L70
+				;731		 
+				;732		 case 4:	//BT,CB
+				;733			delay1(100);
+				_L68:
+04A2	0F64	mov     a, 64H
+04A3	2305	call    _delay1
+				;734			_pcps0  = 0b00100000;
+04A4	0F20	mov     a, 20H
+04A5	80FC	lmov    PCPS0, a
+				;735		//	delay1(50);
+				;736		//	_pb ^= 2;
+				;737		    _integ0 = 0b00001000;	//PHASE A DOWN = C2P DOWN
+04A7	0F08	mov     a, 8H
+04A8	00C5	mov     INTEG0, a
+				;738		 break;
+04A9	2CB0	jmp     _L70
+				;739		 
+				;740		 case 5:	//BT,AB
+				;741			delay1(100);
+				_L69:
+04AA	0F64	mov     a, 64H
+04AB	2305	call    _delay1
+				;742			_pc     = 0b00000010;
+04AC	0F02	mov     a, 2H
+04AD	00A9	mov     PC, a
+				;743		//	delay1(50);
+				;744		//	_pb ^= 2;
+				;745		    _integ0 = 0b00000001;	//PHASE C UP = C1P UP	
+04AE	0F01	mov     a, 1H
+04AF	00C5	mov     INTEG0, a
+				;746		 break;
+				;747		 
+				;748		 default:
+				;749		 break;
+047D	2CB0	jmp     _L70
+				;750		}
+				;751	
+				;752		if(ucHallStep >= 5)
+				_L70:
+04B0	4746	mov     a, ucHallStep[0]
+04B1	408B	mov     ra04, a
+04B2	0F04	mov     a, 4H
+04B3	420B	sub     a, ra04
+04B4	3C0A	sz      C
+04B5	2CC3	jmp     _L71
+				;753		{
+				;754			ucHallStep = 0;
+04B6	5F46	clr     ucHallStep[0]
+				;755			if(ucHallCycle < 250)
+04B7	4745	mov     a, ucHallCycle[0]
+04B8	408B	mov     ra04, a
+04B9	0FF9	mov     a, F9H
+04BA	420B	sub     a, ra04
+04BB	380A	snz     C
+04BC	2CC8	jmp     _L73
+				;756			    ucHallCycle ++;
+04BD	4745	mov     a, ucHallCycle[0]
+04BE	408B	mov     ra04, a
+04BF	548B	inc     ra04
+04C0	470B	mov     a, ra04
+04C1	40C5	mov     ucHallCycle[0], a
+04C2	2CC8	jmp     _L73
+				;757		}
+				;758		else
+				;759		{
+				;760		    ucHallStep ++;
+				_L71:
+04C3	4746	mov     a, ucHallStep[0]
+04C4	408B	mov     ra04, a
+04C5	548B	inc     ra04
+04C6	470B	mov     a, ra04
+04C7	40C6	mov     ucHallStep[0], a
+				;761		}
+				;762		ucDragCnt = 0;
+				_L73:
+04C8	5F5E	clr     ucDragCnt[0]
+04C9	0003	ret
+				;763	}
+				;764	
+				;765	
+				;766	
+				;767	
+				;768	
+				;769	
+				;770	//===============================================
+				;771	//
+				;772	//===============================================
+				;773	void Motor_Stop(void)
+				;774	{
+				;775		uiTempPWM=0;
+				_Motor_Stop:
+				_Motor_Stop:
+04CA	5F35	clr     uiTempPWM[0]
+04CB	5F36	clr     uiTempPWM[1]
+				;776		_dutr0h = 0;
+04CC	1F59	clr     DUTR0H
+				;777		_dutr0l = 0;
+04CD	1F58	clr     DUTR0L
+				;778		_pwmsuf = 1;
+04CE	B155	lset    PWMSUF
+				;779		_hdcd = 0;
+04D0	1F4A	clr     HDCD
+				;780		_pwmme = 0x00;
+04D1	1F62	clr     PWMME
+				;781		_pwmmd = 0xff;
+04D2	1FE3	set     PWMMD
+				;782		
+				;783		_pc = 0;
+04D3	1F29	clr     PC
+				;784		_pcps0 = 0x00;
+04D4	9F7C	lclr    PCPS0
+				;785		_pcps1 = 0x00;
+04D6	9F7D	lclr    PCPS1
+04D8	0003	ret
+				;786	}
+				;787	
+				;788	
+				;789	
+				;790	//===============================================
+				;791	//
+				;792	//===============================================
+				;793	void CommandOK(void)
+				;794	{
+				;795		ucVoiceStep=1;
+				_CommandOK:
+				_CommandOK:
+04D9	0F01	mov     a, 1H
+04DA	40BD	mov     ucVoiceStep[0], a
+				;796		_ptm2c0=0b10100000; 
+04DB	0FA0	mov     a, A0H
+04DC	80DA	lmov    PTM2C0, a
+				;797		_tm2pf=0;
+04DE	361C	clr     TM2PF
+				;798		_tm2pe=0;
+04DF	341C	clr     TM2PE
+				;799		_tm2af=0;
+04E0	369C	clr     TM2AF
+				;800		_tm2ae=0;
+04E1	349C	clr     TM2AE
+				;801		_int_pri9e = 0;
+04E2	3497	clr     INT_PRI9E
+				;802		_int_pri9f = 0;
+04E3	3697	clr     INT_PRI9F
+				;803		
+				;804		_pwmc = 0b00000001;		
+04E4	0F01	mov     a, 1H
+04E5	00D7	mov     PWMC, a
+				;805		_prdrh = 0x03;							
+04E6	0F03	mov     a, 3H
+04E7	00DF	mov     PRDRH, a
+				;806		_prdrl = 0x20;	
+04E8	0F20	mov     a, 20H
+04E9	00DE	mov     PRDRL, a
+				;807		_dutr0h = 0;
+04EA	1F59	clr     DUTR0H
+				;808		_dutr0l = 0x27;
+04EB	0F27	mov     a, 27H
+04EC	00D8	mov     DUTR0L, a
+				;809		_pwmsuf = 1;
+04ED	B155	lset    PWMSUF
+				;810		
+				;811		_mcf=0b10001101; 
+04EF	0F8D	mov     a, 8DH
+04F0	00E4	mov     MCF, a
+				;812		_dts=0B11000110;
+04F1	0FC6	mov     a, C6H
+04F2	00E6	mov     DTS, a
+				;813		_hdcd=0;
+04F3	1F4A	clr     HDCD
+				;814		bPermitStart = 1;
+04F4	7300	set     bit_var_0[0].6
+				;815		_pwmon = 1;
+04F5	31D7	set     PWMON
+				;816		
+				;817		_pwmme = 0x00;
+04F6	1F62	clr     PWMME
+				;818		_pwmmd = 0xFF;	
+04F7	1FE3	set     PWMMD
+				;819		_pc = 0x00;
+04F8	1F29	clr     PC
+				;820		_pcps0 = 0x00;
+04F9	9F7C	lclr    PCPS0
+				;821		_pcps1 = 0x00;
+04FB	9F7D	lclr    PCPS1
+04FD	0003	ret
+				;822	}
+				;823	
+				;824	
+				;825	
+				;826	
+				;827	//===============================================
+				;828	//
+				;829	//===============================================
+				;830	void VoiceSpeakInit(void)
+				;831	{
+				;832		_ptm2c0 = 0b10100000;
+				_VoiceSpeakInit:
+				_VoiceSpeakInit:
+04FE	0FA0	mov     a, A0H
+04FF	80DA	lmov    PTM2C0, a
+				;833		_ptm2c1 = 0b11000000;
+0501	0FC0	mov     a, C0H
+0502	80DB	lmov    PTM2C1, a
+				;834		_ptm2al = 0x10;
+0504	0F10	mov     a, 10H
+0505	80DE	lmov    PTM2AL, a
+				;835		_ptm2ah = 0x00;
+0507	9F5F	lclr    PTM2AH
+				;836		_ptm2rpl = 0xe8;
+0509	0FE8	mov     a, E8H
+050A	80E0	lmov    PTM2RPL, a
+				;837		_ptm2rph = 0x01;	
+050C	0F01	mov     a, 1H
+050D	80E1	lmov    PTM2RPH, a
+				;838		_ptm2c0 = 0b00101000; 
+050F	0F28	mov     a, 28H
+0510	80DA	lmov    PTM2C0, a
+				;839		_tm2pf = 0;
+0512	361C	clr     TM2PF
+				;840		_tm2pe = 1;
+0513	301C	set     TM2PE
+				;841		_tm2af=0;
+0514	369C	clr     TM2AF
+				;842		_int_pri9e = 1;
+0515	3097	set     INT_PRI9E
+				;843		_int_pri9f = 0;
+0516	3697	clr     INT_PRI9F
+				;844		
+				;845		_pwmc = 0b00110001;
+0517	0F31	mov     a, 31H
+0518	00D7	mov     PWMC, a
+				;846		_pwmcs  = 0b00000111;
+0519	0F07	mov     a, 7H
+051A	80D5	lmov    PWMCS, a
+				;847		_prdrh  = 0x03;
+051C	0F03	mov     a, 3H
+051D	00DF	mov     PRDRH, a
+				;848		_prdrl  = 0xff;
+051E	1FDE	set     PRDRL
+				;849		_dutr3h = 1;
+051F	0F01	mov     a, 1H
+0520	00CE	mov     DUTR3H, a
+				;850		_dutr3l = 0xff;
+0521	1FCD	set     DUTR3L
+				;851		_dutr0h = 0;
+0522	1F59	clr     DUTR0H
+				;852		_dutr0l = 0x20;
+0523	0F20	mov     a, 20H
+0524	00D8	mov     DUTR0L, a
+				;853		_pwmsuf = 1;
+0525	B155	lset    PWMSUF
+				;854		
+				;855		_mcf = 0b00001101;
+0527	0F0D	mov     a, DH
+0528	00E4	mov     MCF, a
+				;856		_dts = 0B11100110;
+0529	0FE6	mov     a, E6H
+052A	00E6	mov     DTS, a
+				;857		_hdcr = 0b11010001; 
+052B	0FD1	mov     a, D1H
+052C	00C9	mov     HDCR, a
+				;858		_integ0 = 0x00;
+052D	1F45	clr     INTEG0
+				;859		_hdcd = 0;
+052E	1F4A	clr     HDCD
+				;860		_pwmme = 0xff;
+052F	1FE2	set     PWMME
+				;861		_pwmmd = 0x00;
+0530	1F63	clr     PWMMD
+				;862		_pwmon = 1;
+0531	31D7	set     PWMON
+				;863		_plc = 0x00;	
+0532	1F67	clr     PLC
+				;864		_pcps0 = 0xaa;
+0533	0FAA	mov     a, AAH
+0534	80FC	lmov    PCPS0, a
+				;865		_pcps1 = 0x0a; 	
+0536	0F0A	mov     a, AH
+0537	80FD	lmov    PCPS1, a
+				;866		
+				;867		_halae = 0;
+0539	3419	clr     HALAE
+				;868		_halbe = 0;
+053A	3499	clr     HALBE
+				;869		_halce = 0;
+053B	3519	clr     HALCE
+				;870		_int_pri1e = 0;
+053C	3495	clr     INT_PRI1E
+				;871		
+				;872		_halaf = 0;
+053D	3619	clr     HALAF
+				;873		_halbf = 0;
+053E	3699	clr     HALBF
+				;874		_halcf = 0;
+053F	3719	clr     HALCF
+				;875		_int_pri1f = 0;
+0540	3615	clr     INT_PRI1F
+				;876		
+				;877		ucVoiceStep = 6;
+0541	0F06	mov     a, 6H
+0542	40BD	mov     ucVoiceStep[0], a
+				;878		bAlarmFlag = 0;
+0543	7780	clr     bit_var_0[0].7
+				;879		uiVoiceTime = 556;
+0544	0F2C	mov     a, 2CH
+0545	C080	lmov    uiVoiceTime[0], a
+0547	0F02	mov     a, 2H
+0548	C081	lmov    uiVoiceTime[1], a
+054A	0003	ret
+				;880	}
+				;881	
+				;882	
+				;883	
+				;884	//===============================================
+				;885	//
+				;886	//===============================================
+				;887	void __attribute ((interrupt(0x24))) ISR_TM2(void)
+				;888	{
+				@ISR_TM2_code .SECTION 'CODE'
+0024	4094	mov     r124, a
+0025	070B	mov     a, __mp1h[7]
+0026	4095	mov     r224, a
+0027	2D4B	jmp     _ISR_TM2
+				_ISR_TM2:
+				_ISR_TM2:
+054B	070A	mov     a, STATUS
+054C	C085	lmov    r324, a
+054E	0703	mov     a, MP1L
+054F	C086	lmov    r424, a
+0551	0704	mov     a, MP1H
+0552	C087	lmov    r524, a
+0554	0707	mov     a, TBLP
+0555	C088	lmov    r624, a
+0557	0709	mov     a, TBHP
+0558	C089	lmov    r724, a
+				;889	    _int_pri9f = 0;
+055A	3697	clr     INT_PRI9F
+				;890	    _tm2pf = 0;
+055B	361C	clr     TM2PF
+				;891		
+				;892	   if(bAlarmFlag == 0)
+055C	4700	mov     a, bit_var_0[0]
+055D	4096	mov     ra24, a
+055E	0F80	mov     a, 80H
+055F	4696	andm    a, ra24
+0560	5096	sz      ra24
+0561	2D65	jmp     _L78
+				;893	    {
+				;894	        _hdcd = 1;
+0562	0F01	mov     a, 1H
+0563	00CA	mov     HDCD, a
+0564	2D67	jmp     _L79
+				;895	    }
+				;896	    else
+				;897	    {
+				;898	        _hdcd = 3;
+				_L78:
+0565	0F03	mov     a, 3H
+0566	00CA	mov     HDCD, a
+				;899	    }
+				;900	    
+				;901	    
+				;902		if(ucVoiceStep == 6)
+				_L79:
+0567	473D	mov     a, ucVoiceStep[0]
+0568	4096	mov     ra24, a
+0569	4716	mov     a, ra24
+056A	0A06	sub     a, 6H
+056B	390A	snz     Z
+056C	2DCC	jmp     _L80
+				;903		{
+				;904			if(uiVoiceTimeCnt++ > uiVoiceTime)//
+056D	4743	mov     a, uiVoiceTimeCnt[0]
+056E	4096	mov     ra24, a
+056F	4744	mov     a, uiVoiceTimeCnt[1]
+0570	4097	mov     rb24, a
+0571	0F01	mov     a, 1H
+0572	4316	add     a, ra24
+0573	4098	mov     rc24, a
+0574	0F00	mov     a, 0H
+0575	5317	adc     a, rb24
+0576	4099	mov     rd24, a
+0577	4718	mov     a, rc24
+0578	40C3	mov     uiVoiceTimeCnt[0], a
+0579	4719	mov     a, rd24
+057A	40C4	mov     uiVoiceTimeCnt[1], a
+057B	C700	lmov    a, uiVoiceTime[0]
+057D	4098	mov     rc24, a
+057E	C701	lmov    a, uiVoiceTime[1]
+0580	4099	mov     rd24, a
+0581	4718	mov     a, rc24
+0582	4216	sub     a, ra24
+0583	4719	mov     a, rd24
+0584	5217	sbc     a, rb24
+0585	3C0A	sz      C
+0586	2D9A	jmp     _L81
+				;905			{
+				;906				uiVoiceTimeCnt = 0;
+0587	5F43	clr     uiVoiceTimeCnt[0]
+0588	5F44	clr     uiVoiceTimeCnt[1]
+				;907				uiVoiceTime = 300;
+0589	0F2C	mov     a, 2CH
+058A	C080	lmov    uiVoiceTime[0], a
+058C	0F01	mov     a, 1H
+058D	C081	lmov    uiVoiceTime[1], a
+				;908				if(bAlarmFlag)
+058F	4700	mov     a, bit_var_0[0]
+0590	4096	mov     ra24, a
+0591	0F80	mov     a, 80H
+0592	4696	andm    a, ra24
+0593	5E16	snz     ra24
+0594	2D97	jmp     _L82
+				;909				{
+				;910				    bVoiceFlag = 1;	
+0595	7001	set     bit_var_1[0].0
+0596	2D98	jmp     _L83
+				;911				}
+				;912				else
+				;913				{
+				;914				    bVoiceFlag = 0;
+				_L82:
+0597	7401	clr     bit_var_1[0].0
+				;915				}
+				;916				bAlarmFlag = 1;
+				_L83:
+0598	7380	set     bit_var_0[0].7
+0599	2E0C	jmp     _L77
+				;917			}
+				;918			else
+				;919			{
+				;920				if(bVoltageErrorFlag)
+				_L81:
+059A	4702	mov     a, bit_var_2[0]
+059B	4096	mov     ra24, a
+059C	0F02	mov     a, 2H
+059D	4696	andm    a, ra24
+059E	5E16	snz     ra24
+059F	2DC1	jmp     _L85
+				;921				{
+				;922					ucVoiceCnt = 0;
+05A0	DF14	lclr    ucVoiceCnt[0]
+				;923					if(bVoiceFlag)
+05A2	4701	mov     a, bit_var_1[0]
+05A3	4096	mov     ra24, a
+05A4	0F01	mov     a, 1H
+05A5	4696	andm    a, ra24
+05A6	5E16	snz     ra24
+05A7	2DB1	jmp     _L86
+				;924					{
+				;925						bAlarmFlag = 0;
+05A8	7780	clr     bit_var_0[0].7
+				;926						ucLostCommandVoice ++;
+05A9	C702	lmov    a, ucLostCommandVoice[0]
+05AB	4096	mov     ra24, a
+05AC	5496	inc     ra24
+05AD	4716	mov     a, ra24
+05AE	C082	lmov    ucLostCommandVoice[0], a
+05B0	2E0C	jmp     _L77
+				;927					}
+				;928					else if(ucLostCommandVoice >= 2)
+				_L86:
+05B1	C702	lmov    a, ucLostCommandVoice[0]
+05B3	4096	mov     ra24, a
+05B4	0F01	mov     a, 1H
+05B5	4216	sub     a, ra24
+05B6	3C0A	sz      C
+05B7	2E0C	jmp     _L77
+				;929					{
+				;930						ucLostCommandVoice = 0;
+05B8	DF02	lclr    ucLostCommandVoice[0]
+				;931						uiVoiceTime = 5000;
+05BA	0F88	mov     a, 88H
+05BB	C080	lmov    uiVoiceTime[0], a
+05BD	0F13	mov     a, 13H
+05BE	C081	lmov    uiVoiceTime[1], a
+05C0	2E0C	jmp     _L77
+				;932					}
+				;933				}
+				;934				
+				;935				else if(!bVoltageErrorFlag)
+				_L85:
+05C1	4702	mov     a, bit_var_2[0]
+05C2	4096	mov     ra24, a
+05C3	0F02	mov     a, 2H
+05C4	4696	andm    a, ra24
+05C5	5096	sz      ra24
+05C6	2E0C	jmp     _L77
+				;936				{
+				;937					{
+				;938						ucVoiceCnt=0;
+05C7	DF14	lclr    ucVoiceCnt[0]
+				;939						bAlarmFlag=1;
+05C9	7380	set     bit_var_0[0].7
+				;940						CommandOK();
+05CA	24D9	call    _CommandOK
+05CB	2E0C	jmp     _L77
+				;941					}
+				;942				}
+				;943			}
+				;944		}
+				;945		else
+				;946		{
+				;947			if(uiVoiceTimeCnt ++> 460)
+				_L80:
+05CC	4743	mov     a, uiVoiceTimeCnt[0]
+05CD	4096	mov     ra24, a
+05CE	4744	mov     a, uiVoiceTimeCnt[1]
+05CF	4097	mov     rb24, a
+05D0	0F01	mov     a, 1H
+05D1	4316	add     a, ra24
+05D2	4098	mov     rc24, a
+05D3	0F00	mov     a, 0H
+05D4	5317	adc     a, rb24
+05D5	4099	mov     rd24, a
+05D6	4718	mov     a, rc24
+05D7	40C3	mov     uiVoiceTimeCnt[0], a
+05D8	4719	mov     a, rd24
+05D9	40C4	mov     uiVoiceTimeCnt[1], a
+05DA	0FCC	mov     a, CCH
+05DB	4216	sub     a, ra24
+05DC	0F01	mov     a, 1H
+05DD	5217	sbc     a, rb24
+05DE	3C0A	sz      C
+05DF	2E0C	jmp     _L77
+				;948		    {
+				;949		    	uiVoiceTimeCnt = 0;
+05E0	5F43	clr     uiVoiceTimeCnt[0]
+05E1	5F44	clr     uiVoiceTimeCnt[1]
+				;950		    	ucVoiceStep ++;
+05E2	473D	mov     a, ucVoiceStep[0]
+05E3	4096	mov     ra24, a
+05E4	5496	inc     ra24
+05E5	4716	mov     a, ra24
+05E6	40BD	mov     ucVoiceStep[0], a
+				;951		    	if((ucVoiceStep == 1) || (ucVoiceStep == 3))
+05E7	473D	mov     a, ucVoiceStep[0]
+05E8	4096	mov     ra24, a
+05E9	5716	sdza    ra24
+05EA	2DEC	jmp     _LI2
+05EB	2DF2	jmp     _L89
+				_LI2:
+05EC	473D	mov     a, ucVoiceStep[0]
+05ED	4096	mov     ra24, a
+05EE	4716	mov     a, ra24
+05EF	0A03	sub     a, 3H
+05F0	390A	snz     Z
+05F1	2DF3	jmp     _L90
+				;952		    	{
+				;953		    		bAlarmFlag = 1;	
+				_L89:
+05F2	7380	set     bit_var_0[0].7
+				;954		    	}
+				;955		    	if((ucVoiceStep == 2) || (ucVoiceStep == 4))
+				_L90:
+05F3	473D	mov     a, ucVoiceStep[0]
+05F4	4096	mov     ra24, a
+05F5	4716	mov     a, ra24
+05F6	0A02	sub     a, 2H
+05F7	3D0A	sz      Z
+05F8	2DFF	jmp     _L91
+05F9	473D	mov     a, ucVoiceStep[0]
+05FA	4096	mov     ra24, a
+05FB	4716	mov     a, ra24
+05FC	0A04	sub     a, 4H
+05FD	390A	snz     Z
+05FE	2E00	jmp     _L92
+				;956		    	{
+				;957		    		bAlarmFlag = 0;	
+				_L91:
+05FF	7780	clr     bit_var_0[0].7
+				;958		    	}
+				;959		    	if(ucVoiceStep == 5)
+				_L92:
+0600	473D	mov     a, ucVoiceStep[0]
+0601	4096	mov     ra24, a
+0602	4716	mov     a, ra24
+0603	0A05	sub     a, 5H
+0604	390A	snz     Z
+0605	2E0C	jmp     _L77
+				;960		    	{
+				;961		    		bAlarmFlag = 1;	
+0606	7380	set     bit_var_0[0].7
+				;962					ucVoiceCnt = 0;
+0607	DF14	lclr    ucVoiceCnt[0]
+				;963					CommandOK();
+0609	24D9	call    _CommandOK
+				;964					uiVoiceTimeCnt = 0;
+060A	5F43	clr     uiVoiceTimeCnt[0]
+060B	5F44	clr     uiVoiceTimeCnt[1]
+				_L77:
+060C	4715	mov     a, r224
+060D	008B	mov     __mp1h[7], a
+060E	C705	lmov    a, r324
+0610	008A	mov     STATUS, a
+0611	C706	lmov    a, r424
+0613	0083	mov     MP1L, a
+0614	C707	lmov    a, r524
+0616	0084	mov     MP1H, a
+0617	C708	lmov    a, r624
+0619	0087	mov     TBLP, a
+061A	C709	lmov    a, r724
+061C	0089	mov     TBHP, a
+061D	1D05	tabrd   ACC
+061E	4714	mov     a, r124
+061F	0004	reti
+				;965		    	}
+				;966			}
+				;967		}
+				;968	//	CommandOK();
+				;969		
+				;970	}
+				;971	
+				;972	
+				;973	
+				;974	//===============================================
+				;975	//
+				;976	//===============================================
+				;977	void TM1_Init(void)
+				;978	{
+				;979	    _ptm1c0=0b00100000;  
+				_TM1_Init:
+				_TM1_Init:
+0620	0F20	mov     a, 20H
+0621	80C7	lmov    PTM1C0, a
+				;980		_ptm1c1=0b11000001;	
+0623	0FC1	mov     a, C1H
+0624	80C8	lmov    PTM1C1, a
+				;981		
+				;982		_ptm1al=0xf0;
+0626	0FF0	mov     a, F0H
+0627	80CB	lmov    PTM1AL, a
+				;983		_ptm1ah=0xff;
+0629	9FCC	lset    PTM1AH
+062B	0003	ret
+				;984		
+				;985	}
+				;986	
+				;987	//===============================================
+				;988	//
+				;989	//===============================================
+				;990	void __attribute ((interrupt(0x2c))) ISR_TM1()
+				;991	{
+				@ISR_TM1_code .SECTION 'CODE'
+002C	409A	mov     r12c, a
+002D	070A	mov     a, STATUS
+002E	409B	mov     r22c, a
+002F	2E2C	jmp     _ISR_TM1
+				;992		_int_pri11f = 0;
+				_ISR_TM1:
+				_ISR_TM1:
+062C	3797	clr     INT_PRI11F
+				;993		_tm1af = 0;	
+062D	369E	clr     TM1AF
+				;994	    
+				;995	    _pt1on = 0;
+062E	B5C7	lclr    PT1ON
+				;996		_int_pri11f = 0;
+0630	3797	clr     INT_PRI11F
+				;997		_tm1af = 0;	
+0631	369E	clr     TM1AF
+0632	471B	mov     a, r22c
+0633	008A	mov     STATUS, a
+0634	471A	mov     a, r12c
+0635	0004	reti
+				;998	}
+				;999	
+				;1000	
+				;1001	
+				;1002	
+				;1003	
+				;1004	//===============================================
+				;1005	//
+				;1006	//===============================================
+				;1007	void Init_TM3(void)
+				;1008	{
+				;1009	    _ptm3c0 = 0b00100000;   
+				_Init_TM3:
+				_Init_TM3:
+0636	0F20	mov     a, 20H
+0637	80F1	lmov    PTM3C0, a
+				;1010		_ptm3c1 = 0b11000001;	
+0639	0FC1	mov     a, C1H
+063A	80F2	lmov    PTM3C1, a
+				;1011		
+				;1012		_ptm3al = 250;
+063C	0FFA	mov     a, FAH
+063D	80F5	lmov    PTM3AL, a
+				;1013		_ptm3ah = 0x00;
+063F	9F76	lclr    PTM3AH
+				;1014		
+				;1015		_tm3af = 0;
+0641	369F	clr     TM3AF
+				;1016	    _tm3ae = 1;
+0642	309F	set     TM3AE
+				;1017		
+				;1018		_int_pri14f = 0;
+0643	3718	clr     INT_PRI14F
+				;1019		_int_pri14e = 1;
+0644	3118	set     INT_PRI14E
+0645	0003	ret
+				;1020	}
+				;1021	
+				;1022	
+				;1023	//===============================================
+				;1024	//
+				;1025	//===============================================
+				;1026	void __attribute ((interrupt(0x38))) ISR_TM3(void)
+				;1027	{
+				@ISR_TM3_code .SECTION 'CODE'
+0038	409C	mov     r138, a
+0039	070B	mov     a, __mp1h[7]
+003A	409D	mov     r238, a
+003B	2E46	jmp     _ISR_TM3
+				_ISR_TM3:
+				_ISR_TM3:
+0646	070A	mov     a, STATUS
+0647	C08A	lmov    r338, a
+0649	0703	mov     a, MP1L
+064A	C08B	lmov    r438, a
+064C	0704	mov     a, MP1H
+064D	C08C	lmov    r538, a
+064F	0707	mov     a, TBLP
+0650	C08D	lmov    r638, a
+0652	0709	mov     a, TBHP
+0653	C08E	lmov    r738, a
+				;1028	    _int_pri14f = 0;
+0655	3718	clr     INT_PRI14F
+				;1029		_tm3af = 0;
+0656	369F	clr     TM3AF
+				;1030		_pt3on = 0;
+0657	B5F1	lclr    PT3ON
+				;1031		_int_pri1f = 0;
+0659	3615	clr     INT_PRI1F
+				;1032		_mfi0 = 0x07;	
+065A	0F07	mov     a, 7H
+065B	0099	mov     MFI0, a
+				;1033		_int_pri1e = 1;
+065C	3095	set     INT_PRI1E
+				;1034		
+				;1035	_pb0 = 0;
+065D	3426	clr     PB0
+				;1036	
+				;1037		_integ0 |= 0x40;
+065E	0745	mov     a, INTEG0
+065F	408A	mov     ra38, a
+0660	730A	set     ra38.6
+0661	470A	mov     a, ra38
+0662	00C5	mov     INTEG0, a
+				;1038		if(uiLastHallTime < 140)
+0663	474F	mov     a, uiLastHallTime[0]
+0664	408A	mov     ra38, a
+0665	4750	mov     a, uiLastHallTime[1]
+0666	409E	mov     rb38, a
+0667	0F8B	mov     a, 8BH
+0668	420A	sub     a, ra38
+0669	0F00	mov     a, 0H
+066A	521E	sbc     a, rb38
+066B	380A	snz     C
+066C	2E97	jmp     _L97
+				;1039	    if(_int_pri1f == 1)
+066D	0715	mov     a, INTC0
+066E	408A	mov     ra38, a
+066F	0F10	mov     a, 10H
+0670	468A	andm    a, ra38
+0671	5E0A	snz     ra38
+0672	2E97	jmp     _L97
+				;1040	    {
+				;1041	        if((_mcd & 0x07) == ucDealDragHall[ucHallStep])
+0673	0765	mov     a, MCD
+0674	408A	mov     ra38, a
+0675	5F1E	clr     rb38
+0676	470A	mov     a, ra38
+0677	409F	mov     rc38, a
+0678	471E	mov     a, rb38
+0679	40A0	mov     rd38, a
+067A	0F07	mov     a, 7H
+067B	469F	andm    a, rc38
+067C	0F00	mov     a, 0H
+067D	46A0	andm    a, rd38
+067E	4746	mov     a, ucHallStep[0]
+067F	408A	mov     ra38, a
+0680	5F1E	clr     rb38
+0681	0F02	mov     a, 2H
+0682	438A	addm    a, ra38
+0683	0F80	mov     a, 80H
+0684	539E	adcm    a, rb38
+0685	470A	mov     a, ra38
+0686	0083	mov     MP1L, a
+0687	471E	mov     a, rb38
+0688	0084	mov     MP1H, a
+0689	6287	call    L0A87
+068A	408A	mov     ra38, a
+068B	5F1E	clr     rb38
+068C	471F	mov     a, rc38
+068D	420A	sub     a, ra38
+068E	4720	mov     a, rd38
+068F	521E	sbc     a, rb38
+0690	3B0A	snz     CZ
+0691	2E97	jmp     _L97
+				;1042	        {
+				;1043	    		delay1(80);	//70
+0692	0F50	mov     a, 50H
+0693	2305	call    _delay1
+				;1044				_int_pri14f = 0;
+0694	3718	clr     INT_PRI14F
+				;1045				_tm3af = 0;
+0695	369F	clr     TM3AF
+				;1046	    		return;
+0696	2E9C	jmp     _L96
+				;1047	        }
+				;1048	    }
+				;1049	    
+				;1050		_int_pri1f = 0;
+				_L97:
+0697	3615	clr     INT_PRI1F
+				;1051		_mfi0 = 0x07;
+0698	0F07	mov     a, 7H
+0699	0099	mov     MFI0, a
+				;1052		_int_pri14f = 0;
+069A	3718	clr     INT_PRI14F
+				;1053	    _tm3af = 0;
+069B	369F	clr     TM3AF
+				_L96:
+069C	471D	mov     a, r238
+069D	008B	mov     __mp1h[7], a
+069E	C70A	lmov    a, r338
+06A0	008A	mov     STATUS, a
+06A1	C70B	lmov    a, r438
+06A3	0083	mov     MP1L, a
+06A4	C70C	lmov    a, r538
+06A6	0084	mov     MP1H, a
+06A7	C70D	lmov    a, r638
+06A9	0087	mov     TBLP, a
+06AA	C70E	lmov    a, r738
+06AC	0089	mov     TBHP, a
+06AD	1D05	tabrd   ACC
+06AE	471C	mov     a, r138
+06AF	0004	reti
+				;1054	    
+				;1055	    
+				;1056	}
+				;1057	
+				;1058	
+				;1059	
+				;1060	
+				;1061	//===============================================
+				;1062	//
+				;1063	//===============================================
+				;1064	void TimeBaseInit(void)
+				;1065	{
+				;1066	    _tbc = 0xc0;
+				_TimeBaseInit:
+				_TimeBaseInit:
+06B0	0FC0	mov     a, C0H
+06B1	8093	lmov    TBC, a
+				;1067	    _tbe = 1;
+06B3	31A0	set     TBE
+				;1068	    _tbf = 0;
+06B4	37A0	clr     TBF
+				;1069	    _int_pri15e = 1;
+06B5	3198	set     INT_PRI15E
+				;1070	    _int_pri15f = 0;
+06B6	3798	clr     INT_PRI15F
+06B7	0003	ret
+				;1071	}
+				;1072	
+				;1073	void __attribute ((interrupt(0x3c))) ISR_TimeBase(void)
+				;1074	{
+				@ISR_TimeBase_code .SECTION 'CODE'
+				@dummy56 .SECTION 'CODE'
+003C	40A1	mov     r13c, a
+003D	070B	mov     a, __mp1h[7]
+003E	40A2	mov     r23c, a
+003F	2EB8	jmp     _ISR_TimeBase
+				_ISR_TimeBase:
+				_ISR_TimeBase:
+06B8	070A	mov     a, STATUS
+06B9	C08F	lmov    r33c, a
+06BB	0703	mov     a, MP1L
+06BC	C090	lmov    r43c, a
+06BE	0704	mov     a, MP1H
+06BF	C091	lmov    r53c, a
+06C1	0707	mov     a, TBLP
+06C2	C092	lmov    r63c, a
+06C4	0709	mov     a, TBHP
+06C5	C093	lmov    r73c, a
+				;1075		_int_pri15f = 0;
+06C7	3798	clr     INT_PRI15F
+				;1076	    _tbf = 0;
+06C8	37A0	clr     TBF
+				;1077		if(bPermitStart)
+06C9	4700	mov     a, bit_var_0[0]
+06CA	4089	mov     ra3c, a
+06CB	0F40	mov     a, 40H
+06CC	4689	andm    a, ra3c
+06CD	5E09	snz     ra3c
+06CE	2EF0	jmp     _L101
+				;1078		{
+				;1079			if(bDragFlag && (bStopMotor == 0) && (bVoltageOver == 0))
+06CF	4700	mov     a, bit_var_0[0]
+06D0	4089	mov     ra3c, a
+06D1	0F01	mov     a, 1H
+06D2	4689	andm    a, ra3c
+06D3	5E09	snz     ra3c
+06D4	2EF0	jmp     _L101
+06D5	4700	mov     a, bit_var_0[0]
+06D6	4089	mov     ra3c, a
+06D7	0F20	mov     a, 20H
+06D8	4689	andm    a, ra3c
+06D9	5089	sz      ra3c
+06DA	2EF0	jmp     _L101
+06DB	4701	mov     a, bit_var_1[0]
+06DC	4089	mov     ra3c, a
+06DD	0F40	mov     a, 40H
+06DE	4689	andm    a, ra3c
+06DF	5089	sz      ra3c
+06E0	2EF0	jmp     _L101
+				;1080			{
+				;1081				if(ucDragCnt++ > ucDragDelayTime)
+06E1	475E	mov     a, ucDragCnt[0]
+06E2	4089	mov     ra3c, a
+06E3	4709	mov     a, ra3c
+06E4	408E	mov     rb3c, a
+06E5	540E	inca    rb3c
+06E6	4089	mov     ra3c, a
+06E7	4709	mov     a, ra3c
+06E8	40DE	mov     ucDragCnt[0], a
+06E9	474C	mov     a, ucDragDelayTime[0]
+06EA	4089	mov     ra3c, a
+06EB	4709	mov     a, ra3c
+06EC	420E	sub     a, rb3c
+06ED	3C0A	sz      C
+06EE	2EF0	jmp     _L101
+				;1082				{
+				;1083			    	Drag_Motor();
+06EF	2334	call    _Drag_Motor
+				;1084				}
+				;1085			}
+				;1086		}
+				;1087		
+				;1088		
+				;1089		if(uiVoltageCheckCnt++ > 4000)
+				_L101:
+06F0	473F	mov     a, uiVoltageCheckCnt[0]
+06F1	4089	mov     ra3c, a
+06F2	4740	mov     a, uiVoltageCheckCnt[1]
+06F3	408E	mov     rb3c, a
+06F4	0F01	mov     a, 1H
+06F5	4309	add     a, ra3c
+06F6	408C	mov     rc3c, a
+06F7	0F00	mov     a, 0H
+06F8	530E	adc     a, rb3c
+06F9	408D	mov     rd3c, a
+06FA	470C	mov     a, rc3c
+06FB	40BF	mov     uiVoltageCheckCnt[0], a
+06FC	470D	mov     a, rd3c
+06FD	40C0	mov     uiVoltageCheckCnt[1], a
+06FE	0FA0	mov     a, A0H
+06FF	4209	sub     a, ra3c
+0700	0F0F	mov     a, FH
+0701	520E	sbc     a, rb3c
+0702	3C0A	sz      C
+0703	2F11	jmp     _L102
+				;1090		{
+				;1091			uiVoltageCheckCnt = 4001;
+0704	0FA1	mov     a, A1H
+0705	40BF	mov     uiVoltageCheckCnt[0], a
+0706	0F0F	mov     a, FH
+0707	40C0	mov     uiVoltageCheckCnt[1], a
+				;1092			if(!bVoltageErrorFlag)
+0708	4702	mov     a, bit_var_2[0]
+0709	4089	mov     ra3c, a
+070A	0F02	mov     a, 2H
+070B	4689	andm    a, ra3c
+070C	5089	sz      ra3c
+070D	2F11	jmp     _L102
+				;1093			{
+				;1094				bVoltageErrorFlag = 1;
+070E	7082	set     bit_var_2[0].1
+				;1095				bVoltageErrorVoice = 1;
+070F	7002	set     bit_var_2[0].0
+				;1096				bPermitStart = 0;		
+0710	7700	clr     bit_var_0[0].6
+				;1097		    }
+				;1098		}
+				;1099		
+				;1100		if(uiHallTimeCnt++ > 1000)
+				_L102:
+0711	4747	mov     a, uiHallTimeCnt[0]
+0712	4089	mov     ra3c, a
+0713	4748	mov     a, uiHallTimeCnt[1]
+0714	408E	mov     rb3c, a
+0715	0F01	mov     a, 1H
+0716	4309	add     a, ra3c
+0717	408C	mov     rc3c, a
+0718	0F00	mov     a, 0H
+0719	530E	adc     a, rb3c
+071A	408D	mov     rd3c, a
+071B	470C	mov     a, rc3c
+071C	40C7	mov     uiHallTimeCnt[0], a
+071D	470D	mov     a, rd3c
+071E	40C8	mov     uiHallTimeCnt[1], a
+071F	0FE8	mov     a, E8H
+0720	4209	sub     a, ra3c
+0721	0F03	mov     a, 3H
+0722	520E	sbc     a, rb3c
+0723	3C0A	sz      C
+0724	2F29	jmp     _L103
+				;1101		{
+				;1102			uiHallTimeCnt = 1001;
+0725	0FE9	mov     a, E9H
+0726	40C7	mov     uiHallTimeCnt[0], a
+0727	0F03	mov     a, 3H
+0728	40C8	mov     uiHallTimeCnt[1], a
+				;1103		}
+				;1104		
+				;1105		uiCount1ms ++;
+				_L103:
+0729	475B	mov     a, uiCount1ms[0]
+072A	4089	mov     ra3c, a
+072B	5489	inc     ra3c
+072C	4709	mov     a, ra3c
+072D	40DB	mov     uiCount1ms[0], a
+				;1106	    if(uiCount1ms >= 1)	
+072E	475B	mov     a, uiCount1ms[0]
+072F	4089	mov     ra3c, a
+0730	5E09	snz     ra3c
+0731	2F34	jmp     _L104
+				;1107		{
+				;1108		    uiCount1ms = 0;
+0732	5F5B	clr     uiCount1ms[0]
+				;1109		    bNmsFlag = 1;
+0733	7101	set     bit_var_1[0].2
+				;1110		}
+				;1111		
+				;1112		if(ucReadADCNT < 200)
+				_L104:
+0734	4751	mov     a, ucReadADCNT[0]
+0735	4089	mov     ra3c, a
+0736	0FC7	mov     a, C7H
+0737	4209	sub     a, ra3c
+0738	380A	snz     C
+0739	2F3F	jmp     _L105
+				;1113		{
+				;1114			ucReadADCNT ++;
+073A	4751	mov     a, ucReadADCNT[0]
+073B	4089	mov     ra3c, a
+073C	5489	inc     ra3c
+073D	4709	mov     a, ra3c
+073E	40D1	mov     ucReadADCNT[0], a
+				;1115		}
+				;1116		
+				;1117		if(uiReleaseKey_CNT < 20000)
+				_L105:
+073F	4741	mov     a, uiReleaseKey_CNT[0]
+0740	4089	mov     ra3c, a
+0741	4742	mov     a, uiReleaseKey_CNT[1]
+0742	408E	mov     rb3c, a
+0743	0F1F	mov     a, 1FH
+0744	4209	sub     a, ra3c
+0745	0F4E	mov     a, 4EH
+0746	520E	sbc     a, rb3c
+0747	380A	snz     C
+0748	2F54	jmp     _L106
+				;1118		{
+				;1119			uiReleaseKey_CNT ++;
+0749	4741	mov     a, uiReleaseKey_CNT[0]
+074A	4089	mov     ra3c, a
+074B	4742	mov     a, uiReleaseKey_CNT[1]
+074C	408E	mov     rb3c, a
+074D	5489	inc     ra3c
+074E	3D0A	sz      Z
+074F	548E	inc     rb3c
+0750	4709	mov     a, ra3c
+0751	40C1	mov     uiReleaseKey_CNT[0], a
+0752	470E	mov     a, rb3c
+0753	40C2	mov     uiReleaseKey_CNT[1], a
+				;1120		}
+				;1121		
+				;1122		asm("CLR	WDT");	
+				_L106:
+0754	0001	clr     wdt
+0755	4722	mov     a, r23c
+0756	008B	mov     __mp1h[7], a
+0757	C70F	lmov    a, r33c
+0759	008A	mov     STATUS, a
+075A	C710	lmov    a, r43c
+075C	0083	mov     MP1L, a
+075D	C711	lmov    a, r53c
+075F	0084	mov     MP1H, a
+0760	C712	lmov    a, r63c
+0762	0087	mov     TBLP, a
+0763	C713	lmov    a, r73c
+0765	0089	mov     TBHP, a
+0766	1D05	tabrd   ACC
+0767	4721	mov     a, r13c
+0768	0004	reti
+				;1123	}
+				;1124	
+				;1125	
+				;1126	
+				;1127	//===============================================
+				;1128	//
+				;1129	//===============================================
+				;1130	void	KeyCheck(void)
+				;1131	{
+				;1132		if(!_pb7)
+				_KeyCheck:
+				_KeyCheck:
+0769	0726	mov     a, PB
+076A	4083	mov     ra, a
+076B	0F80	mov     a, 80H
+076C	4683	andm    a, ra
+076D	5083	sz      ra
+076E	2F7D	jmp     _L108
+				;1133		{
+				;1134			bKey_NO = 0;
+076F	7682	clr     bit_var_2[0].5
+				;1135			uiReleaseKey_CNT = 0;
+0770	5F41	clr     uiReleaseKey_CNT[0]
+0771	5F42	clr     uiReleaseKey_CNT[1]
+				;1136			if(bKey_Press)
+0772	4702	mov     a, bit_var_2[0]
+0773	4083	mov     ra, a
+0774	0F08	mov     a, 8H
+0775	4683	andm    a, ra
+0776	5E03	snz     ra
+0777	2F7B	jmp     _L109
+				;1137			{
+				;1138	/*			if(bKey_Bounce)
+				;1139				{
+				;1140					bKey_Bounce = 0;
+				;1141					if(ucMTR_State == 0)
+				;1142					{
+				;1143						ucMTR_State = 1;
+				;1144					}
+				;1145					else if(ucMTR_State == 1)
+				;1146					{
+				;1147						ucMTR_State = 2;
+				;1148					}
+				;1149					else if(ucMTR_State == 2)
+				;1150					{
+				;1151						ucMTR_State = 3;
+				;1152					}
+				;1153					else if(ucMTR_State == 4)
+				;1154					{
+				;1155						ucMTR_State = 1;
+				;1156					}
+				;1157				}*/
+				;1158				ucMTR_State = 3;
+0778	0F03	mov     a, 3H
+0779	40D8	mov     ucMTR_State[0], a
+077A	2FA9	jmp     _L107
+				;1159			}
+				;1160			else
+				;1161			{
+				;1162				bKey_Press = 1;
+				_L109:
+077B	7182	set     bit_var_2[0].3
+077C	2FA9	jmp     _L107
+				;1163			}
+				;1164		}
+				;1165		else
+				;1166		{
+				;1167			if(bKey_NO)
+				_L108:
+077D	4702	mov     a, bit_var_2[0]
+077E	4083	mov     ra, a
+077F	0F20	mov     a, 20H
+0780	4683	andm    a, ra
+0781	5E03	snz     ra
+0782	2F86	jmp     _L112
+				;1168			{
+				;1169				bKey_Bounce = 1;
+0783	7202	set     bit_var_2[0].4
+				;1170				bKey_Press  = 0;
+0784	7582	clr     bit_var_2[0].3
+0785	2F87	jmp     _L113
+				;1171			}
+				;1172			else
+				;1173			{
+				;1174				bKey_NO = 1;
+				_L112:
+0786	7282	set     bit_var_2[0].5
+				;1175			}
+				;1176			
+				;1177			if((uiReleaseKey_CNT > 2000) && (uiReleaseKey_CNT < 3000))
+				_L113:
+0787	4741	mov     a, uiReleaseKey_CNT[0]
+0788	4083	mov     ra, a
+0789	4742	mov     a, uiReleaseKey_CNT[1]
+078A	4084	mov     rb, a
+078B	0FD0	mov     a, D0H
+078C	4203	sub     a, ra
+078D	0F07	mov     a, 7H
+078E	5204	sbc     a, rb
+078F	3C0A	sz      C
+0790	2F9E	jmp     _L114
+0791	4741	mov     a, uiReleaseKey_CNT[0]
+0792	4083	mov     ra, a
+0793	4742	mov     a, uiReleaseKey_CNT[1]
+0794	4084	mov     rb, a
+0795	0FB7	mov     a, B7H
+0796	4203	sub     a, ra
+0797	0F0B	mov     a, BH
+0798	5204	sbc     a, rb
+0799	380A	snz     C
+079A	2F9E	jmp     _L114
+				;1178			{
+				;1179				ucMTR_State = 4;
+079B	0F04	mov     a, 4H
+079C	40D8	mov     ucMTR_State[0], a
+079D	2FA9	jmp     _L107
+				;1180			}
+				;1181			else if(uiReleaseKey_CNT > 10000)
+				_L114:
+079E	4741	mov     a, uiReleaseKey_CNT[0]
+079F	4083	mov     ra, a
+07A0	4742	mov     a, uiReleaseKey_CNT[1]
+07A1	4084	mov     rb, a
+07A2	0F10	mov     a, 10H
+07A3	4203	sub     a, ra
+07A4	0F27	mov     a, 27H
+07A5	5204	sbc     a, rb
+07A6	3C0A	sz      C
+07A7	2FA9	jmp     _L107
+				;1182			{
+				;1183				ucMTR_State = 0;
+07A8	5F58	clr     ucMTR_State[0]
+				_L107:
+07A9	0003	ret
+				;1184			}
+				;1185		}
+				;1186	}
+				;1187	
+				;1188	
+				;1189	
+				;1190	//===============================================
+				;1191	//
+				;1192	//===============================================
+				;1193	void	ReadMTRState(void)
+				;1194	{
+				;1195		switch(ucMTR_State)
+				_ReadMTRState:
+				_ReadMTRState:
+07AA	4758	mov     a, ucMTR_State[0]
+07AB	4083	mov     ra, a
+07AC	5F04	clr     rb
+07AD	4703	mov     a, ra
+07AE	4504	or      a, rb
+07AF	3D0A	sz      Z
+07B0	2FC6	jmp     _L117
+07B1	4703	mov     a, ra
+07B2	0C01	xor     a, 1H
+07B3	4504	or      a, rb
+07B4	3D0A	sz      Z
+07B5	2FC9	jmp     _L118
+07B6	4703	mov     a, ra
+07B7	0C02	xor     a, 2H
+07B8	4504	or      a, rb
+07B9	3D0A	sz      Z
+07BA	2FCE	jmp     _L119
+07BB	4703	mov     a, ra
+07BC	0C03	xor     a, 3H
+07BD	4504	or      a, rb
+07BE	3D0A	sz      Z
+07BF	2FD3	jmp     _L120
+07C0	4703	mov     a, ra
+07C1	0C04	xor     a, 4H
+07C2	4504	or      a, rb
+07C3	3D0A	sz      Z
+07C4	2FD8	jmp     _L121
+07C5	2FDC	jmp     _L123
+				;1196		{
+				;1197			case 0:
+				;1198				uiADC_ValueTemp = 0;
+				_L117:
+07C6	5F33	clr     uiADC_ValueTemp[0]
+07C7	5F34	clr     uiADC_ValueTemp[1]
+				;1199			break;
+07C8	2FDE	jmp     _L122
+				;1200			
+				;1201			case 1:
+				;1202				uiADC_ValueTemp = PWM_MAX_Gear1;
+				_L118:
+07C9	0F90	mov     a, 90H
+07CA	40B3	mov     uiADC_ValueTemp[0], a
+07CB	0F01	mov     a, 1H
+07CC	40B4	mov     uiADC_ValueTemp[1], a
+				;1203			break;
+07CD	2FDE	jmp     _L122
+				;1204			
+				;1205			case 2:
+				;1206				uiADC_ValueTemp = PWM_MAX_Gear2;
+				_L119:
+07CE	0F88	mov     a, 88H
+07CF	40B3	mov     uiADC_ValueTemp[0], a
+07D0	0F02	mov     a, 2H
+07D1	40B4	mov     uiADC_ValueTemp[1], a
+				;1207			break;
+07D2	2FDE	jmp     _L122
+				;1208			
+				;1209			case 3:
+				;1210				uiADC_ValueTemp = PWM_MAX_Gear3;
+				_L120:
+07D3	0F20	mov     a, 20H
+07D4	40B3	mov     uiADC_ValueTemp[0], a
+07D5	0F03	mov     a, 3H
+07D6	40B4	mov     uiADC_ValueTemp[1], a
+				;1211			break;
+07D7	2FDE	jmp     _L122
+				;1212			
+				;1213			case 4:
+				;1214				uiADC_ValueTemp = PWM_MAX_Gear4;
+				_L121:
+07D8	0F7D	mov     a, 7DH
+07D9	40B3	mov     uiADC_ValueTemp[0], a
+07DA	5F34	clr     uiADC_ValueTemp[1]
+				;1215			break;
+07DB	2FDE	jmp     _L122
+				;1216			
+				;1217			default:
+				;1218				uiADC_ValueTemp = 0;
+				_L123:
+07DC	5F33	clr     uiADC_ValueTemp[0]
+07DD	5F34	clr     uiADC_ValueTemp[1]
+				;1219			break;
+				;1220		}
+				;1221		
+				;1222		uiADCSum -= uiVRValue[ucVRIndex];
+				_L122:
+07DE	4752	mov     a, uiADCSum[0]
+07DF	4085	mov     rc, a
+07E0	4753	mov     a, uiADCSum[1]
+07E1	4086	mov     rd, a
+07E2	4749	mov     a, ucVRIndex[0]
+07E3	4083	mov     ra, a
+07E4	5F04	clr     rb
+07E5	340A	clr     C
+07E6	5A83	rlc     ra
+07E7	5A84	rlc     rb
+07E8	0FE3	mov     a, E3H
+07E9	4383	addm    a, ra
+07EA	0F00	mov     a, 0H
+07EB	5384	adcm    a, rb
+07EC	4703	mov     a, ra
+07ED	0083	mov     MP1L, a
+07EE	4704	mov     a, rb
+07EF	0084	mov     MP1H, a
+07F0	6287	call    L0A87
+07F1	4083	mov     ra, a
+07F2	6286	call    L0A86
+07F3	4084	mov     rb, a
+07F4	4705	mov     a, rc
+07F5	4283	subm    a, ra
+07F6	4706	mov     a, rd
+07F7	5284	sbcm    a, rb
+07F8	4703	mov     a, ra
+07F9	40D2	mov     uiADCSum[0], a
+07FA	4704	mov     a, rb
+07FB	40D3	mov     uiADCSum[1], a
+				;1223		uiADCSum += uiADC_ValueTemp;
+07FC	4752	mov     a, uiADCSum[0]
+07FD	4085	mov     rc, a
+07FE	4753	mov     a, uiADCSum[1]
+07FF	4086	mov     rd, a
+0800	4733	mov     a, uiADC_ValueTemp[0]
+0801	4083	mov     ra, a
+0802	4734	mov     a, uiADC_ValueTemp[1]
+0803	4084	mov     rb, a
+0804	4705	mov     a, rc
+0805	4383	addm    a, ra
+0806	4706	mov     a, rd
+0807	5384	adcm    a, rb
+0808	4703	mov     a, ra
+0809	40D2	mov     uiADCSum[0], a
+080A	4704	mov     a, rb
+080B	40D3	mov     uiADCSum[1], a
+				;1224		uiVRValue[ucVRIndex] = uiADC_ValueTemp;
+080C	4749	mov     a, ucVRIndex[0]
+080D	4083	mov     ra, a
+080E	5F04	clr     rb
+080F	4733	mov     a, uiADC_ValueTemp[0]
+0810	4085	mov     rc, a
+0811	4734	mov     a, uiADC_ValueTemp[1]
+0812	4086	mov     rd, a
+0813	340A	clr     C
+0814	5A83	rlc     ra
+0815	5A84	rlc     rb
+0816	0FE3	mov     a, E3H
+0817	4383	addm    a, ra
+0818	0F00	mov     a, 0H
+0819	5384	adcm    a, rb
+081A	4703	mov     a, ra
+081B	0083	mov     MP1L, a
+081C	4704	mov     a, rb
+081D	0084	mov     MP1H, a
+081E	4705	mov     a, rc
+081F	0082	mov     __iar1[0], a
+0820	1483	inc     MP1L
+0821	4706	mov     a, rd
+0822	0082	mov     __iar1[0], a
+				;1225		ucVRIndex ++;
+0823	4749	mov     a, ucVRIndex[0]
+0824	4083	mov     ra, a
+0825	5483	inc     ra
+0826	4703	mov     a, ra
+0827	40C9	mov     ucVRIndex[0], a
+				;1226		ucVRIndex = ucVRIndex & 3;
+0828	4749	mov     a, ucVRIndex[0]
+0829	4083	mov     ra, a
+082A	0F03	mov     a, 3H
+082B	4683	andm    a, ra
+082C	4703	mov     a, ra
+082D	40C9	mov     ucVRIndex[0], a
+				;1227		uiVRValue_Final = uiADCSum >> 2;
+082E	4752	mov     a, uiADCSum[0]
+082F	4083	mov     ra, a
+0830	4753	mov     a, uiADCSum[1]
+0831	4084	mov     rb, a
+0832	340A	clr     C
+0833	5B84	rrc     rb
+0834	5B83	rrc     ra
+0835	340A	clr     C
+0836	5B84	rrc     rb
+0837	5B83	rrc     ra
+0838	4703	mov     a, ra
+0839	40DC	mov     uiVRValue_Final[0], a
+083A	4704	mov     a, rb
+083B	40DD	mov     uiVRValue_Final[1], a
+				;1228		
+				;1229		asm("clr	wdt");
+083C	0001	clr     wdt
+083D	0003	ret
+				;1230	}
+				;1231	
+				;1232	
+				;1233	
+				;1234	
+				;1235	
+				;1236	
+				;1237	//===============================================
+				;1238	//
+				;1239	//===============================================
+				;1240	void	ReadVDC_PowerON(void)
+				;1241	{
+				;1242		uiADC_ValueTemp = _isrl1;
+				_ReadVDC_PowerON:
+				_ReadVDC_PowerON:
+083E	8738	lmov    a, ISRL1
+0840	4083	mov     ra, a
+0841	5F04	clr     rb
+0842	4703	mov     a, ra
+0843	40B3	mov     uiADC_ValueTemp[0], a
+0844	4704	mov     a, rb
+0845	40B4	mov     uiADC_ValueTemp[1], a
+				;1243		uiADC_ValueTemp += _isrh1 << 8;
+0846	8739	lmov    a, ISRH1
+0848	4083	mov     ra, a
+0849	5F04	clr     rb
+084A	4703	mov     a, ra
+084B	4084	mov     rb, a
+084C	5F03	clr     ra
+084D	4703	mov     a, ra
+084E	4085	mov     rc, a
+084F	4704	mov     a, rb
+0850	4086	mov     rd, a
+0851	4733	mov     a, uiADC_ValueTemp[0]
+0852	4083	mov     ra, a
+0853	4734	mov     a, uiADC_ValueTemp[1]
+0854	4084	mov     rb, a
+0855	4705	mov     a, rc
+0856	4383	addm    a, ra
+0857	4706	mov     a, rd
+0858	5384	adcm    a, rb
+0859	4703	mov     a, ra
+085A	40B3	mov     uiADC_ValueTemp[0], a
+085B	4704	mov     a, rb
+085C	40B4	mov     uiADC_ValueTemp[1], a
+				;1244		_iseocb = 0;
+085D	35BA	clr     ISEOCB
+				;1245		uiVDCValue_Final = uiADC_ValueTemp;
+085E	4733	mov     a, uiADC_ValueTemp[0]
+085F	4083	mov     ra, a
+0860	4734	mov     a, uiADC_ValueTemp[1]
+0861	4084	mov     rb, a
+0862	4703	mov     a, ra
+0863	40BB	mov     uiVDCValue_Final[0], a
+0864	4704	mov     a, rb
+0865	40BC	mov     uiVDCValue_Final[1], a
+				;1246		if(uiVDCValue_Final > 0x237)
+0866	473B	mov     a, uiVDCValue_Final[0]
+0867	4083	mov     ra, a
+0868	473C	mov     a, uiVDCValue_Final[1]
+0869	4084	mov     rb, a
+086A	0F37	mov     a, 37H
+086B	4203	sub     a, ra
+086C	0F02	mov     a, 2H
+086D	5204	sbc     a, rb
+086E	3C0A	sz      C
+086F	6872	jmp     _L125
+				;1247		{
+				;1248			bVDC_WorkOK = 1;
+0870	7102	set     bit_var_2[0].2
+0871	6873	jmp     _L126
+				;1249		}
+				;1250		else
+				;1251		{
+				;1252			bVDC_WorkOK = 0;
+				_L125:
+0872	7502	clr     bit_var_2[0].2
+				;1253		}
+				;1254		bVDC_WorkOK = 1;  //HZS
+				_L126:
+0873	7102	set     bit_var_2[0].2
+0874	0003	ret
+				;1255	}
+				;1256	
+				;1257	
+				;1258	//===============================================
+				;1259	//
+				;1260	//
+				;1261	//===============================================
+				;1262	void	ReadVDC(void)
+				;1263	{
+				;1264		uiADC_ValueTemp = _isrl1;
+				_ReadVDC:
+				_ReadVDC:
+0875	8738	lmov    a, ISRL1
+0877	4083	mov     ra, a
+0878	5F04	clr     rb
+0879	4703	mov     a, ra
+087A	40B3	mov     uiADC_ValueTemp[0], a
+087B	4704	mov     a, rb
+087C	40B4	mov     uiADC_ValueTemp[1], a
+				;1265		uiADC_ValueTemp += _isrh1 << 8;
+087D	8739	lmov    a, ISRH1
+087F	4083	mov     ra, a
+0880	5F04	clr     rb
+0881	4703	mov     a, ra
+0882	4084	mov     rb, a
+0883	5F03	clr     ra
+0884	4703	mov     a, ra
+0885	4085	mov     rc, a
+0886	4704	mov     a, rb
+0887	4086	mov     rd, a
+0888	4733	mov     a, uiADC_ValueTemp[0]
+0889	4083	mov     ra, a
+088A	4734	mov     a, uiADC_ValueTemp[1]
+088B	4084	mov     rb, a
+088C	4705	mov     a, rc
+088D	4383	addm    a, ra
+088E	4706	mov     a, rd
+088F	5384	adcm    a, rb
+0890	4703	mov     a, ra
+0891	40B3	mov     uiADC_ValueTemp[0], a
+0892	4704	mov     a, rb
+0893	40B4	mov     uiADC_ValueTemp[1], a
+				;1266		_iseocb = 0;
+0894	35BA	clr     ISEOCB
+				;1267		
+				;1268		uiVDCADCSum -= uiVDCValue[ucVDCIndex];
+0895	4754	mov     a, uiVDCADCSum[0]
+0896	4085	mov     rc, a
+0897	4755	mov     a, uiVDCADCSum[1]
+0898	4086	mov     rd, a
+0899	474A	mov     a, ucVDCIndex[0]
+089A	4083	mov     ra, a
+089B	5F04	clr     rb
+089C	340A	clr     C
+089D	5A83	rlc     ra
+089E	5A84	rlc     rb
+089F	0FEC	mov     a, ECH
+08A0	4383	addm    a, ra
+08A1	0F00	mov     a, 0H
+08A2	5384	adcm    a, rb
+08A3	4703	mov     a, ra
+08A4	0083	mov     MP1L, a
+08A5	4704	mov     a, rb
+08A6	0084	mov     MP1H, a
+08A7	6287	call    L0A87
+08A8	4083	mov     ra, a
+08A9	6286	call    L0A86
+08AA	4084	mov     rb, a
+08AB	4705	mov     a, rc
+08AC	4283	subm    a, ra
+08AD	4706	mov     a, rd
+08AE	5284	sbcm    a, rb
+08AF	4703	mov     a, ra
+08B0	40D4	mov     uiVDCADCSum[0], a
+08B1	4704	mov     a, rb
+08B2	40D5	mov     uiVDCADCSum[1], a
+				;1269		uiVDCADCSum += uiADC_ValueTemp;
+08B3	4754	mov     a, uiVDCADCSum[0]
+08B4	4085	mov     rc, a
+08B5	4755	mov     a, uiVDCADCSum[1]
+08B6	4086	mov     rd, a
+08B7	4733	mov     a, uiADC_ValueTemp[0]
+08B8	4083	mov     ra, a
+08B9	4734	mov     a, uiADC_ValueTemp[1]
+08BA	4084	mov     rb, a
+08BB	4705	mov     a, rc
+08BC	4383	addm    a, ra
+08BD	4706	mov     a, rd
+08BE	5384	adcm    a, rb
+08BF	4703	mov     a, ra
+08C0	40D4	mov     uiVDCADCSum[0], a
+08C1	4704	mov     a, rb
+08C2	40D5	mov     uiVDCADCSum[1], a
+				;1270		uiVDCValue[ucVDCIndex] = uiADC_ValueTemp;
+08C3	474A	mov     a, ucVDCIndex[0]
+08C4	4083	mov     ra, a
+08C5	5F04	clr     rb
+08C6	4733	mov     a, uiADC_ValueTemp[0]
+08C7	4085	mov     rc, a
+08C8	4734	mov     a, uiADC_ValueTemp[1]
+08C9	4086	mov     rd, a
+08CA	340A	clr     C
+08CB	5A83	rlc     ra
+08CC	5A84	rlc     rb
+08CD	0FEC	mov     a, ECH
+08CE	4383	addm    a, ra
+08CF	0F00	mov     a, 0H
+08D0	5384	adcm    a, rb
+08D1	4703	mov     a, ra
+08D2	0083	mov     MP1L, a
+08D3	4704	mov     a, rb
+08D4	0084	mov     MP1H, a
+08D5	4705	mov     a, rc
+08D6	0082	mov     __iar1[0], a
+08D7	1483	inc     MP1L
+08D8	4706	mov     a, rd
+08D9	0082	mov     __iar1[0], a
+				;1271		ucVDCIndex ++;
+08DA	474A	mov     a, ucVDCIndex[0]
+08DB	4083	mov     ra, a
+08DC	5483	inc     ra
+08DD	4703	mov     a, ra
+08DE	40CA	mov     ucVDCIndex[0], a
+				;1272		ucVDCIndex = ucVDCIndex & 3;
+08DF	474A	mov     a, ucVDCIndex[0]
+08E0	4083	mov     ra, a
+08E1	0F03	mov     a, 3H
+08E2	4683	andm    a, ra
+08E3	4703	mov     a, ra
+08E4	40CA	mov     ucVDCIndex[0], a
+				;1273		uiVDCValue_Final = uiVDCADCSum >> 2;
+08E5	4754	mov     a, uiVDCADCSum[0]
+08E6	4083	mov     ra, a
+08E7	4755	mov     a, uiVDCADCSum[1]
+08E8	4084	mov     rb, a
+08E9	340A	clr     C
+08EA	5B84	rrc     rb
+08EB	5B83	rrc     ra
+08EC	340A	clr     C
+08ED	5B84	rrc     rb
+08EE	5B83	rrc     ra
+08EF	4703	mov     a, ra
+08F0	40BB	mov     uiVDCValue_Final[0], a
+08F1	4704	mov     a, rb
+08F2	40BC	mov     uiVDCValue_Final[1], a
+				;1274		
+				;1275		if(bVDC_WorkOK)	
+08F3	4702	mov     a, bit_var_2[0]
+08F4	4083	mov     ra, a
+08F5	0F04	mov     a, 4H
+08F6	4683	andm    a, ra
+08F7	5E03	snz     ra
+08F8	693A	jmp     _L128
+				;1276		{
+				;1277			if(uiVDCValue_Final > 0x326)		
+08F9	473B	mov     a, uiVDCValue_Final[0]
+08FA	4083	mov     ra, a
+08FB	473C	mov     a, uiVDCValue_Final[1]
+08FC	4084	mov     rb, a
+08FD	0F26	mov     a, 26H
+08FE	4203	sub     a, ra
+08FF	0F03	mov     a, 3H
+0900	5204	sbc     a, rb
+0901	3C0A	sz      C
+0902	6905	jmp     _L129
+				;1278			{
+				;1279				bVoltageOver = 1;
+0903	7301	set     bit_var_1[0].6
+0904	6919	jmp     _L130
+				;1280				
+				;1281			}
+				;1282			else if((uiVDCValue_Final < 0x30d) && (!bVoltageUnder))	
+				_L129:
+0905	473B	mov     a, uiVDCValue_Final[0]
+0906	4083	mov     ra, a
+0907	473C	mov     a, uiVDCValue_Final[1]
+0908	4084	mov     rb, a
+0909	0F0C	mov     a, CH
+090A	4203	sub     a, ra
+090B	0F03	mov     a, 3H
+090C	5204	sbc     a, rb
+090D	380A	snz     C
+090E	6919	jmp     _L130
+090F	4701	mov     a, bit_var_1[0]
+0910	4083	mov     ra, a
+0911	0F10	mov     a, 10H
+0912	4683	andm    a, ra
+0913	5083	sz      ra
+0914	6919	jmp     _L130
+				;1283			{
+				;1284				bVoltageOver = 0;
+0915	7701	clr     bit_var_1[0].6
+				;1285				bVoltageErrorFlag = 0;
+0916	7482	clr     bit_var_2[0].1
+				;1286				uiVoltageCheckCnt = 0;
+0917	5F3F	clr     uiVoltageCheckCnt[0]
+0918	5F40	clr     uiVoltageCheckCnt[1]
+				;1287			}
+				;1288			
+				;1289			if(uiVDCValue_Final < 0x22a)	
+				_L130:
+0919	473B	mov     a, uiVDCValue_Final[0]
+091A	4083	mov     ra, a
+091B	473C	mov     a, uiVDCValue_Final[1]
+091C	4084	mov     rb, a
+091D	0F29	mov     a, 29H
+091E	4203	sub     a, ra
+091F	0F02	mov     a, 2H
+0920	5204	sbc     a, rb
+0921	380A	snz     C
+0922	6925	jmp     _L131
+				;1290			{
+				;1291				bVoltageUnder = 1;
+0923	7201	set     bit_var_1[0].4
+0924	697A	jmp     _L133
+				;1292				
+				;1293			}
+				;1294			else if((uiVDCValue_Final > 0x237) && (!bVoltageOver))
+				_L131:
+0925	473B	mov     a, uiVDCValue_Final[0]
+0926	4083	mov     ra, a
+0927	473C	mov     a, uiVDCValue_Final[1]
+0928	4084	mov     rb, a
+0929	0F37	mov     a, 37H
+092A	4203	sub     a, ra
+092B	0F02	mov     a, 2H
+092C	5204	sbc     a, rb
+092D	3C0A	sz      C
+092E	697A	jmp     _L133
+092F	4701	mov     a, bit_var_1[0]
+0930	4083	mov     ra, a
+0931	0F40	mov     a, 40H
+0932	4683	andm    a, ra
+0933	5083	sz      ra
+0934	697A	jmp     _L133
+				;1295			{
+				;1296				bVoltageUnder = 0;
+0935	7601	clr     bit_var_1[0].4
+				;1297				bVoltageErrorFlag = 0;
+0936	7482	clr     bit_var_2[0].1
+				;1298				uiVoltageCheckCnt = 0;
+0937	5F3F	clr     uiVoltageCheckCnt[0]
+0938	5F40	clr     uiVoltageCheckCnt[1]
+0939	697A	jmp     _L133
+				;1299			}
+				;1300		}
+				;1301		else			
+				;1302		{
+				;1303			if(uiVDCValue_Final > 0x2c0)	
+				_L128:
+093A	473B	mov     a, uiVDCValue_Final[0]
+093B	4083	mov     ra, a
+093C	473C	mov     a, uiVDCValue_Final[1]
+093D	4084	mov     rb, a
+093E	0FC0	mov     a, C0H
+093F	4203	sub     a, ra
+0940	0F02	mov     a, 2H
+0941	5204	sbc     a, rb
+0942	3C0A	sz      C
+0943	6946	jmp     _L134
+				;1304			{
+				;1305				bVoltageOver = 1;
+0944	7301	set     bit_var_1[0].6
+0945	695A	jmp     _L135
+				;1306				
+				;1307			}
+				;1308			else if((uiVDCValue_Final < 0x2b3) && (!bVoltageUnder))
+				_L134:
+0946	473B	mov     a, uiVDCValue_Final[0]
+0947	4083	mov     ra, a
+0948	473C	mov     a, uiVDCValue_Final[1]
+0949	4084	mov     rb, a
+094A	0FB2	mov     a, B2H
+094B	4203	sub     a, ra
+094C	0F02	mov     a, 2H
+094D	5204	sbc     a, rb
+094E	380A	snz     C
+094F	695A	jmp     _L135
+0950	4701	mov     a, bit_var_1[0]
+0951	4083	mov     ra, a
+0952	0F10	mov     a, 10H
+0953	4683	andm    a, ra
+0954	5083	sz      ra
+0955	695A	jmp     _L135
+				;1309			{
+				;1310				bVoltageOver = 0;
+0956	7701	clr     bit_var_1[0].6
+				;1311				bVoltageErrorFlag = 0;
+0957	7482	clr     bit_var_2[0].1
+				;1312				uiVoltageCheckCnt = 0;
+0958	5F3F	clr     uiVoltageCheckCnt[0]
+0959	5F40	clr     uiVoltageCheckCnt[1]
+				;1313			}
+				;1314			
+				;1315			if(uiVDCValue_Final < 0x16D)
+				_L135:
+095A	473B	mov     a, uiVDCValue_Final[0]
+095B	4083	mov     ra, a
+095C	473C	mov     a, uiVDCValue_Final[1]
+095D	4084	mov     rb, a
+095E	0F6C	mov     a, 6CH
+095F	4203	sub     a, ra
+0960	0F01	mov     a, 1H
+0961	5204	sbc     a, rb
+0962	380A	snz     C
+0963	6966	jmp     _L136
+				;1316			{
+				;1317				bVoltageUnder = 1;
+0964	7201	set     bit_var_1[0].4
+0965	697A	jmp     _L133
+				;1318				
+				;1319			}
+				;1320			else if((uiVDCValue_Final > 0x17D) && (!bVoltageOver))
+				_L136:
+0966	473B	mov     a, uiVDCValue_Final[0]
+0967	4083	mov     ra, a
+0968	473C	mov     a, uiVDCValue_Final[1]
+0969	4084	mov     rb, a
+096A	0F7D	mov     a, 7DH
+096B	4203	sub     a, ra
+096C	0F01	mov     a, 1H
+096D	5204	sbc     a, rb
+096E	3C0A	sz      C
+096F	697A	jmp     _L133
+0970	4701	mov     a, bit_var_1[0]
+0971	4083	mov     ra, a
+0972	0F40	mov     a, 40H
+0973	4683	andm    a, ra
+0974	5083	sz      ra
+0975	697A	jmp     _L133
+				;1321			{
+				;1322				bVoltageUnder = 0;
+0976	7601	clr     bit_var_1[0].4
+				;1323				bVoltageErrorFlag = 0;
+0977	7482	clr     bit_var_2[0].1
+				;1324				uiVoltageCheckCnt = 0;
+0978	5F3F	clr     uiVoltageCheckCnt[0]
+0979	5F40	clr     uiVoltageCheckCnt[1]
+				;1325			}
+				;1326		}
+				;1327				
+				;1328				bVoltageUnder = 0;			//HZS
+				_L133:
+097A	7601	clr     bit_var_1[0].4
+				;1329				bVoltageErrorFlag = 0;		//HZS
+097B	7482	clr     bit_var_2[0].1
+				;1330				uiVoltageCheckCnt = 0;		//HZS
+097C	5F3F	clr     uiVoltageCheckCnt[0]
+097D	5F40	clr     uiVoltageCheckCnt[1]
+				;1331		asm("clr	wdt");
+097E	0001	clr     wdt
+097F	0003	ret
+				;1332		
+				;1333	}
+				;1334	
+				;1335	
+				;1336	
+				;1337	//===============================================
+				;1338	//
+				;1339	//===============================================
+				;1340	void	ReadCurrent(void)
+				;1341	{
+				;1342		uiADC_ValueTemp = _isrl0;
+				_ReadCurrent:
+				_ReadCurrent:
+0980	8736	lmov    a, ISRL0
+0982	4083	mov     ra, a
+0983	5F04	clr     rb
+0984	4703	mov     a, ra
+0985	40B3	mov     uiADC_ValueTemp[0], a
+0986	4704	mov     a, rb
+0987	40B4	mov     uiADC_ValueTemp[1], a
+				;1343		uiADC_ValueTemp += _isrh0 << 8;
+0988	8737	lmov    a, ISRH0
+098A	4083	mov     ra, a
+098B	5F04	clr     rb
+098C	4703	mov     a, ra
+098D	4084	mov     rb, a
+098E	5F03	clr     ra
+098F	4703	mov     a, ra
+0990	4085	mov     rc, a
+0991	4704	mov     a, rb
+0992	4086	mov     rd, a
+0993	4733	mov     a, uiADC_ValueTemp[0]
+0994	4083	mov     ra, a
+0995	4734	mov     a, uiADC_ValueTemp[1]
+0996	4084	mov     rb, a
+0997	4705	mov     a, rc
+0998	4383	addm    a, ra
+0999	4706	mov     a, rd
+099A	5384	adcm    a, rb
+099B	4703	mov     a, ra
+099C	40B3	mov     uiADC_ValueTemp[0], a
+099D	4704	mov     a, rb
+099E	40B4	mov     uiADC_ValueTemp[1], a
+				;1344		_iseocb = 0;
+099F	35BA	clr     ISEOCB
+				;1345		
+				;1346		uiCurrentADCSum -= uiCurrentValue[ucCurrentIndex];
+09A0	4756	mov     a, uiCurrentADCSum[0]
+09A1	4085	mov     rc, a
+09A2	4757	mov     a, uiCurrentADCSum[1]
+09A3	4086	mov     rd, a
+09A4	474B	mov     a, ucCurrentIndex[0]
+09A5	4083	mov     ra, a
+09A6	5F04	clr     rb
+09A7	340A	clr     C
+09A8	5A83	rlc     ra
+09A9	5A84	rlc     rb
+09AA	0FF4	mov     a, F4H
+09AB	4383	addm    a, ra
+09AC	0F00	mov     a, 0H
+09AD	5384	adcm    a, rb
+09AE	4703	mov     a, ra
+09AF	0083	mov     MP1L, a
+09B0	4704	mov     a, rb
+09B1	0084	mov     MP1H, a
+09B2	6287	call    L0A87
+09B3	4083	mov     ra, a
+09B4	6286	call    L0A86
+09B5	4084	mov     rb, a
+09B6	4705	mov     a, rc
+09B7	4283	subm    a, ra
+09B8	4706	mov     a, rd
+09B9	5284	sbcm    a, rb
+09BA	4703	mov     a, ra
+09BB	40D6	mov     uiCurrentADCSum[0], a
+09BC	4704	mov     a, rb
+09BD	40D7	mov     uiCurrentADCSum[1], a
+				;1347		uiCurrentADCSum += uiADC_ValueTemp;
+09BE	4756	mov     a, uiCurrentADCSum[0]
+09BF	4085	mov     rc, a
+09C0	4757	mov     a, uiCurrentADCSum[1]
+09C1	4086	mov     rd, a
+09C2	4733	mov     a, uiADC_ValueTemp[0]
+09C3	4083	mov     ra, a
+09C4	4734	mov     a, uiADC_ValueTemp[1]
+09C5	4084	mov     rb, a
+09C6	4705	mov     a, rc
+09C7	4383	addm    a, ra
+09C8	4706	mov     a, rd
+09C9	5384	adcm    a, rb
+09CA	4703	mov     a, ra
+09CB	40D6	mov     uiCurrentADCSum[0], a
+09CC	4704	mov     a, rb
+09CD	40D7	mov     uiCurrentADCSum[1], a
+				;1348		uiCurrentValue[ucCurrentIndex] = uiADC_ValueTemp;
+09CE	474B	mov     a, ucCurrentIndex[0]
+09CF	4083	mov     ra, a
+09D0	5F04	clr     rb
+09D1	4733	mov     a, uiADC_ValueTemp[0]
+09D2	4085	mov     rc, a
+09D3	4734	mov     a, uiADC_ValueTemp[1]
+09D4	4086	mov     rd, a
+09D5	340A	clr     C
+09D6	5A83	rlc     ra
+09D7	5A84	rlc     rb
+09D8	0FF4	mov     a, F4H
+09D9	4383	addm    a, ra
+09DA	0F00	mov     a, 0H
+09DB	5384	adcm    a, rb
+09DC	4703	mov     a, ra
+09DD	0083	mov     MP1L, a
+09DE	4704	mov     a, rb
+09DF	0084	mov     MP1H, a
+09E0	4705	mov     a, rc
+09E1	0082	mov     __iar1[0], a
+09E2	1483	inc     MP1L
+09E3	4706	mov     a, rd
+09E4	0082	mov     __iar1[0], a
+				;1349		ucCurrentIndex ++;
+09E5	474B	mov     a, ucCurrentIndex[0]
+09E6	4083	mov     ra, a
+09E7	5483	inc     ra
+09E8	4703	mov     a, ra
+09E9	40CB	mov     ucCurrentIndex[0], a
+				;1350		ucCurrentIndex = ucCurrentIndex & 3;
+09EA	474B	mov     a, ucCurrentIndex[0]
+09EB	4083	mov     ra, a
+09EC	0F03	mov     a, 3H
+09ED	4683	andm    a, ra
+09EE	4703	mov     a, ra
+09EF	40CB	mov     ucCurrentIndex[0], a
+				;1351		uiCurrentValue_Final = uiCurrentADCSum >> 2;
+09F0	4756	mov     a, uiCurrentADCSum[0]
+09F1	4083	mov     ra, a
+09F2	4757	mov     a, uiCurrentADCSum[1]
+09F3	4084	mov     rb, a
+09F4	340A	clr     C
+09F5	5B84	rrc     rb
+09F6	5B83	rrc     ra
+09F7	340A	clr     C
+09F8	5B84	rrc     rb
+09F9	5B83	rrc     ra
+09FA	4703	mov     a, ra
+09FB	40E0	mov     uiCurrentValue_Final[0], a
+09FC	4704	mov     a, rb
+09FD	40E1	mov     uiCurrentValue_Final[1], a
+				;1352		
+				;1353		if((uiCurrentValue_Final > 500) && bPermitStart)
+09FE	4760	mov     a, uiCurrentValue_Final[0]
+09FF	4083	mov     ra, a
+0A00	4761	mov     a, uiCurrentValue_Final[1]
+0A01	4084	mov     rb, a
+0A02	0FF4	mov     a, F4H
+0A03	4203	sub     a, ra
+0A04	0F01	mov     a, 1H
+0A05	5204	sbc     a, rb
+0A06	3C0A	sz      C
+0A07	6A40	jmp     _L138
+0A08	4700	mov     a, bit_var_0[0]
+0A09	4083	mov     ra, a
+0A0A	0F40	mov     a, 40H
+0A0B	4683	andm    a, ra
+0A0C	5E03	snz     ra
+0A0D	6A40	jmp     _L138
+				;1354		{
+				;1355			bCurrentLimit = 1;
+0A0E	7281	set     bit_var_1[0].5
+				;1356			if(uiTempPWM > 80)
+0A0F	4735	mov     a, uiTempPWM[0]
+0A10	4083	mov     ra, a
+0A11	4736	mov     a, uiTempPWM[1]
+0A12	4084	mov     rb, a
+0A13	0F50	mov     a, 50H
+0A14	4203	sub     a, ra
+0A15	0F00	mov     a, 0H
+0A16	5204	sbc     a, rb
+0A17	3C0A	sz      C
+0A18	6A3F	jmp     _L139
+0A3E	6A41	jmp     _L140
+				_L139:
+0A3F	6A41	jmp     _L140
+				;1357			{
+				;1358				uiTempPWM --;
+0A19	4735	mov     a, uiTempPWM[0]
+0A1A	4083	mov     ra, a
+0A1B	4736	mov     a, uiTempPWM[1]
+0A1C	4084	mov     rb, a
+0A1D	0FFF	mov     a, FFH
+0A1E	4383	addm    a, ra
+0A1F	0FFF	mov     a, FFH
+0A20	5384	adcm    a, rb
+0A21	4703	mov     a, ra
+0A22	40B5	mov     uiTempPWM[0], a
+0A23	4704	mov     a, rb
+0A24	40B6	mov     uiTempPWM[1], a
+				;1359				ValueTemp = (unsigned char)(uiTempPWM >> 8);
+0A25	4735	mov     a, uiTempPWM[0]
+0A26	4083	mov     ra, a
+0A27	4736	mov     a, uiTempPWM[1]
+0A28	4084	mov     rb, a
+0A29	4704	mov     a, rb
+0A2A	4083	mov     ra, a
+0A2B	5F04	clr     rb
+0A2C	4703	mov     a, ra
+0A2D	40BE	mov     ValueTemp[0], a
+				;1360			    _dutr0h = ValueTemp;
+0A2E	473E	mov     a, ValueTemp[0]
+0A2F	4083	mov     ra, a
+0A30	4703	mov     a, ra
+0A31	00D9	mov     DUTR0H, a
+				;1361			    ValueTemp = (unsigned char)uiTempPWM;
+0A32	4735	mov     a, uiTempPWM[0]
+0A33	4083	mov     ra, a
+0A34	4736	mov     a, uiTempPWM[1]
+0A35	4084	mov     rb, a
+0A36	4703	mov     a, ra
+0A37	40BE	mov     ValueTemp[0], a
+				;1362				_dutr0l = ValueTemp;
+0A38	473E	mov     a, ValueTemp[0]
+0A39	4083	mov     ra, a
+0A3A	4703	mov     a, ra
+0A3B	00D8	mov     DUTR0L, a
+				;1363				_pwmsuf = 1;
+0A3C	B155	lset    PWMSUF
+				;1364			}
+				;1365			
+				;1366		}
+				;1367		else
+				;1368		{
+				;1369			bCurrentLimit = 0;
+				_L138:
+0A40	7681	clr     bit_var_1[0].5
+				;1370		}
+				;1371		
+				;1372		asm("clr	wdt");
+				_L140:
+0A41	0001	clr     wdt
+0A42	0003	ret
+				;1373	}
+				;1374	
+				;1375	
+				;1376	
+				;1377	
+				;1378	//===============================================
+				;1379	//
+				;1380	//===============================================
+				;1381	void	get_drag_pwm(void)
+				;1382	{
+				;1383		asm("MOV	A,80H");		//5c
+				_get_drag_pwm:
+				_get_drag_pwm:
+0A43	0F80	mov     a, 80H
+				;1384		asm("MOV	MDU1R0,A");
+0A44	00F6	mov     MDU1R0, a
+				;1385		asm("MOV	A,0EEH");		//ee
+0A45	0FEE	mov     a, EEH
+				;1386		asm("MOV	MDU1R1,A");
+0A46	00F7	mov     MDU1R1, a
+				;1387		asm("MOV	A,0H");			//0
+0A47	0F00	mov     a, 0H
+				;1388		asm("MOV	MDU1R2,A");
+0A48	00F8	mov     MDU1R2, a
+				;1389	
+				;1390		asm("MOV	A,0");
+0A49	0F00	mov     a, 0H
+				;1391		asm("MOV	MDU1R3,A");
+0A4A	00FA	mov     MDU1R3, a
+				;1392		asm("MOV	A,_uiVDCValue_Final[0]");
+0A4B	473B	mov     a, uiVDCValue_Final[0]
+				;1393		asm("MOV	MDU1R4,A");
+0A4C	00FB	mov     MDU1R4, a
+				;1394		asm("MOV	A,_uiVDCValue_Final[1]");
+0A4D	473C	mov     a, uiVDCValue_Final[1]
+				;1395		asm("MOV	MDU1R5,A");
+0A4E	00FC	mov     MDU1R5, a
+				;1396		asm("NOP");
+0A4F	0000	nop
+				;1397		asm("NOP");
+0A50	0000	nop
+				;1398		asm("NOP");
+0A51	0000	nop
+				;1399		asm("NOP");
+0A52	0000	nop
+				;1400		asm("NOP");
+0A53	0000	nop
+				;1401		asm("NOP");
+0A54	0000	nop
+				;1402		asm("NOP");
+0A55	0000	nop
+				;1403		asm("NOP");
+0A56	0000	nop
+				;1404		asm("NOP");
+0A57	0000	nop
+				;1405		asm("NOP");
+0A58	0000	nop
+				;1406		asm("NOP");
+0A59	0000	nop
+				;1407		asm("NOP");
+0A5A	0000	nop
+				;1408		asm("NOP");
+0A5B	0000	nop
+				;1409		asm("NOP");
+0A5C	0000	nop
+				;1410		asm("NOP");
+0A5D	0000	nop
+				;1411		asm("NOP");
+0A5E	0000	nop
+				;1412		asm("NOP");
+0A5F	0000	nop
+				;1413		asm("NOP");
+0A60	0000	nop
+				;1414		asm("MOV	A,MDU1R0");
+0A61	0776	mov     a, MDU1R0
+				;1415		asm("MOV	_uiDragPWM[0],A");
+0A62	40B7	mov     uiDragPWM[0], a
+				;1416		asm("MOV	A,MDU1R1");
+0A63	0777	mov     a, MDU1R1
+				;1417		asm("MOV	_uiDragPWM[1],A");
+0A64	40B8	mov     uiDragPWM[1], a
+				;1418		
+				;1419		
+				;1420		if(uiDragPWM > 700)
+0A65	4737	mov     a, uiDragPWM[0]
+0A66	4083	mov     ra, a
+0A67	4738	mov     a, uiDragPWM[1]
+0A68	4084	mov     rb, a
+0A69	0FBC	mov     a, BCH
+0A6A	4203	sub     a, ra
+0A6B	0F02	mov     a, 2H
+0A6C	5204	sbc     a, rb
+0A6D	3C0A	sz      C
+0A6E	6A74	jmp     _L142
+				;1421		{
+				;1422			uiDragPWM = 700;		//HZS
+0A6F	0FBC	mov     a, BCH
+0A70	40B7	mov     uiDragPWM[0], a
+0A71	0F02	mov     a, 2H
+0A72	40B8	mov     uiDragPWM[1], a
+0A73	6A81	jmp     _L141
+				;1423		}
+				;1424		else if(uiDragPWM < 50)
+				_L142:
+0A74	4737	mov     a, uiDragPWM[0]
+0A75	4083	mov     ra, a
+0A76	4738	mov     a, uiDragPWM[1]
+0A77	4084	mov     rb, a
+0A78	0F31	mov     a, 31H
+0A79	4203	sub     a, ra
+0A7A	0F00	mov     a, 0H
+0A7B	5204	sbc     a, rb
+0A7C	380A	snz     C
+0A7D	6A81	jmp     _L141
+				;1425		{
+				;1426			uiDragPWM = 50;
+0A7E	0F32	mov     a, 32H
+0A7F	40B7	mov     uiDragPWM[0], a
+0A80	5F38	clr     uiDragPWM[1]
+				_L141:
+0A81	0003	ret
+				startup_value:
+				@ROMDATA_BASE .SECTION 'CODE'
+0A82	0002	halt
+0A83	00B1	mov     CAPTMDH, a
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+0A84	0000	nop
+0A85	0000	nop
+				L0A86:
+0A86	1483	inc     MP1L
+				L0A87:
+0A87	3F84	sz      MP1H.7
+0A88	6A8B	jmp     L0A8B
+0A89	0702	mov     a, __iar1[0]
+0A8A	0003	ret
+				L0A8B:
+0A8B	1B04	rrca    MP1H
+0A8C	0E3F	and     a, 3FH
+0A8D	0089	mov     TBHP, a
+0A8E	1B03	rrca    MP1L
+0A8F	0087	mov     TBLP, a
+0A90	1D05	tabrd   ACC
+0A91	3C0A	sz      C
+0A92	0708	mov     a, TBLH
+0A93	0003	ret
+				;1427		}
+				;1428		
+				;1429		//uiDragPWM = 450;	//for test
+				;1430	}
+				;1431	
+				;file C:\Users\steven.ho\Desktop\致新20180124\startup1_l.asm
+				;1	;;--------------------------------------------------------------;;
+				;2	;;    This file is part of the Holtek C Compiler V3 package     ;;
+				;3	;;    For the initialization of static linkage variables        ;;
+				;4	;;    Copyright (C) 2017 Holtek Semiconductor Inc.              ;;
+				;5	;;    Version: 1.07 (Above IDE3000 V7.94)                       ;;
+				;6	;;    Date:    2017/03/06                                        ;;
+				;7	;;--------------------------------------------------------------;;
+				;8	
+				;9	acc equ [05h]
+				;10	tblp equ [07h]
+				;11	tblh equ [08h]
+				;12	;;tbhp equ [09h] 
+				;13	r0 equ [00h]
+				;14	mp0 equ [01h]
+				;15	r1 equ [02h]
+				;16	mp1l equ [03h]
+				;17	mp1h equ [04h]
+				;18	z equ [0ah].2
+				;19	c equ [0ah].0
+				;20	
+				;21	ifndef tbhp
+				;22	tbhp equ [09h]
+				;23	endif
+				;24	 
+				;25	extern startup_value_1:near
+				;26	
+				;27	@start .section 'code'
+				;28	begin_startup_value:
+				;29	  mov a,low (offset startup_value_1) 
+				begin_startup_value:
+				@start .SECTION 'CODE'
+				@dummy60 .SECTION 'CODE'
+				_main_startup1:
+				@start .SECTION 'CODE'
+0040	0F81	mov     a, 81H
+				;30	  mov tblp,a
+0041	0087	mov     TBLP, a
+				;31	  mov a,high (offset startup_value_1) 
+0042	0F0A	mov     a, AH
+				;32	  mov tbhp,a
+0043	0089	mov     TBHP, a
+				;33	next_table:
+				;34	  ;CLR WDT
+				;35	  inc tblp
+				next_table:
+0044	1487	inc     TBLP
+				;36	  sz z
+0045	3D0A	sz      Z
+				;37	  inc tbhp
+0046	1489	inc     TBHP
+				;38	ifdef USE_TABRDC
+				;39	  tabrdc mp0
+				;40	else
+				;41	  tabrd mp0
+0047	1D01	tabrd   MP0
+				;42	endif
+				;43	  sz mp0
+0048	1081	sz      MP0
+				;44	  jmp read_data
+0049	284B	jmp     read_data
+				;45	  jmp startupend1
+004A	2860	jmp     startupend1
+				;46	read_data:
+				;47	  inc tblp
+				read_data:
+004B	1487	inc     TBLP
+				;48	  sz z
+004C	3D0A	sz      Z
+				;49	  inc tbhp
+004D	1489	inc     TBHP
+				;50	ifdef USE_TABRDC
+				;51	  tabrdc mp1l
+				;52	else
+				;53	  tabrd mp1l
+004E	1D03	tabrd   MP1L
+				;54	endif
+				;55	  mov a,tblh
+004F	0708	mov     a, TBLH
+				;56	  mov mp1h,a
+0050	0084	mov     MP1H, a
+				;57	next_data:
+				;58	  inc tblp
+				next_data:
+0051	1487	inc     TBLP
+				;59	  sz z
+0052	3D0A	sz      Z
+				;60	  inc tbhp
+0053	1489	inc     TBHP
+				;61	ifdef USE_TABRDC
+				;62	  tabrdc acc
+				;63	else
+				;64	  tabrd acc
+0054	1D05	tabrd   ACC
+				;65	endif
+				;66	  mov r1,a
+0055	0082	mov     __iar1[0], a
+				;67	  sdz mp0
+0056	1781	sdz     MP0
+				;68	  jmp $+2
+0057	2859	jmp     L0059
+				;69	  jmp next_table
+0058	2844	jmp     next_table
+				;70	  inc mp1l
+				L0059:
+0059	1483	inc     MP1L
+				;71	  mov a,tblh
+005A	0708	mov     a, TBLH
+				;72	  mov r1,a
+005B	0082	mov     __iar1[0], a
+				;73	  inc mp1l
+005C	1483	inc     MP1L
+				;74	  sdz mp0
+005D	1781	sdz     MP0
+				;75	  jmp next_data
+005E	2851	jmp     next_data
+				;76	  jmp next_table
+005F	2844	jmp     next_table
+				;77	
+				;78	;end_startup_value:
+				;79	
+				;80	startupend1:
+				;81	ifndef Disable_Bit_Initial
+				;82		MOV A,high  bitdatasec1_start
+				startupend1:
+0060	0F00	mov     a, 0H
+				;83		MOV mp1h,a
+0061	0084	mov     MP1H, a
+				;84		MOV A,offset bitdatasec1_end
+0062	0F83	mov     a, 83H
+				;85		mov mp1l,A
+0063	0083	mov     MP1L, a
+				;86		dec mp1l
+0064	1583	dec     MP1L
+				;87		clr z
+0065	350A	clr     Z
+				;88		sub a,offset bitdatasec1_start
+0066	0A83	sub     a, 83H
+				;89		sz z
+0067	3D0A	sz      Z
+				;90		jmp startupend2
+0068	286D	jmp     startupend2
+				;91	L0005:
+				;92		set r1
+				L0005:
+0069	1F82	set     __iar1[0]
+				;93		dec mp1l
+006A	1583	dec     MP1L
+				;94		sdz  acc
+006B	1785	sdz     ACC
+				;95		jmp L0005
+006C	2869	jmp     L0005
+				;96	
+				;97	startupend2:
+				;98		MOV A,high  bitdatasec0_start
+				startupend2:
+006D	0F00	mov     a, 0H
+				;99		MOV mp1h,a
+006E	0084	mov     MP1H, a
+				;100		MOV A,offset bitdatasec0_end
+006F	0F83	mov     a, 83H
+				;101		mov mp1l,A
+0070	0083	mov     MP1L, a
+				;102		dec mp1l
+0071	1583	dec     MP1L
+				;103		clr z
+0072	350A	clr     Z
+				;104		sub a,offset bitdatasec0_start
+0073	0A83	sub     a, 83H
+				;105		sz  z
+0074	3D0A	sz      Z
+				;106		jmp startupend3
+0075	287A	jmp     startupend3
+				;107	L0006:
+				;108		clr r1
+				L0006:
+0076	1F02	clr     __iar1[0]
+				;109		dec mp1l
+0077	1583	dec     MP1L
+				;110		sdz  acc
+0078	1785	sdz     ACC
+				;111		jmp L0006
+0079	2876	jmp     L0006
+				;112	startupend3:
+				;113	endif		
+				;114	   
+				;115	@ROMDATA_BASE .SECTION com_l 'CODE'  
+				;116	startup_value:
+				;117	;;linker range the initial value table here
+				;118	
+				;119	@BITDATASEC1 .SECTION com_l 'DATA'  
+				;120	bitdatasec1_start:
+				;121	
+				;122	@BITDATASEC1 .SECTION com_e 'DATA'  
+				;123	bitdatasec1_end:
+				;124	
+				;125	@BITDATASEC .SECTION com_l 'DATA'  
+				;126	bitdatasec0_start:
+				;127	
+				;128	@BITDATASEC .SECTION com_e 'DATA'  
+				;129	bitdatasec0_end:
+				data .SECTION 'DATA'
+				__iar0 DB DUP (?) ; __iar0
+				__mp0 DB DUP (?) ; __mp0
+				__iar1 DB DUP (?) ; __iar1
+				__mp1l DB DUP (?) ; __mp1l
+				__mp1h DB DUP (?) ; __mp1h
+				__mp2l DB DUP (?) ; __mp2l
+				__mp2h DB DUP (?) ; __mp2h
+				__smod DB DUP (?) ; __smod
+				__lvdc DB DUP (?) ; __lvdc
+				__intc0 DB DUP (?) ; __intc0
+				__intc2 DB DUP (?) ; __intc2
+				__intc3 DB DUP (?) ; __intc3
+				__mfi0 DB DUP (?) ; __mfi0
+				__mfi3 DB DUP (?) ; __mfi3
+				__mfi5 DB DUP (?) ; __mfi5
+				__mfi6 DB DUP (?) ; __mfi6
+				__mfi7 DB DUP (?) ; __mfi7
+				__pa DB DUP (?) ; __pa
+				__pac DB DUP (?) ; __pac
+				__pbpu DB DUP (?) ; __pbpu
+				__pb DB DUP (?) ; __pb
+				__pbc DB DUP (?) ; __pbc
+				__pc DB DUP (?) ; __pc
+				__pcc DB DUP (?) ; __pcc
+				__captc0 DB DUP (?) ; __captc0
+				__captc1 DB DUP (?) ; __captc1
+				__captmal DB DUP (?) ; __captmal
+				__captmah DB DUP (?) ; __captmah
+				__adcr0 DB DUP (?) ; __adcr0
+				__adcr1 DB DUP (?) ; __adcr1
+				__adcr2 DB DUP (?) ; __adcr2
+				__adisg1 DB DUP (?) ; __adisg1
+				__adisg2 DB DUP (?) ; __adisg2
+				__addl DB DUP (?) ; __addl
+				__pbps0 DB DUP (?) ; __pbps0
+				__pbps1 DB DUP (?) ; __pbps1
+				__ocps DB DUP (?) ; __ocps
+				__integ0 DB DUP (?) ; __integ0
+				__hdcr DB DUP (?) ; __hdcr
+				__hdcd DB DUP (?) ; __hdcd
+				__mptc1 DB DUP (?) ; __mptc1
+				__dutr3l DB DUP (?) ; __dutr3l
+				__dutr3h DB DUP (?) ; __dutr3h
+				__pwmc DB DUP (?) ; __pwmc
+				__dutr0l DB DUP (?) ; __dutr0l
+				__dutr0h DB DUP (?) ; __dutr0h
+				__prdrl DB DUP (?) ; __prdrl
+				__prdrh DB DUP (?) ; __prdrh
+				__pwmme DB DUP (?) ; __pwmme
+				__pwmmd DB DUP (?) ; __pwmmd
+				__mcf DB DUP (?) ; __mcf
+				__mcd DB DUP (?) ; __mcd
+				__dts DB DUP (?) ; __dts
+				__plc DB DUP (?) ; __plc
+				__cmpc DB DUP (?) ; __cmpc
+				bit_var_0 DB DUP (?) ; bit_var_0
+				bit_var_1 DB DUP (?) ; bit_var_1
+				bit_var_2 DB DUP (?) ; bit_var_2
+				ra DB DUP (?)
+				rb DB DUP (?)
+				rc DB DUP (?)
+				rd DB DUP (?)
+				r108 DB DUP (?)
+				r208 DB DUP (?)
+				ra3c DB DUP (?)
+				ra38 DB DUP (?)
+				ra04 DB DUP (?)
+				rc3c DB DUP (?)
+				rd3c DB DUP (?)
+				rb3c DB DUP (?)
+				r104 DB DUP (?)
+				r204 DB DUP (?)
+				rb04 DB DUP (?)
+				rc04 DB DUP (?)
+				rd04 DB DUP (?)
+				r124 DB DUP (?)
+				r224 DB DUP (?)
+				ra24 DB DUP (?)
+				rb24 DB DUP (?)
+				rc24 DB DUP (?)
+				rd24 DB DUP (?)
+				r12c DB DUP (?)
+				r22c DB DUP (?)
+				r138 DB DUP (?)
+				r238 DB DUP (?)
+				rb38 DB DUP (?)
+				rc38 DB DUP (?)
+				rd38 DB DUP (?)
+				r13c DB DUP (?)
+				r23c DB DUP (?)
+				j DB DUP (?) ; j
+				n DB DUP (?) ; n
+				temp DB DUP (?) ; temp
+				uiHallTimeNewTemp DB 2 DUP (?) ; uiHallTimeNewTemp
+				ucHallTimeTemp DB DUP (?) ; ucHallTimeTemp
+				uiHallCheckDelay DB 2 DUP (?) ; uiHallCheckDelay
+				x DB 2 DUP (?) ; x
+				i DB 2 DUP (?) ; i
+				j DB DUP (?) ; j
+				k DB DUP (?) ; k
+				uiHallTimeNew DB 2 DUP (?) ; uiHallTimeNew
+				uiADC_ValueTemp DB 2 DUP (?) ; uiADC_ValueTemp
+				uiTempPWM DB 2 DUP (?) ; uiTempPWM
+				uiDragPWM DB 2 DUP (?) ; uiDragPWM
+				uiVR_Value DB 2 DUP (?) ; uiVR_Value
+				uiVDCValue_Final DB 2 DUP (?) ; uiVDCValue_Final
+				ucVoiceStep DB DUP (?) ; ucVoiceStep
+				ValueTemp DB DUP (?) ; ValueTemp
+				uiVoltageCheckCnt DB 2 DUP (?) ; uiVoltageCheckCnt
+				uiReleaseKey_CNT DB 2 DUP (?) ; uiReleaseKey_CNT
+				uiVoiceTimeCnt DB 2 DUP (?) ; uiVoiceTimeCnt
+				ucHallCycle DB DUP (?) ; ucHallCycle
+				ucHallStep DB DUP (?) ; ucHallStep
+				uiHallTimeCnt DB 2 DUP (?) ; uiHallTimeCnt
+				ucVRIndex DB DUP (?) ; ucVRIndex
+				ucVDCIndex DB DUP (?) ; ucVDCIndex
+				ucCurrentIndex DB DUP (?) ; ucCurrentIndex
+				ucDragDelayTime DB DUP (?) ; ucDragDelayTime
+				ucTempDragDelayTime DB DUP (?) ; ucTempDragDelayTime
+				ucHallCnt DB DUP (?) ; ucHallCnt
+				uiLastHallTime DB 2 DUP (?) ; uiLastHallTime
+				ucReadADCNT DB DUP (?) ; ucReadADCNT
+				uiADCSum DB 2 DUP (?) ; uiADCSum
+				uiVDCADCSum DB 2 DUP (?) ; uiVDCADCSum
+				uiCurrentADCSum DB 2 DUP (?) ; uiCurrentADCSum
+				ucMTR_State DB DUP (?) ; ucMTR_State
+				uiDragPWM_Max DB 2 DUP (?) ; uiDragPWM_Max
+				uiCount1ms DB DUP (?) ; uiCount1ms
+				uiVRValue_Final DB 2 DUP (?) ; uiVRValue_Final
+				ucDragCnt DB DUP (?) ; ucDragCnt
+				ucMinDragDelayTime DB DUP (?) ; ucMinDragDelayTime
+				uiCurrentValue_Final DB 2 DUP (?) ; uiCurrentValue_Final
+				ucDragPWM_BaseInc DB DUP (?) ; ucDragPWM_BaseInc
+				uiVRValue DB DUP (?) ; uiVRValue
+				ucVDC_Temp DB DUP (?) ; ucVDC_Temp
+				uiVDCValue DB DUP (?) ; uiVDCValue
+				uiCurrentValue DB DUP (?) ; uiCurrentValue
+				ucPWMUpdateCNT DB DUP (?) ; ucPWMUpdateCNT
+				r304 DB DUP (?)
+				r404 DB DUP (?)
+				r504 DB DUP (?)
+				__tbc DB DUP (?) ; __tbc
+				__isrl0 DB DUP (?) ; __isrl0
+				__isrh0 DB DUP (?) ; __isrh0
+				__isrl1 DB DUP (?) ; __isrl1
+				__isrh1 DB DUP (?) ; __isrh1
+				__adbyps DB DUP (?) ; __adbyps
+				__adcr3 DB DUP (?) ; __adcr3
+				__ptm1c0 DB DUP (?) ; __ptm1c0
+				__ptm1c1 DB DUP (?) ; __ptm1c1
+				__ptm1dl DB DUP (?) ; __ptm1dl
+				__ptm1dh DB DUP (?) ; __ptm1dh
+				__ptm1al DB DUP (?) ; __ptm1al
+				__ptm1ah DB DUP (?) ; __ptm1ah
+				__pwmcs DB DUP (?) ; __pwmcs
+				__hchk_num DB DUP (?) ; __hchk_num
+				__hnf_msel DB DUP (?) ; __hnf_msel
+				__ptm2c0 DB DUP (?) ; __ptm2c0
+				__ptm2c1 DB DUP (?) ; __ptm2c1
+				__ptm2al DB DUP (?) ; __ptm2al
+				__ptm2ah DB DUP (?) ; __ptm2ah
+				__ptm2rpl DB DUP (?) ; __ptm2rpl
+				__ptm2rph DB DUP (?) ; __ptm2rph
+				__hdct0 DB DUP (?) ; __hdct0
+				__hdct1 DB DUP (?) ; __hdct1
+				__hdct2 DB DUP (?) ; __hdct2
+				__hdct3 DB DUP (?) ; __hdct3
+				__hdct4 DB DUP (?) ; __hdct4
+				__hdct5 DB DUP (?) ; __hdct5
+				__hdct6 DB DUP (?) ; __hdct6
+				__hdct7 DB DUP (?) ; __hdct7
+				__hdct8 DB DUP (?) ; __hdct8
+				__hdct9 DB DUP (?) ; __hdct9
+				__hdct10 DB DUP (?) ; __hdct10
+				__hdct11 DB DUP (?) ; __hdct11
+				__opoms DB DUP (?) ; __opoms
+				__opcm DB DUP (?) ; __opcm
+				__opa0cal DB DUP (?) ; __opa0cal
+				__ptm3c0 DB DUP (?) ; __ptm3c0
+				__ptm3c1 DB DUP (?) ; __ptm3c1
+				__ptm3al DB DUP (?) ; __ptm3al
+				__ptm3ah DB DUP (?) ; __ptm3ah
+				__paps0 DB DUP (?) ; __paps0
+				__paps1 DB DUP (?) ; __paps1
+				__pcps0 DB DUP (?) ; __pcps0
+				__pcps1 DB DUP (?) ; __pcps1
+				uiVoiceTime DB 2 DUP (?) ; uiVoiceTime
+				ucLostCommandVoice DB DUP (?) ; ucLostCommandVoice
+				r604 DB DUP (?)
+				r704 DB DUP (?)
+				r324 DB DUP (?)
+				r424 DB DUP (?)
+				r524 DB DUP (?)
+				r624 DB DUP (?)
+				r724 DB DUP (?)
+				r338 DB DUP (?)
+				r438 DB DUP (?)
+				r538 DB DUP (?)
+				r638 DB DUP (?)
+				r738 DB DUP (?)
+				r33c DB DUP (?)
+				r43c DB DUP (?)
+				r53c DB DUP (?)
+				r63c DB DUP (?)
+				r73c DB DUP (?)
+				ucVoiceCnt DB DUP (?) ; ucVoiceCnt

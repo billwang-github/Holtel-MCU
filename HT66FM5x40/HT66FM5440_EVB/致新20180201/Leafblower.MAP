@@ -1,0 +1,528 @@
+
+Linker Version 8.7.2.161220
+Input Object File: C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ
+Input Object File: C:\Users\steven.ho\Desktop\致新20180124\STARTUP1_L.OBJ
+
+Input Library File: C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB
+Input Library File: C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\v3_lmrsc.lib
+
+
+     Bank    Start     End      Length     Class    AvgIns    Name
+     00h     0000h     0000h    0001h      CODE               @code (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0001h     0003h    0003h      CODE               @crom (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0004h     0007h    0004h      CODE               @ISR_HALL_code (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0008h     000bh    0004h      CODE               @ISR_OCP_code (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     000ch     0023h    0018h      CODE               _IO_Init (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0024h     0027h    0004h      CODE               @ISR_TM2_code (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0028h     002ah    0003h      CODE               _INT_Init (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     002ch     002fh    0004h      CODE               @ISR_TM1_code (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0030h     0035h    0006h      CODE               _ISR_OCP (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0038h     003bh    0004h      CODE               @ISR_TM3_code (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     003ch     003fh    0004h      CODE               @ISR_TimeBase_code (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0040h     007ah    003bh      CODE               @start (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     007bh     0230h    01b6h      CODE               _main (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0231h     0261h    0031h      CODE               _System_Init (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0262h     0276h    0015h      CODE               _ADC_Init (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0277h     0286h    0010h      CODE               _Comparator_Init (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0287h     02a2h    001ch      CODE               _PWMInit (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     02a3h     02d1h    002fh      CODE               _Hall_Init (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     02d2h     02d9h    0008h      CODE               _CAPTM_Init (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     02dah     0304h    002bh      CODE               _Varitate_Init (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0305h     0311h    000dh      CODE               _delay1 (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0312h     0333h    0022h      CODE               _delay (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0334h     03a2h    006fh      CODE               _Drag_Motor (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     03a3h     045ah    00b8h      CODE               _ISR_HALL (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     045bh     04c9h    006fh      CODE               _commutation (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     04cah     04d8h    000fh      CODE               _Motor_Stop (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     04d9h     04fdh    0025h      CODE               _CommandOK (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     04feh     054ah    004dh      CODE               _VoiceSpeakInit (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     054bh     061fh    00d5h      CODE               _ISR_TM2 (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0620h     062bh    000ch      CODE               _TM1_Init (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     062ch     0635h    000ah      CODE               _ISR_TM1 (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0636h     0645h    0010h      CODE               _Init_TM3 (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0646h     06afh    006ah      CODE               _ISR_TM3 (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     06b0h     06b7h    0008h      CODE               _TimeBaseInit (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     06b8h     0768h    00b1h      CODE               _ISR_TimeBase (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0769h     07a9h    0041h      CODE               _KeyCheck (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     07aah     083dh    0094h      CODE               _ReadMTRState (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     083eh     0874h    0037h      CODE               _ReadVDC_PowerON (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0875h     097fh    010bh      CODE               _ReadVDC (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0980h     0a42h    00c3h      CODE               _ReadCurrent (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0a43h     0a81h    003fh      CODE               _get_drag_pwm (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     0a82h     0a85h    0004h      CODE               @ROMDATA_BASE (C:\Users\steven.ho\Desktop\致新20180124\STARTUP1_L.OBJ)
+     00h     0a86h     0a93h    000eh      CODE               _CROM2PROM (CROM2PROM)
+     00h     0083h     0083h    0001h      DATA     313       @data_ra (C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0084h     0084h    0001h      DATA     168       @data_rb (C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0085h     0085h    0001h      DATA     28        @data_rc (C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0086h     0086h    0001h      DATA     28        @data_rd (C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0087h     0087h    0001h      DATA     2         @data_r108 (isr:ra~rh)
+     00h     0088h     0088h    0001h      DATA     2         @data_r208 (isr:ra~rh)
+     00h     0089h     0089h    0001h      DATA     68        @data_ra3c (isr:ra~rh)
+     00h     008ah     008ah    0001h      DATA     15        @data_ra38 (isr:ra~rh)
+     00h     008bh     008bh    0001h      DATA     53        @data_ra04 (isr:ra~rh)
+     00h     008ch     008ch    0001h      DATA     8         @data_rc3c (isr:ra~rh)
+     00h     008dh     008dh    0001h      DATA     8         @data_rd3c (isr:ra~rh)
+     00h     008eh     008eh    0001h      DATA     33        @data_rb3c (isr:ra~rh)
+     00h     008fh     008fh    0001h      DATA     2         @data_r104 (isr:ra~rh)
+     00h     0090h     0090h    0001h      DATA     2         @data_r204 (isr:ra~rh)
+     00h     0091h     0091h    0001h      DATA     22        @data_rb04 (isr:ra~rh)
+     00h     0092h     0092h    0001h      DATA     6         @data_rc04 (isr:ra~rh)
+     00h     0093h     0093h    0001h      DATA     6         @data_rd04 (isr:ra~rh)
+     00h     0094h     0094h    0001h      DATA     2         @data_r124 (isr:ra~rh)
+     00h     0095h     0095h    0001h      DATA     2         @data_r224 (isr:ra~rh)
+     00h     0096h     0096h    0001h      DATA     41        @data_ra24 (isr:ra~rh)
+     00h     0097h     0097h    0001h      DATA     6         @data_rb24 (isr:ra~rh)
+     00h     0098h     0098h    0001h      DATA     6         @data_rc24 (isr:ra~rh)
+     00h     0099h     0099h    0001h      DATA     6         @data_rd24 (isr:ra~rh)
+     00h     009ah     009ah    0001h      DATA     2         @data_r12c (isr:ra~rh)
+     00h     009bh     009bh    0001h      DATA     2         @data_r22c (isr:ra~rh)
+     00h     009ch     009ch    0001h      DATA     2         @data_r138 (isr:ra~rh)
+     00h     009dh     009dh    0001h      DATA     2         @data_r238 (isr:ra~rh)
+     00h     009eh     009eh    0001h      DATA     9         @data_rb38 (isr:ra~rh)
+     00h     009fh     009fh    0001h      DATA     3         @data_rc38 (isr:ra~rh)
+     00h     00a0h     00a0h    0001h      DATA     3         @data_rd38 (isr:ra~rh)
+     00h     00a1h     00a1h    0001h      DATA     2         @data_r13c (isr:ra~rh)
+     00h     00a2h     00a2h    0001h      DATA     2         @data_r23c (isr:ra~rh)
+     00h     00b1h     00b2h    0002h      DATA     3         @HCCINIT_uiHallTimeNew (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00b3h     00b4h    0002h      DATA     22        @HCCINIT0_uiADC_ValueTemp (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00b5h     00b6h    0002h      DATA     18        @HCCINIT0_uiTempPWM (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00b7h     00b8h    0002h      DATA     16        @HCCINIT0_uiDragPWM (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00b9h     00bah    0002h      DATA     15        @HCCINIT0_uiVR_Value (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00bbh     00bch    0002h      DATA     12        @HCCINIT0_uiVDCValue_Final (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00bdh     00bdh    0001h      DATA     11        @HCCINIT0_ucVoiceStep (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00beh     00beh    0001h      DATA     8         @HCCINIT0_ValueTemp (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00bfh     00c0h    0002h      DATA     8         @HCCINIT0_uiVoltageCheckCnt (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00c1h     00c2h    0002h      DATA     8         @HCCINIT0_uiReleaseKey_CNT (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00c3h     00c4h    0002h      DATA     7         @HCCINIT0_uiVoiceTimeCnt (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00c5h     00c5h    0001h      DATA     6         @HCCINIT0_ucHallCycle (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00c6h     00c6h    0001h      DATA     6         @HCCINIT0_ucHallStep (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00c7h     00c8h    0002h      DATA     6         @HCCINIT0_uiHallTimeCnt (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00c9h     00c9h    0001h      DATA     6         @HCCINIT0_ucVRIndex (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00cah     00cah    0001h      DATA     6         @HCCINIT0_ucVDCIndex (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00cbh     00cbh    0001h      DATA     6         @HCCINIT0_ucCurrentIndex (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00cch     00cch    0001h      DATA     5         @HCCINIT0_ucDragDelayTime (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00cdh     00cdh    0001h      DATA     5         @HCCINIT0_ucTempDragDelayTime (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00ceh     00ceh    0001h      DATA     5         @HCCINIT0_ucHallCnt (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00cfh     00d0h    0002h      DATA     5         @HCCINIT0_uiLastHallTime (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00d1h     00d1h    0001h      DATA     5         @HCCINIT0_ucReadADCNT (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00d2h     00d3h    0002h      DATA     5         @HCCINIT0_uiADCSum (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00d4h     00d5h    0002h      DATA     5         @HCCINIT0_uiVDCADCSum (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00d6h     00d7h    0002h      DATA     5         @HCCINIT0_uiCurrentADCSum (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00d8h     00d8h    0001h      DATA     5         @HCCINIT0_ucMTR_State (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00d9h     00dah    0002h      DATA     4         @HCCINIT0_uiDragPWM_Max (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00dbh     00dbh    0001h      DATA     4         @HCCINIT0_uiCount1ms (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00dch     00ddh    0002h      DATA     4         @HCCINIT0_uiVRValue_Final (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00deh     00deh    0001h      DATA     3         @HCCINIT0_ucDragCnt (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00dfh     00dfh    0001h      DATA     2         @HCCINIT0_ucMinDragDelayTime (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00e0h     00e1h    0002h      DATA     2         @HCCINIT0_uiCurrentValue_Final (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00e2h     00e2h    0001h      DATA     1         @HCCINIT0_ucDragPWM_BaseInc (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00e3h     00eah    0008h      DATA     0         @HCCINIT0_uiVRValue (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00ebh     00ebh    0001h      DATA     0         @HCCINIT0_ucVDC_Temp (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00ech     00f3h    0008h      DATA     0         @HCCINIT0_uiVDCValue (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00f4h     00fbh    0008h      DATA     0         @HCCINIT0_uiCurrentValue (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00fch     00fch    0001h      DATA     0         @HCCINIT0_ucPWMUpdateCNT (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00fdh     00fdh    0001h      DATA     2         @data_r304 (isr:ra~rh)
+     00h     00feh     00feh    0001h      DATA     2         @data_r404 (isr:ra~rh)
+     00h     00ffh     00ffh    0001h      DATA     2         @data_r504 (isr:ra~rh)
+     01h     0083h     0083h    0001h      DATA     2         @data_r604 (isr:ra~rh)
+     01h     0084h     0084h    0001h      DATA     2         @data_r704 (isr:ra~rh)
+     01h     0085h     0085h    0001h      DATA     2         @data_r324 (isr:ra~rh)
+     01h     0086h     0086h    0001h      DATA     2         @data_r424 (isr:ra~rh)
+     01h     0087h     0087h    0001h      DATA     2         @data_r524 (isr:ra~rh)
+     01h     0088h     0088h    0001h      DATA     2         @data_r624 (isr:ra~rh)
+     01h     0089h     0089h    0001h      DATA     2         @data_r724 (isr:ra~rh)
+     01h     008ah     008ah    0001h      DATA     2         @data_r338 (isr:ra~rh)
+     01h     008bh     008bh    0001h      DATA     2         @data_r438 (isr:ra~rh)
+     01h     008ch     008ch    0001h      DATA     2         @data_r538 (isr:ra~rh)
+     01h     008dh     008dh    0001h      DATA     2         @data_r638 (isr:ra~rh)
+     01h     008eh     008eh    0001h      DATA     2         @data_r738 (isr:ra~rh)
+     01h     008fh     008fh    0001h      DATA     2         @data_r33c (isr:ra~rh)
+     01h     0090h     0090h    0001h      DATA     2         @data_r43c (isr:ra~rh)
+     01h     0091h     0091h    0001h      DATA     2         @data_r53c (isr:ra~rh)
+     01h     0092h     0092h    0001h      DATA     2         @data_r63c (isr:ra~rh)
+     01h     0093h     0093h    0001h      DATA     2         @data_r73c (isr:ra~rh)
+
+     Local Sections
+
+     Bank    Start     End      Length     Class    AvgIns    Name
+     00h     00b1h     00b1h    0000h      LOCAL    0         @dummy (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00b1h     00b1h    0000h      LOCAL    0         _main (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00abh    0000h      LOCAL    0         _IO_Init (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00abh    0000h      LOCAL    0         _System_Init (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00abh    0000h      LOCAL    0         _TM1_Init (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00abh    0000h      LOCAL    0         _PWMInit (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00abh    0000h      LOCAL    0         _Hall_Init (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00abh    0000h      LOCAL    0         _ADC_Init (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00abh    0000h      LOCAL    0         _Comparator_Init (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00abh    0000h      LOCAL    0         _CAPTM_Init (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00abh    0000h      LOCAL    0         _Init_TM3 (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00abh    0000h      LOCAL    0         _TimeBaseInit (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00abh    0000h      LOCAL    0         _INT_Init (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00abh    0000h      LOCAL    0         _Varitate_Init (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00b0h    0006h      LOCAL    3.3333    _delay (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00abh    0000h      LOCAL    0         _ReadVDC_PowerON (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00a6h     00a6h    0000h      LOCAL    0         _CommandOK (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00abh    0000h      LOCAL    0         _KeyCheck (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00abh    0000h      LOCAL    0         _ReadMTRState (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00a6h     00a6h    0000h      LOCAL    0         _Crom2Prom (CROM2PROM)
+     00h     00abh     00abh    0000h      LOCAL    0         _ReadVDC (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00abh    0000h      LOCAL    0         _ReadCurrent (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00abh    0000h      LOCAL    0         _Motor_Stop (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00abh    0000h      LOCAL    0         _get_drag_pwm (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00abh    0000h      LOCAL    0         _VoiceSpeakInit (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00abh    0000h      LOCAL    0         @dummy8 (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00abh    0000h      LOCAL    0         _ISR_OCP (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00abh     00abh    0000h      LOCAL    0         @dummy4 (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00a6h     00aah    0005h      LOCAL    3.2       _ISR_HALL (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00a5h     00a5h    0000h      LOCAL    0         _commutation (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00a3h     00a4h    0002h      LOCAL    3         _delay1 (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00a6h     00a6h    0000h      LOCAL    0         @dummy36 (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00a6h     00a6h    0000h      LOCAL    0         _ISR_TM2 (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00a6h     00a6h    0000h      LOCAL    0         @dummy44 (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00a6h     00a6h    0000h      LOCAL    0         _ISR_TM1 (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00a6h     00a6h    0000h      LOCAL    0         @dummy56 (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00a6h     00a6h    0000h      LOCAL    0         _ISR_TM3 (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00a6h     00a6h    0000h      LOCAL    0         @dummy60 (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00a6h     00a6h    0000h      LOCAL    0         _ISR_TimeBase (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+     00h     00a5h     00a5h    0001h      LOCAL    4         _Drag_Motor (C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ)
+
+     Public Symbols Information
+     Address            Public by Name
+     0262h              _ADC_Init
+     02d2h              _CAPTM_Init
+     04d9h              _CommandOK
+     0277h              _Comparator_Init
+     0a86h              _Crom2Prom
+     0a86h              _Crom2PromNext
+     0334h              _Drag_Motor
+     02a3h              _Hall_Init
+     0028h              _INT_Init
+     000ch              _IO_Init
+     03a3h              _ISR_HALL
+     0030h              _ISR_OCP
+     062ch              _ISR_TM1
+     054bh              _ISR_TM2
+     0646h              _ISR_TM3
+     06b8h              _ISR_TimeBase
+     0636h              _Init_TM3
+     0769h              _KeyCheck
+     04cah              _Motor_Stop
+     0287h              _PWMInit
+     0980h              _ReadCurrent
+     07aah              _ReadMTRState
+     0875h              _ReadVDC
+     083eh              _ReadVDC_PowerON
+     0231h              _System_Init
+     0620h              _TM1_Init
+     06b0h              _TimeBaseInit
+     00beh              _ValueTemp
+     02dah              _Varitate_Init
+     04feh              _VoiceSpeakInit
+     045bh              _commutation
+     0312h              _delay
+     0305h              _delay1
+     00abh              _delay_2
+     0a43h              _get_drag_pwm
+     007bh              _main
+     00cbh              _ucCurrentIndex
+     0001h              _ucDealDragHall
+     00deh              _ucDragCnt
+     00cch              _ucDragDelayTime
+     00e2h              _ucDragPWM_BaseInc
+     00ceh              _ucHallCnt
+     00c5h              _ucHallCycle
+     00c6h              _ucHallStep
+     00d8h              _ucMTR_State
+     00dfh              _ucMinDragDelayTime
+     00fch              _ucPWMUpdateCNT
+     00d1h              _ucReadADCNT
+     00cdh              _ucTempDragDelayTime
+     00cah              _ucVDCIndex
+     00ebh              _ucVDC_Temp
+     00c9h              _ucVRIndex
+     00bdh              _ucVoiceStep
+     00d2h              _uiADCSum
+     00b3h              _uiADC_ValueTemp
+     00dbh              _uiCount1ms
+     00d6h              _uiCurrentADCSum
+     00f4h              _uiCurrentValue
+     00e0h              _uiCurrentValue_Final
+     00b7h              _uiDragPWM
+     00d9h              _uiDragPWM_Max
+     00c7h              _uiHallTimeCnt
+     00b1h              _uiHallTimeNew
+     00cfh              _uiLastHallTime
+     00c1h              _uiReleaseKey_CNT
+     00b5h              _uiTempPWM
+     00d4h              _uiVDCADCSum
+     00ech              _uiVDCValue
+     00bbh              _uiVDCValue_Final
+     00e3h              _uiVRValue
+     00dch              _uiVRValue_Final
+     00b9h              _uiVR_Value
+     00c3h              _uiVoiceTimeCnt
+     00bfh              _uiVoltageCheckCnt
+     008fh              r104
+     0087h              r108
+     0094h              r124
+     009ah              r12c
+     009ch              r138
+     00a1h              r13c
+     0090h              r204
+     0088h              r208
+     0095h              r224
+     009bh              r22c
+     009dh              r238
+     00a2h              r23c
+     00fdh              r304
+     0185h              r324
+     018ah              r338
+     018fh              r33c
+     00feh              r404
+     0186h              r424
+     018bh              r438
+     0190h              r43c
+     00ffh              r504
+     0187h              r524
+     018ch              r538
+     0191h              r53c
+     0183h              r604
+     0188h              r624
+     018dh              r638
+     0192h              r63c
+     0184h              r704
+     0189h              r724
+     018eh              r738
+     0193h              r73c
+     0083h              ra
+     008bh              ra04
+     0096h              ra24
+     008ah              ra38
+     0089h              ra3c
+     0084h              rb
+     0091h              rb04
+     0097h              rb24
+     009eh              rb38
+     008eh              rb3c
+     0085h              rc
+     0092h              rc04
+     0098h              rc24
+     009fh              rc38
+     008ch              rc3c
+     0086h              rd
+     0093h              rd04
+     0099h              rd24
+     00a0h              rd38
+     008dh              rd3c
+     0a82h              startup_value_1
+
+     Address            Public by Value
+     0001h              _ucDealDragHall
+     000ch              _IO_Init
+     0028h              _INT_Init
+     0030h              _ISR_OCP
+     007bh              _main
+     0083h              ra
+     0084h              rb
+     0085h              rc
+     0086h              rd
+     0087h              r108
+     0088h              r208
+     0089h              ra3c
+     008ah              ra38
+     008bh              ra04
+     008ch              rc3c
+     008dh              rd3c
+     008eh              rb3c
+     008fh              r104
+     0090h              r204
+     0091h              rb04
+     0092h              rc04
+     0093h              rd04
+     0094h              r124
+     0095h              r224
+     0096h              ra24
+     0097h              rb24
+     0098h              rc24
+     0099h              rd24
+     009ah              r12c
+     009bh              r22c
+     009ch              r138
+     009dh              r238
+     009eh              rb38
+     009fh              rc38
+     00a0h              rd38
+     00a1h              r13c
+     00a2h              r23c
+     00abh              _delay_2
+     00b1h              _uiHallTimeNew
+     00b3h              _uiADC_ValueTemp
+     00b5h              _uiTempPWM
+     00b7h              _uiDragPWM
+     00b9h              _uiVR_Value
+     00bbh              _uiVDCValue_Final
+     00bdh              _ucVoiceStep
+     00beh              _ValueTemp
+     00bfh              _uiVoltageCheckCnt
+     00c1h              _uiReleaseKey_CNT
+     00c3h              _uiVoiceTimeCnt
+     00c5h              _ucHallCycle
+     00c6h              _ucHallStep
+     00c7h              _uiHallTimeCnt
+     00c9h              _ucVRIndex
+     00cah              _ucVDCIndex
+     00cbh              _ucCurrentIndex
+     00cch              _ucDragDelayTime
+     00cdh              _ucTempDragDelayTime
+     00ceh              _ucHallCnt
+     00cfh              _uiLastHallTime
+     00d1h              _ucReadADCNT
+     00d2h              _uiADCSum
+     00d4h              _uiVDCADCSum
+     00d6h              _uiCurrentADCSum
+     00d8h              _ucMTR_State
+     00d9h              _uiDragPWM_Max
+     00dbh              _uiCount1ms
+     00dch              _uiVRValue_Final
+     00deh              _ucDragCnt
+     00dfh              _ucMinDragDelayTime
+     00e0h              _uiCurrentValue_Final
+     00e2h              _ucDragPWM_BaseInc
+     00e3h              _uiVRValue
+     00ebh              _ucVDC_Temp
+     00ech              _uiVDCValue
+     00f4h              _uiCurrentValue
+     00fch              _ucPWMUpdateCNT
+     00fdh              r304
+     00feh              r404
+     00ffh              r504
+     0183h              r604
+     0184h              r704
+     0185h              r324
+     0186h              r424
+     0187h              r524
+     0188h              r624
+     0189h              r724
+     018ah              r338
+     018bh              r438
+     018ch              r538
+     018dh              r638
+     018eh              r738
+     018fh              r33c
+     0190h              r43c
+     0191h              r53c
+     0192h              r63c
+     0193h              r73c
+     0231h              _System_Init
+     0262h              _ADC_Init
+     0277h              _Comparator_Init
+     0287h              _PWMInit
+     02a3h              _Hall_Init
+     02d2h              _CAPTM_Init
+     02dah              _Varitate_Init
+     0305h              _delay1
+     0312h              _delay
+     0334h              _Drag_Motor
+     03a3h              _ISR_HALL
+     045bh              _commutation
+     04cah              _Motor_Stop
+     04d9h              _CommandOK
+     04feh              _VoiceSpeakInit
+     054bh              _ISR_TM2
+     0620h              _TM1_Init
+     062ch              _ISR_TM1
+     0636h              _Init_TM3
+     0646h              _ISR_TM3
+     06b0h              _TimeBaseInit
+     06b8h              _ISR_TimeBase
+     0769h              _KeyCheck
+     07aah              _ReadMTRState
+     083eh              _ReadVDC_PowerON
+     0875h              _ReadVDC
+     0980h              _ReadCurrent
+     0a43h              _get_drag_pwm
+     0a82h              startup_value_1
+     0a86h              _Crom2PromNext
+     0a86h              _Crom2Prom
+
+Warning(L3009) : Same sub function exists between ISR(24H) CMG and MAIN CMG: _CommandOK
+Warning(L3008) : Same sub function exists between ISR(3CH) CMG and ISR(38H) CMG: _delay1
+Warning(L3008) : Same sub function exists between ISR(3CH) CMG and ISR(04H) CMG: _commutation
+Warning(L3008) : Same sub function exists between ISR(3CH) CMG and ISR(04H) CMG: _delay1
+Warning(L3008) : Same sub function exists between ISR(38H) CMG and ISR(04H) CMG: _delay1
+
+ROM Usage Statistics
+     Size      Used     Percentage
+     1000h     0a91h    66%
+
+RAM Usage Statistics
+    Bank      Size      Used     Percentage
+     00h       0080h     0080h    100%
+     01h       0080h     0015h    16%
+     02h       0080h     0000h    0%
+     Total     0180h     0095h    38%
+
+Use Stack Count
+_main: 2
+_ISR_OCP: 0
+_ISR_HALL: 2
+_ISR_TM2: 1
+_ISR_TM1: 0
+_ISR_TM3: 1
+_ISR_TimeBase: 3
+
+Call Tree
+    @dummy
+        _main (0)
+            _IO_Init (1)
+            _System_Init (1)
+            _TM1_Init (1)
+            _PWMInit (1)
+            _Hall_Init (1)
+            _ADC_Init (1)
+            _Comparator_Init (1)
+            _CAPTM_Init (1)
+            _Init_TM3 (1)
+            _TimeBaseInit (1)
+            _INT_Init (1)
+            _Varitate_Init (1)
+            _delay (1)
+            _ReadVDC_PowerON (1)
+            _CommandOK (1)
+            _KeyCheck (1)
+            _ReadMTRState (1)
+                _Crom2Prom (2)
+                _Crom2Prom (2)
+            _ReadVDC (1)
+                _Crom2Prom (2)
+                _Crom2Prom (2)
+            _ReadCurrent (1)
+                _Crom2Prom (2)
+                _Crom2Prom (2)
+            _Motor_Stop (1)
+            _get_drag_pwm (1)
+            _VoiceSpeakInit (1)
+    @dummy8
+        _ISR_OCP (0)
+    @dummy4
+        _ISR_HALL (0)
+            _commutation (1)
+                _delay1 (2)
+    @dummy36
+        _ISR_TM2 (0)
+            _CommandOK (1)
+    @dummy44
+        _ISR_TM1 (0)
+    @dummy56
+        _ISR_TM3 (0)
+            _Crom2Prom (1)
+            _delay1 (1)
+    @dummy60
+        _ISR_TimeBase (0)
+            _Drag_Motor (1)
+                _commutation (2)
+                    _delay1 (3)
+
+HLINK: Program entry point at section '@code' (address 0) of file 'C:\Users\steven.ho\Desktop\致新20180124\LEAFBLOWER.OBJ'
+
+Total 0 error(s), Total 5 Warning(s)

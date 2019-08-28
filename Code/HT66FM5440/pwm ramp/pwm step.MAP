@@ -1,0 +1,193 @@
+
+Linker Version 8.7.6.180315
+Input Object File: D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ
+Input Object File: D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\STARTUP1_L.OBJ
+
+Input Library File: C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB
+Input Library File: C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\v3_lmrsc.lib
+
+
+     Bank    Start     End      Length     Class    AvgIns    Name
+     00h     0000h     0000h    0001h      CODE               @code (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     0001h     0007h    0007h      CODE               _ISR_OCP (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     0008h     000bh    0004h      CODE               @ISR_OCP_code (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     000ch     0016h    000bh      CODE               _Set_PWM_Duty (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     0017h     0021h    000bh      CODE               _Motor_Break (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     0022h     0029h    0008h      CODE               _TimeBase_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     002ch     002fh    0004h      CODE               @ISR_TM1_code (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     0030h     0038h    0009h      CODE               _Motor_Down (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     003ch     003fh    0004h      CODE               @ISR_TimeBase_code (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     0040h     007ah    003bh      CODE               @start (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     007bh     00bah    0040h      CODE               _Motor_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     00bbh     00d9h    001fh      CODE               _IO_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     00dah     00edh    0014h      CODE               _TM1_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     00eeh     012ch    003fh      CODE               _ISR_TM1 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     012dh     0160h    0034h      CODE               _main (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     0161h     01cbh    006bh      CODE               _ISR_TimeBase (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     01cch     01d5h    000ah      CODE               @ROMDATA_BASE (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\STARTUP1_L.OBJ)
+     00h     0080h     0080h    0001h      DATA     0         @BITDATASEC1 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\STARTUP1_L.OBJ)
+     00h     0081h     0081h    0001h      DATA     0         @BITDATASEC (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\STARTUP1_L.OBJ)
+     00h     0082h     0082h    0001h      DATA     2         @data_r12c (isr:ra~rh)
+     00h     0083h     0083h    0001h      DATA     2         @data_r22c (isr:ra~rh)
+     00h     0084h     0084h    0001h      DATA     1         @data_rb2c (isr:ra~rh)
+     00h     0085h     0085h    0001h      DATA     1         @data_rc2c (isr:ra~rh)
+     00h     0086h     0086h    0001h      DATA     2         @data_r13c (isr:ra~rh)
+     00h     0087h     0087h    0001h      DATA     2         @data_r23c (isr:ra~rh)
+     00h     0088h     0088h    0001h      DATA     5         @data_ra3c (isr:ra~rh)
+     00h     0089h     0089h    0001h      DATA     2         @data_rb3c (isr:ra~rh)
+     00h     008ah     008ah    0001h      DATA     2         @data_r108 (isr:ra~rh)
+     00h     008bh     008bh    0001h      DATA     2         @data_r208 (isr:ra~rh)
+     00h     008eh     008fh    0002h      DATA     12        @HCCINIT_duty_now (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     0090h     0091h    0002h      DATA     9         @HCCINIT_cnt_hall_period (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     0092h     0093h    0002h      DATA     6         @HCCINIT_cnt_1ms (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     0094h     0095h    0002h      DATA     3         @HCCINIT_cnt_debounce (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     0096h     0097h    0002h      DATA     3         @HCCINIT_cnt_pwm_inc (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     0098h     0098h    0001h      DATA     2         @HCCINIT_status_ctrl_now (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     0099h     0099h    0001h      DATA     1         @HCCINIT_status_ctrl_old (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     009ah     009ah    0001h      DATA     0         @HCCINIT_key_pressed (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     009bh     009bh    0001h      DATA     2         @data_r33c (isr:ra~rh)
+     00h     009ch     009ch    0001h      DATA     2         @data_r43c (isr:ra~rh)
+     00h     009dh     009dh    0001h      DATA     2         @data_r53c (isr:ra~rh)
+     00h     009eh     009eh    0001h      DATA     2         @data_r63c (isr:ra~rh)
+
+     Local Sections
+
+     Bank    Start     End      Length     Class    AvgIns    Name
+     00h     008eh     008eh    0000h      LOCAL    0         @dummy44 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     008eh     008eh    0000h      LOCAL    0         _ISR_TM1 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     008eh     008eh    0000h      LOCAL    0         @dummy (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     008eh     008eh    0000h      LOCAL    0         _main (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     008eh     008eh    0000h      LOCAL    0         _IO_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     008eh     008eh    0000h      LOCAL    0         _TM1_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     008eh     008eh    0000h      LOCAL    0         _TimeBase_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     008eh     008eh    0000h      LOCAL    0         _Motor_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     008eh     008eh    0000h      LOCAL    0         _Motor_Break (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     008ch     008dh    0002h      LOCAL    5         _Set_PWM_Duty (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     008eh     008eh    0000h      LOCAL    0         _Motor_Down (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     008eh     008eh    0000h      LOCAL    0         @dummy60 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     008eh     008eh    0000h      LOCAL    0         _ISR_TimeBase (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     008ch     008ch    0000h      LOCAL    0         @dummy8 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+     00h     008ch     008ch    0000h      LOCAL    0         _ISR_OCP (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ)
+
+     Public Symbols Information
+     Address            Public by Name
+     00bbh              _IO_Init
+     0001h              _ISR_OCP
+     00eeh              _ISR_TM1
+     0161h              _ISR_TimeBase
+     0017h              _Motor_Break
+     0030h              _Motor_Down
+     007bh              _Motor_Init
+     000ch              _Set_PWM_Duty
+     008ch              _Set_PWM_Duty_2
+     00dah              _TM1_Init
+     0022h              _TimeBase_Init
+     0081h[0]           _bDutyDir
+     0081h[1]           _bOCP
+     0080h[0]           _bPauseDutyCnt
+     0092h              _cnt_1ms
+     0094h              _cnt_debounce
+     0090h              _cnt_hall_period
+     0096h              _cnt_pwm_inc
+     008eh              _duty_now
+     009ah              _key_pressed
+     012dh              _main
+     0098h              _status_ctrl_now
+     0099h              _status_ctrl_old
+     008ah              r108
+     0082h              r12c
+     0086h              r13c
+     008bh              r208
+     0083h              r22c
+     0087h              r23c
+     009bh              r33c
+     009ch              r43c
+     009dh              r53c
+     009eh              r63c
+     0088h              ra3c
+     0084h              rb2c
+     0089h              rb3c
+     0085h              rc2c
+     01cbh              startup_value_1
+
+     Address            Public by Value
+     0001h              _ISR_OCP
+     000ch              _Set_PWM_Duty
+     0017h              _Motor_Break
+     0022h              _TimeBase_Init
+     0030h              _Motor_Down
+     007bh              _Motor_Init
+     0082h              r12c
+     0083h              r22c
+     0084h              rb2c
+     0085h              rc2c
+     0086h              r13c
+     0087h              r23c
+     0088h              ra3c
+     0089h              rb3c
+     008ah              r108
+     008bh              r208
+     008ch              _Set_PWM_Duty_2
+     008eh              _duty_now
+     0090h              _cnt_hall_period
+     0092h              _cnt_1ms
+     0094h              _cnt_debounce
+     0096h              _cnt_pwm_inc
+     0098h              _status_ctrl_now
+     0099h              _status_ctrl_old
+     009ah              _key_pressed
+     009bh              r33c
+     009ch              r43c
+     009dh              r53c
+     009eh              r63c
+     00bbh              _IO_Init
+     00dah              _TM1_Init
+     00eeh              _ISR_TM1
+     012dh              _main
+     0161h              _ISR_TimeBase
+     01cbh              startup_value_1
+     0080h[0]           _bPauseDutyCnt
+     0081h[0]           _bDutyDir
+     0081h[1]           _bOCP
+
+Warning(L3009) : Same sub function exists between ISR(3CH) CMG and MAIN CMG: _Set_PWM_Duty
+
+ROM Usage Statistics
+     Size      Used     Percentage
+     1000h     01d1h    11%
+
+RAM Usage Statistics
+    Bank      Size      Used     Percentage
+     00h       0080h     001fh    24%
+     01h       0080h     0000h    0%
+     02h       0080h     0000h    0%
+     Total     0180h     001fh    8%
+
+Use Stack Count
+_ISR_TM1: 0
+_main: 2
+_ISR_TimeBase: 1
+_ISR_OCP: 0
+
+Call Tree
+    @dummy44
+        _ISR_TM1 (0)
+    @dummy
+        _main (0)
+            _IO_Init (1)
+            _TM1_Init (1)
+            _TimeBase_Init (1)
+            _Motor_Init (1)
+            _Motor_Break (1)
+                _Set_PWM_Duty (2)
+            _Set_PWM_Duty (1)
+            _Motor_Down (1)
+    @dummy60
+        _ISR_TimeBase (0)
+            _Set_PWM_Duty (1)
+    @dummy8
+        _ISR_OCP (0)
+
+HLINK: Program entry point at section '@code' (address 0) of file 'D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\PWM STEP.OBJ'
+
+Total 0 error(s), Total 1 Warning(s)

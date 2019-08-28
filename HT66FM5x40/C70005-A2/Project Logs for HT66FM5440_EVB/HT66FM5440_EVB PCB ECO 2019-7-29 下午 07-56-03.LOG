@@ -1,0 +1,8 @@
+Removed Pin From Net: NetName=IOCP Pin=C25-1
+Removed Pin From Net: NetName=GND Pin=C25-2
+Removed Pin From Net: NetName=NetC3_2 Pin=R38-1
+Removed Pin From Net: NetName=IOCP Pin=R38-2
+Added Pin To Net: NetName=GND Pin=C25-1
+Added Pin To Net: NetName=IOCP Pin=C25-2
+Added Pin To Net: NetName=IOCP Pin=R38-1
+Added Pin To Net: NetName=NetC3_2 Pin=R38-2

@@ -1,0 +1,131 @@
+"File: code_asm.asm  Assembler  Version 2.98      Page 1
+
+
+   1  0000              ;; 16 bits x 16 bits 
+   2  0000              #include HT66FM5440.inc
+
+
+   3  0000              
+   4  0000              public _vara1 
+   5  0000              public _varb1 			;; define the function and parameters as public
+   6  0000              public _vara2
+   7  0000              public _varb2 			;; define the function and parameters as public
+   8  0000              public _vara3
+   9  0000              public _varb3
+  10  0000              
+  11  0000              public _mul16x16
+  12  0000              _mul16x16 .section page 'code'
+  13  0000              _mul16x16 proc 		;; define function with proc/endp
+  14  0000  0002[       	local _vara1 db 2 dup (?) ;; define parameters
+            00
+            ]
+  15  0002  0002[       	local _varb1 db 2 dup (?)
+            00
+            ]
+  16  0004  0004[       	local _result db 4 dup (?) ;; define local variables	
+            00
+            ]
+  17  0000  0700     R  	mov a, _vara1[0]
+  18  0001  00F6        	mov mdu1r0 , a
+  19  0002  0700     R  	mov a, _varb1[0]
+  20  0003  00FB        	mov mdu1r4 , a
+  21  0004  0700     R  	mov a, _vara1[1]
+  22  0005  00F7        	mov mdu1r1 , a
+  23  0006  0700     R  	mov a, _varb1[1]
+  24  0007  00FC        	mov mdu1r5 , a			
+  25  0008              
+  26  0008  0776        	mov a, mdu1r0
+  27  0009  0080     R  	mov _result[0], a
+  28  000A  0777        	mov a, mdu1r1
+  29  000B  0080     R  	mov _result[1], a
+  30  000C  0778        	mov a, mdu1r2
+  31  000D  0080     R  	mov _result[2], a
+  32  000E  077A        	mov a, mdu1r3
+  33  000F  0080     R  	mov _result[3], a		
+  34  0010  0003        	ret
+  35  0011              _mul16x16 endp
+  36  0011              
+  37  0011              public _div16_16 ; vara2/varb2
+  38  0000              _div16_16 .section page 'code'
+  39  0000              _div16_16 proc 		;; define function with proc/endp
+  40  0000  0002[       	local _vara2 db 2  dup(?)
+            00
+            ]
+  41  0002  0002[       	local _varb2 db 2  dup(?)			;; define the function and parameters as public		
+            00
+            ]
+  42  0004  0002[       	local _quo1 db 2 dup (?) ;; define local variables	
+            00
+            ]
+  43  0006  0002[       	local _rem1 db 2 dup (?) ;; define local variables		
+            00
+            ]
+"File: code_asm.asm  Assembler  Version 2.98      Page 2
+
+  44  0000  0700     R  	mov a, _vara2[0]
+  45  0001  00F6        	mov mdu1r0 , a
+  46  0002  0700     R  	mov a, _vara2[1]
+  47  0003  00F7        	mov mdu1r1 , a
+  48  0004  0700     R  	mov a, _varb2[0]
+  49  0005  00FB        	mov mdu1r4 , a
+  50  0006  0700     R  	mov a, _varb2[1]
+  51  0007  00FC        	mov mdu1r5 , a			
+  52  0008              
+  53  0008  0776        	mov a, mdu1r0
+  54  0009  0080     R  	mov _quo1[0], a
+  55  000A  0777        	mov a, mdu1r1
+  56  000B  0080     R  	mov _quo1[1], a
+  57  000C  077B        	mov a, mdu1r4
+  58  000D  0080     R  	mov _rem1[2], a
+  59  000E  077C        	mov a, mdu1r5
+  60  000F  0080     R  	mov _rem1[3], a		
+  61  0010  0003        	ret
+  62  0011              _div16_16 endp
+  63  0011              
+  64  0011              public _div32_16 ; vara3/varb3
+  65  0000              _div32_16 .section page 'code'
+  66  0000              _div32_16 proc 		;; define function with proc/endp
+  67  0000  0004[       	local _vara3 db 4  dup(?)
+            00
+            ]
+  68  0004  0002[       	local _varb3 db 2  dup(?)			;; define the function and parameters as public		
+            00
+            ]
+  69  0006  0004[       	local _quo2 db 4 dup (?) ;; define local variables	
+            00
+            ]
+  70  000A  0002[       	local _rem2 db 2 dup (?) ;; define local variables		
+            00
+            ]
+  71  0000  0700     R  	mov a, _vara3[0]
+  72  0001  00F6        	mov mdu1r0 , a
+  73  0002  0700     R  	mov a, _vara3[1]
+  74  0003  00F7        	mov mdu1r1 , a
+  75  0004  0700     R  	mov a, _vara3[2]
+  76  0005  00F8        	mov mdu1r2 , a
+  77  0006  0700     R  	mov a, _vara3[3]
+  78  0007  00FA        	mov mdu1r3 , a			
+  79  0008  0700     R  	mov a, _varb3[0]
+  80  0009  00FB        	mov mdu1r4 , a		
+  81  000A  0700     R  	mov a, _varb3[1]
+  82  000B  00FC        	mov mdu1r5 , a		
+  83  000C              		
+  84  000C  0776        	mov a, mdu1r0
+  85  000D  0080     R  	mov _quo2[0], a
+  86  000E  0777        	mov a, mdu1r1
+  87  000F  0080     R  	mov _quo2[1], a
+  88  0010  0778        	mov a, mdu1r2
+  89  0011  0080     R  	mov _quo2[2], a
+  90  0012  077A        	mov a, mdu1r3
+  91  0013  0080     R  	mov _quo2[3], a		
+  92  0014  077B        	mov a, mdu1r4
+  93  0015  0080     R  	mov _rem2[2], a
+  94  0016  077C        	mov a, mdu1r5
+  95  0017  0080     R  	mov _rem2[3], a		
+"File: code_asm.asm  Assembler  Version 2.98      Page 3
+
+  96  0018  0003        	ret
+  97  0019              _div32_16 endp
+
+
+        0 Errors, 0 Warnings

@@ -1,0 +1,10 @@
+Removed Pin From Net: NetName=HA Pin=C14-1
+Removed Pin From Net: NetName=HC Pin=C19-1
+Removed Pin From Net: NetName=HA Pin=R18-2
+Removed Pin From Net: NetName=HC Pin=R31-2
+Change Component Designator: OldDesignator=R20 NewDesignator=R32
+Change Component Designator: OldDesignator=R32 NewDesignator=R20
+Added Pin To Net: NetName=HC Pin=C14-1
+Added Pin To Net: NetName=HA Pin=C19-1
+Added Pin To Net: NetName=HC Pin=R18-2
+Added Pin To Net: NetName=HA Pin=R31-2

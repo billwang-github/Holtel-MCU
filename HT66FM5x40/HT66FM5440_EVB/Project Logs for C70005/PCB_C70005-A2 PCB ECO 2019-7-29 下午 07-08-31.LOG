@@ -1,0 +1,7 @@
+Added Component: Designator=C10(ECAP 35V47UF)
+Added Component: Designator=C11(ECAP 35V47UF)
+Added Pin To Net: NetName=+15V Pin=C10-1
+Added Pin To Net: NetName=GND Pin=C10-2
+Added Pin To Net: NetName=5V Pin=C11-1
+Added Pin To Net: NetName=GND Pin=C11-2
+Added Class: Name=CKT_C70005-A2

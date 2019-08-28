@@ -1,0 +1,1116 @@
+				;file D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\pwm step.c
+				;1	/* 
+				;2		Sweep PWM duty from low to high and high to low , pwm frequency = 1KHz
+				;3	*/
+				;4	#include "HT66FM5440.h"
+				;5	/* Macro */
+				;6	#define FEED_WATCHDOG() GCC_CLRWDT()
+				;7	#define MOTOR_BRAKE() (_brke = 1)
+				;8	#define SPEED_UP() (bDutyDir = 1)
+				;9	#define SPEED_DOWN() (bDutyDir = 0)
+				;10	
+				;11	/* PWM constants */
+				;12	#define PWM_PERIOD 100 // * 0.5us
+				;13	#define PWM_DUTY_MAX 100 // x 0.5us full PWM_PERIOD 
+				;14	#define PWM_DUTY_MIN 90 // x 0.5us full PWM_PERIOD 
+				;15	#define PWM_STEP_TIME 15 // x 1ms 
+				;16	#define PWM_STEP_DUTY 1
+				;17	#define DEAD_TIME 0 // (dead time + 1)x0.5us
+				;18	
+				;19	/* hall emulator constants */
+				;20	#define TM1_PERIOD 10 //us
+				;21	#define HALL_PERIOD 996 // x10us
+				;22	#define HALL_60D (HALL_PERIOD / 6)
+				;23	#define HALL_120D (HALL_PERIOD / 3)
+				;24	#define HALL_180D	(HALL_PERIOD >> 1)
+				;25	#define HA_DLY0 0
+				;26	#define HA_DLY1 HALL_180D //180 degree
+				;27	#define HB_DLY0 HALL_120D // 120 degree
+				;28	#define HB_DLY1 HB_DLY0 + HALL_180D
+				;29	#define HC_DLY0 HALL_60D
+				;30	#define HC_DLY1 HALL_120D + HALL_120D // 240 degree
+				;31	
+				;32	/* Other Constants */
+				;33	
+				;34	/* IO definition */
+				;35	#define CTRL_DOWN _pd1
+				;36	#define CTRL_UP _pd0
+				;37	#define TO0 _pb0
+				;38	#define TO1 _pb1
+				;39	#define TO2 _pb2
+				;40	
+				;41	
+				;42	/* Variables */
+				;43	volatile unsigned int cnt_hall_period = 0;
+				;44	volatile unsigned int duty_now = 0;
+				;45	volatile unsigned int cnt_pwm_inc = 0, cnt_debounce  = 0;
+				;46	volatile unsigned char status_ctrl_old = 0xff, status_ctrl_now = 0x00;
+				;47	volatile unsigned char key_pressed = 0;
+				;48	volatile bit bOCP =0, bPauseDutyCnt = 1, bDutyDir = 0;
+				;49	volatile unsigned int cnt_1ms = 0;
+				;50	
+				;51	/* functions */
+				;52	void Motor_Init(void);
+				;53	void Motor_Up(void);
+				;54	void Motor_Down(void);
+				;55	void Motor_FreeRun(void);
+				;56	void Motor_Break(void);
+				;57	void Set_PWM_Duty(unsigned int duty);
+				;58	
+				;59	void IO_Init(void);
+				;60	void Comparator_Init(void);
+				;61	void TM1_Init(void);
+				;62	void TimeBase_Init(void);
+				;63	
+				;64	void main()
+				;65	{
+				@code .SECTION 'CODE'
+				include HT66FM5440.inc
+0000	2840	jmp     begin_startup_value
+				startupend3:
+				@start .SECTION 'CODE'
+007A	292D	jmp     _main
+				;66		unsigned long int i = 0;
+				;67	
+				;68		IO_Init();
+				_main:
+				_main:
+012D	20BB	call    _IO_Init
+				;69		//Comparator_Init();
+				;70		TM1_Init();
+012E	20DA	call    _TM1_Init
+				;71		TimeBase_Init();
+012F	2022	call    _TimeBase_Init
+				;72			
+				;73		_emi = 1;
+0130	3015	set     EMI
+				;74		
+				;75	
+				;76		Motor_Init();
+0131	207B	call    _Motor_Init
+				;77		Motor_Break();
+0132	2017	call    _Motor_Break
+				;78		_dte = 0; // dead time disabled
+0133	36E6	clr     DTE
+				;79		Set_PWM_Duty(900);
+0134	0F84	mov     a, 84H
+0135	408C	mov     duty, a
+0136	0F03	mov     a, 3H
+0137	408D	mov     duty[1], a
+0138	200C	call    _Set_PWM_Duty
+				;80		//while (1) {FEED_WATCHDOG();}
+				;81		Motor_Down();
+0139	2030	call    _Motor_Down
+				;82				
+				;83		while (1)
+				;84		{			
+				;85			SPEED_UP();
+				_L30:
+013A	7001	set     bDutyDir[0].0
+				;86			while (duty_now < PWM_DUTY_MAX) { FEED_WATCHDOG();}	
+				_L22:
+013B	0F63	mov     a, 63H
+013C	420E	sub     a, duty_now[0]
+013D	0F00	mov     a, 0H
+013E	520F	sbc     a, duty_now[1]
+013F	380A	snz     C
+0140	2943	jmp     _L31
+0141	0001	clr     wdt
+0142	293B	jmp     _L22
+				;87			cnt_1ms = 500;
+				_L31:
+0143	0FF4	mov     a, F4H
+0144	4092	mov     cnt_1ms[0], a
+0145	0F01	mov     a, 1H
+0146	4093	mov     cnt_1ms[1], a
+				;88			while (cnt_1ms > 0) FEED_WATCHDOG();
+				_L24:
+0147	4712	mov     a, cnt_1ms[0]
+0148	4513	or      a, cnt_1ms[1]
+0149	3D0A	sz      Z
+014A	294D	jmp     _L32
+014B	0001	clr     wdt
+014C	2947	jmp     _L24
+				;89			SPEED_DOWN();
+				_L32:
+014D	7401	clr     bDutyDir[0].0
+				;90			while (duty_now > PWM_DUTY_MIN) {FEED_WATCHDOG();}
+				_L26:
+014E	0F5A	mov     a, 5AH
+014F	420E	sub     a, duty_now[0]
+0150	0F00	mov     a, 0H
+0151	520F	sbc     a, duty_now[1]
+0152	3C0A	sz      C
+0153	2956	jmp     _L33
+0154	0001	clr     wdt
+0155	294E	jmp     _L26
+				;91			cnt_1ms = 500;
+				_L33:
+0156	0FF4	mov     a, F4H
+0157	4092	mov     cnt_1ms[0], a
+0158	0F01	mov     a, 1H
+0159	4093	mov     cnt_1ms[1], a
+				;92			while (cnt_1ms > 0) FEED_WATCHDOG();		
+				_L28:
+015A	4712	mov     a, cnt_1ms[0]
+015B	4513	or      a, cnt_1ms[1]
+015C	3D0A	sz      Z
+015D	293A	jmp     _L30
+015E	0001	clr     wdt
+015F	295A	jmp     _L28
+0160	2960	jmp     $
+				;93		}
+				;94	}
+				;95	
+				;96	void Motor_Init(void)
+				;97	{	
+				;98		/* PWM Setting */
+				;99	    _pwmc = 0b00110001;	//edge aligned, fpwm/8 = 2MHz, PDDR reload	, fh=16MHz
+				_Motor_Init:
+				_Motor_Init:
+007B	0F31	mov     a, 31H
+007C	00D7	mov     PWMC, a
+				;100		_pwmcs  = 0b00000111; //dutr update request, synchronous update, write to dutr0~2  
+007D	0F07	mov     a, 7H
+007E	80D5	lmov    PWMCS, a
+				;101		_prdrh  = PWM_PERIOD >> 8; // 2MHz/1023=20KHz, high byte first
+0080	1F5F	clr     PRDRH
+				;102		_prdrl  = PWM_PERIOD & 0xFF;		
+0081	0F64	mov     a, 64H
+0082	00DE	mov     PRDRL, a
+				;103		_dutr3h = 0; // no pwm3 output, only for sine wave calculation
+0083	1F4E	clr     DUTR3H
+				;104		_dutr3l = 0;
+0084	1F4D	clr     DUTR3L
+				;105		_dutr0h = 0; // duty, high byte first
+0085	1F59	clr     DUTR0H
+				;106		_dutr0l = 0;
+0086	1F58	clr     DUTR0L
+				;107		_pwmsuf = 1; //if update the pwm duty, this bit must be set 
+0087	B155	lset    PWMSUF
+				;108		
+				;109		/* Mask Setting */
+				;110		_mcf = 0b00000111;	// hw mask, complement output, pwm output enable, break at protection, top pwm
+0089	0F07	mov     a, 7H
+008A	00E4	mov     MCF, a
+				;111		_pwmmd = 0b00101010; // set low side mos on to break
+008B	0F2A	mov     a, 2AH
+008C	00E3	mov     PWMMD, a
+				;112		_pwmme = 0xff; // pwm mask is enabled
+008D	1FE2	set     PWMME
+				;113	
+				;114		
+				;115		/* Others */
+				;116		_dts = 0b11100000 | DEAD_TIME;   // dead time enabled, clock=fsys/8 = 0.5us
+008E	0FE0	mov     a, E0H
+008F	00E6	mov     DTS, a
+				;117		_plc = 0x00; // non-inverting output
+0090	1F67	clr     PLC
+				;118		
+				;119		/* hall sensor decoder */
+				;120		_integ0 = 0x00; // disable hall interrupt
+0091	1F45	clr     INTEG0
+				;121		_hdcr = 0b11010101; // hall delay ckt disabled, 120 degree, software mode, break mode, hall decoder enabled
+0092	0FD5	mov     a, D5H
+0093	00C9	mov     HDCR, a
+				;122		_hdcd = 0; // sw hall signal
+0094	1F4A	clr     HDCD
+				;123		_hdct0 = 0b00001001; // HBT on, HCB on, FRS=0
+0095	0F09	mov     a, 9H
+0096	80E2	lmov    HDCT0, a
+				;124		_hdct1 = 0b00001001;
+0098	0F09	mov     a, 9H
+0099	80E3	lmov    HDCT1, a
+				;125		_hdct2 = 0b00001001;
+009B	0F09	mov     a, 9H
+009C	80E4	lmov    HDCT2, a
+				;126		_hdct3 = 0b00001001;
+009E	0F09	mov     a, 9H
+009F	80E5	lmov    HDCT3, a
+				;127		_hdct4 = 0b00001001;
+00A1	0F09	mov     a, 9H
+00A2	80E6	lmov    HDCT4, a
+				;128		_hdct5 = 0b00001001;
+00A4	0F09	mov     a, 9H
+00A5	80E7	lmov    HDCT5, a
+				;129		_hdct6 = 0b00000110; // HCT on, HBB on, FRS=1
+00A7	0F06	mov     a, 6H
+00A8	80E8	lmov    HDCT6, a
+				;130		_hdct7 = 0b00000110;
+00AA	0F06	mov     a, 6H
+00AB	80E9	lmov    HDCT7, a
+				;131		_hdct8 = 0b00000110;
+00AD	0F06	mov     a, 6H
+00AE	80EA	lmov    HDCT8, a
+				;132		_hdct9 = 0b00000110;
+00B0	0F06	mov     a, 6H
+00B1	80EB	lmov    HDCT9, a
+				;133		_hdct10 = 0b00000110;
+00B3	0F06	mov     a, 6H
+00B4	80EC	lmov    HDCT10, a
+				;134		_hdct11 = 0b00000110;
+00B6	0F06	mov     a, 6H
+00B7	80ED	lmov    HDCT11, a
+				;135			
+				;136		MOTOR_BRAKE();
+00B9	3149	set     BRKE
+00BA	0003	ret
+				;137	}
+				;138	
+				;139	void Motor_Up(void)
+				;140	{
+				;141	//	_brke = 1;
+				;142	//	_pwmon = 0;	
+				;143	//	_hdcen = 1;
+				;144	//	_hdcd = 1;			
+				;145	//	_frs = 0;	
+				;146	//	_brke =0;	
+				;147	//	_pwmon = 1;	
+				;148	
+				;149		_hdcen = 1;
+				;150		_hdcd = 1;			
+				;151		_frs = 1;	
+				;152		_brke =0;	
+				;153		_pwmon = 1;	
+				;154		bPauseDutyCnt = 0;
+				;155		SPEED_UP();
+				;156	}
+				;157	
+				;158	void Motor_Down(void)
+				;159	{		
+				;160	//	_brke = 1;
+				;161	//	_pwmon = 0;	
+				;162	//	_hdcen = 1;	
+				;163	//	_hdcd = 1;			
+				;164	//	_frs = 1;	
+				;165	//	_brke =0;	
+				;166	//	_pwmon = 1;	
+				;167		_hdcen = 1;
+				@dummy44 .SECTION 'CODE'
+				_Motor_Down:
+				_Motor_Down:
+0030	3049	set     HDCEN
+				;168		_hdcd = 1;			
+0031	0F01	mov     a, 1H
+0032	00CA	mov     HDCD, a
+				;169		_frs = 0;	
+0033	34C9	clr     FRS
+				;170		_brke =0;	
+0034	3549	clr     BRKE
+				;171		_pwmon = 1;	
+0035	31D7	set     PWMON
+				;172		bPauseDutyCnt = 0;
+0036	7400	clr     bPauseDutyCnt[0].0
+				;173		SPEED_UP();
+0037	7001	set     bDutyDir[0].0
+0038	0003	ret
+0039	0000	nop
+003A	0000	nop
+003B	0000	nop
+				;174	}
+				;175	
+				;176	void Motor_Break(void)
+				;177	{
+				;178	//	SPEED_DOWN();
+				;179	//	bPauseDutyCnt = 0;
+				;180	//	while (duty_now > 0) {FEED_WATCHDOG();}
+				;181		
+				;182		_pwmon = 0;
+				_Motor_Break:
+				_Motor_Break:
+0017	35D7	clr     PWMON
+				;183		bPauseDutyCnt = 1;
+0018	7000	set     bPauseDutyCnt[0].0
+				;184		duty_now = 0;
+0019	5F0E	clr     duty_now[0]
+001A	5F0F	clr     duty_now[1]
+				;185		Set_PWM_Duty(duty_now);
+001B	470E	mov     a, duty_now[0]
+001C	408C	mov     duty, a
+001D	470F	mov     a, duty_now[1]
+001E	408D	mov     duty[1], a
+001F	200C	call    _Set_PWM_Duty
+				;186		MOTOR_BRAKE();	
+0020	3149	set     BRKE
+0021	0003	ret
+				;187	}
+				;188	
+				;189	void Motor_FreeRun(void)
+				;190	{
+				;191		_hdcen = 0;
+				;192		_brke = 0;
+				;193	}
+				;194	
+				;195	
+				;196	/* ===========================
+				;197		PWM period = 0x3FF(20KHz)
+				;198	==============================*/
+				;199	void Set_PWM_Duty(unsigned int duty) 
+				;200	{
+				;201		duty_now = duty;
+				@dummy8 .SECTION 'CODE'
+				_Set_PWM_Duty:
+				_Set_PWM_Duty:
+000C	470C	mov     a, duty[0]
+000D	408E	mov     duty_now[0], a
+000E	470D	mov     a, duty[1]
+000F	408F	mov     duty_now[1], a
+				;202		_dutr0h = (duty >> 8) & 0xff; // high byte first
+0010	470D	mov     a, duty[1]
+0011	00D9	mov     DUTR0H, a
+				;203		_dutr0l = (duty) & 0xff;
+0012	470C	mov     a, duty[0]
+0013	00D8	mov     DUTR0L, a
+				;204		_pwmsuf = 1; // update duty
+0014	B155	lset    PWMSUF
+0016	0003	ret
+				;205	}
+				;206	
+				;207	/* I/O Setting */
+				;208	void IO_Init(void)
+				;209	{
+				;210		/* Hall emulator output */
+				;211		_pb0 = 0;
+				_IO_Init:
+				_IO_Init:
+00BB	3426	clr     PB0
+				;212		_pbc0 = 0;	
+00BC	3427	clr     PBC0
+				;213		_pb1 = 0;
+00BD	34A6	clr     PB1
+				;214		_pbc1 = 0;	
+00BE	34A7	clr     PBC1
+				;215		_pb2 = 0;
+00BF	3526	clr     PB2
+				;216		_pbc2 = 0;	
+00C0	3527	clr     PBC2
+				;217		
+				;218		/* current sensing pin AP */
+				;219		_pa1s1 = 1;
+00C1	B1FA	lset    PA1S1
+				;220		_pa1s0 = 0;
+00C3	B57A	lclr    PA1S0
+				;221		
+				;222		/* control pins */
+				;223		_pdps0 &= 0b11000000; // pin share 
+00C5	0FC0	mov     a, C0H
+00C6	86FE	landm   a, PDPS0
+				;224	
+				;225		_pd0 = 1; // set 1
+00C8	302C	set     PD0
+				;226		_pd1 = 1;
+00C9	30AC	set     PD1
+				;227		_pd2 = 1;
+00CA	312C	set     PD2
+				;228		_pdpu0 = 1; // pull up
+00CB	302B	set     PDPU0
+				;229		_pdpu1 = 1;
+00CC	30AB	set     PDPU1
+				;230		_pdpu2 = 1;
+00CD	312B	set     PDPU2
+				;231		_pdc0 = 1; // input
+00CE	302D	set     PDC0
+				;232		_pdc1 = 1;
+00CF	30AD	set     PDC1
+				;233		_pdc2 = 1;
+00D0	312D	set     PDC2
+				;234		
+				;235		/* PWM output */
+				;236		_pc = 0x00;
+00D1	1F29	clr     PC
+				;237		_pcc = 0x00;
+00D2	1F2A	clr     PCC
+				;238		_pcps0 = 0b10101010; // Set GxT, GxB I/O enabled
+00D3	0FAA	mov     a, AAH
+00D4	80FC	lmov    PCPS0, a
+				;239		_pcps1 = 0b00001010;			
+00D6	0F0A	mov     a, AH
+00D7	80FD	lmov    PCPS1, a
+00D9	0003	ret
+				;240	}
+				;241	
+				;242	void TM1_Init(void) // 16 bits counter
+				;243	{
+				;244	    _ptm1c0=0b00100000;   // tm1 clock = 1MHz
+				_TM1_Init:
+				_TM1_Init:
+00DA	0F20	mov     a, 20H
+00DB	80C7	lmov    PTM1C0, a
+				;245		_ptm1c1=0b11000001;	// timer/counter mode, comp A match clear
+00DD	0FC1	mov     a, C1H
+00DE	80C8	lmov    PTM1C1, a
+				;246		
+				;247		_ptm1al= TM1_PERIOD & 0xff; // low byte first
+00E0	0F0A	mov     a, AH
+00E1	80CB	lmov    PTM1AL, a
+				;248		_ptm1ah=TM1_PERIOD >> 8;
+00E3	9F4C	lclr    PTM1AH
+				;249	
+				;250		_int_pri11f = 0;
+00E5	3797	clr     INT_PRI11F
+				;251		_tm1af = 0;		
+00E6	369E	clr     TM1AF
+				;252		_tm1ae = 1;
+00E7	309E	set     TM1AE
+				;253		_int_pri11e = 1;
+00E8	3197	set     INT_PRI11E
+				;254		
+				;255		_pt1on = 0;
+00E9	B5C7	lclr    PT1ON
+				;256		_pt1on = 1;
+00EB	B1C7	lset    PT1ON
+00ED	0003	ret
+				;257	}
+				;258	
+				;259	void __attribute ((interrupt(0x2c))) ISR_TM1()
+				;260	{  
+				@ISR_TM1_code .SECTION 'CODE'
+002C	0000	nop
+002D	4082	mov     r12c, a
+002E	070A	mov     a, STATUS
+002F	28EE	jmp     _ISR_TM1
+				_ISR_TM1:
+				_ISR_TM1:
+00EE	4083	mov     r22c, a
+				;261		FEED_WATCHDOG();
+00EF	0001	clr     wdt
+				;262		if (cnt_hall_period >= HALL_PERIOD)
+00F0	0FE3	mov     a, E3H
+00F1	4210	sub     a, cnt_hall_period[0]
+00F2	0F03	mov     a, 3H
+00F3	5211	sbc     a, cnt_hall_period[1]
+00F4	3C0A	sz      C
+00F5	28F9	jmp     _L10
+				;263			cnt_hall_period = 0;
+00F6	5F10	clr     cnt_hall_period[0]
+00F7	5F11	clr     cnt_hall_period[1]
+00F8	28FC	jmp     _L11
+				;264		else
+				;265			cnt_hall_period++;
+				_L10:
+00F9	5490	inc     cnt_hall_period[0]
+00FA	3D0A	sz      Z
+00FB	5491	inc     cnt_hall_period[1]
+				;266			
+				;267		if ((cnt_hall_period >= HA_DLY0) && (cnt_hall_period < HA_DLY1))
+				_L11:
+00FC	4710	mov     a, cnt_hall_period[0]
+00FD	4084	mov     rb2c, a
+00FE	4711	mov     a, cnt_hall_period[1]
+00FF	4085	mov     rc2c, a
+0100	0FF1	mov     a, F1H
+0101	4210	sub     a, cnt_hall_period[0]
+0102	0F01	mov     a, 1H
+0103	5211	sbc     a, cnt_hall_period[1]
+0104	380A	snz     C
+0105	2908	jmp     _L12
+				;268			TO0 = 1;
+0106	3026	set     PB0
+0107	2909	jmp     _L13
+				;269		else
+				;270			TO0 = 0;
+				_L12:
+0108	3426	clr     PB0
+				;271			
+				;272		if ((cnt_hall_period >= HB_DLY0) && (cnt_hall_period < HB_DLY1))
+				_L13:
+0109	0F4B	mov     a, 4BH
+010A	4210	sub     a, cnt_hall_period[0]
+010B	0F01	mov     a, 1H
+010C	5211	sbc     a, cnt_hall_period[1]
+010D	3C0A	sz      C
+010E	2917	jmp     _L14
+010F	0F3D	mov     a, 3DH
+0110	4210	sub     a, cnt_hall_period[0]
+0111	0F03	mov     a, 3H
+0112	5211	sbc     a, cnt_hall_period[1]
+0113	380A	snz     C
+0114	2917	jmp     _L14
+				;273			TO1 = 1;
+0115	30A6	set     PB1
+0116	2918	jmp     _L15
+				;274		else
+				;275			TO1 = 0;
+				_L14:
+0117	34A6	clr     PB1
+				;276			
+				;277		if ((cnt_hall_period >= HC_DLY1) || (cnt_hall_period < HC_DLY0))
+				_L15:
+0118	0F97	mov     a, 97H
+0119	4210	sub     a, cnt_hall_period[0]
+011A	0F02	mov     a, 2H
+011B	5211	sbc     a, cnt_hall_period[1]
+011C	380A	snz     C
+011D	2924	jmp     _L16
+011E	0FA5	mov     a, A5H
+011F	4210	sub     a, cnt_hall_period[0]
+0120	0F00	mov     a, 0H
+0121	5211	sbc     a, cnt_hall_period[1]
+0122	380A	snz     C
+0123	2926	jmp     _L17
+				;278			TO2 = 1;
+				_L16:
+0124	3126	set     PB2
+0125	2927	jmp     _L18
+				;279		else
+				;280			TO2 = 0;				
+				_L17:
+0126	3526	clr     PB2
+				;281			
+				;282		_int_pri11f = 0;
+				_L18:
+0127	3797	clr     INT_PRI11F
+				;283		_tm1af = 0;	
+0128	369E	clr     TM1AF
+0129	4703	mov     a, r22c
+012A	008A	mov     STATUS, a
+012B	4702	mov     a, r12c
+012C	0004	reti
+				;284	}
+				;285	
+				;286	void TimeBase_Init(void)
+				;287	{
+				;288	    _tbc = 0xc0; // 1.024ms
+				_TimeBase_Init:
+				_TimeBase_Init:
+0022	0FC0	mov     a, C0H
+0023	8093	lmov    TBC, a
+				;289	    _tbe = 1;
+0025	31A0	set     TBE
+				;290	    _tbf = 0;
+0026	37A0	clr     TBF
+				;291	    _int_pri15e = 1;
+0027	3198	set     INT_PRI15E
+				;292	    _int_pri15f = 0;
+0028	3798	clr     INT_PRI15F
+0029	0003	ret
+002A	0000	nop
+002B	0000	nop
+				;293	}
+				;294	
+				;295	void __attribute ((interrupt(0x3c))) ISR_TimeBase(void) 
+				;296	{
+				@ISR_TimeBase_code .SECTION 'CODE'
+003C	0000	nop
+003D	4086	mov     r13c, a
+003E	070A	mov     a, STATUS
+003F	2961	jmp     _ISR_TimeBase
+				_ISR_TimeBase:
+				_ISR_TimeBase:
+				@dummy .SECTION 'CODE'
+0161	4087	mov     r23c, a
+0162	0703	mov     a, MP1L
+0163	409B	mov     r33c, a
+0164	0704	mov     a, MP1H
+0165	409C	mov     r43c, a
+0166	0707	mov     a, TBLP
+0167	409D	mov     r53c, a
+0168	0709	mov     a, TBHP
+0169	409E	mov     r63c, a
+				;297		FEED_WATCHDOG();
+016A	0001	clr     wdt
+				;298		
+				;299		if (cnt_1ms > 0)
+016B	4712	mov     a, cnt_1ms[0]
+016C	4513	or      a, cnt_1ms[1]
+016D	3D0A	sz      Z
+016E	2973	jmp     _L35
+				;300			cnt_1ms--;
+016F	0FFF	mov     a, FFH
+0170	4392	addm    a, cnt_1ms[0]
+0171	0FFF	mov     a, FFH
+0172	5393	adcm    a, cnt_1ms[1]
+				;301		
+				;302		if (cnt_debounce > 0) 
+				_L35:
+0173	4714	mov     a, cnt_debounce[0]
+0174	4515	or      a, cnt_debounce[1]
+0175	3D0A	sz      Z
+0176	297C	jmp     _L36
+				;303			cnt_debounce--;	
+0177	0FFF	mov     a, FFH
+0178	4394	addm    a, cnt_debounce[0]
+0179	0FFF	mov     a, FFH
+017A	5395	adcm    a, cnt_debounce[1]
+017B	298C	jmp     _L37
+				;304		else
+				;305		{
+				;306			status_ctrl_old = status_ctrl_now ;
+				_L36:
+017C	4718	mov     a, status_ctrl_now[0]
+017D	4099	mov     status_ctrl_old[0], a
+				;307			status_ctrl_now = (CTRL_DOWN << 1 | CTRL_UP); // sample key status
+017E	5F08	clr     ra3c
+017F	3CAC	sz      PD1
+0180	5488	inc     ra3c
+0181	072C	mov     a, PD
+0182	0E01	and     a, 1H
+0183	4089	mov     rb3c, a
+0184	4708	mov     a, ra3c
+0185	4388	addm    a, ra3c
+0186	4708	mov     a, ra3c
+0187	4509	or      a, rb3c
+0188	4098	mov     status_ctrl_now[0], a
+				;308			cnt_debounce = 100; // every 10ms
+0189	0F64	mov     a, 64H
+018A	4094	mov     cnt_debounce[0], a
+018B	5F15	clr     cnt_debounce[1]
+				;309		}
+				;310			
+				;311		
+				;312		if (cnt_pwm_inc < PWM_STEP_TIME) // increase duty every PWM_STEP_TIME 
+				_L37:
+018C	0F0E	mov     a, EH
+018D	4216	sub     a, cnt_pwm_inc[0]
+018E	0F00	mov     a, 0H
+018F	5217	sbc     a, cnt_pwm_inc[1]
+0190	380A	snz     C
+0191	2996	jmp     _L38
+				;313			cnt_pwm_inc ++;
+0192	5496	inc     cnt_pwm_inc[0]
+0193	3D0A	sz      Z
+0194	5497	inc     cnt_pwm_inc[1]
+0195	29BD	jmp     _L39
+				;314		else
+				;315		{
+				;316			cnt_pwm_inc = 0;
+				_L38:
+0196	5F16	clr     cnt_pwm_inc[0]
+0197	5F17	clr     cnt_pwm_inc[1]
+				;317		
+				;318			if (bPauseDutyCnt == 0)		 
+0198	7C00	sz      bPauseDutyCnt[0].0
+0199	29BD	jmp     _L39
+				;319			{
+				;320				if (bDutyDir ==1)
+019A	7801	snz     bDutyDir[0].0
+019B	29AA	jmp     _L40
+				;321				{
+				;322					if (duty_now <= (PWM_DUTY_MAX - PWM_STEP_DUTY))
+019C	0F63	mov     a, 63H
+019D	420E	sub     a, duty_now[0]
+019E	0F00	mov     a, 0H
+019F	520F	sbc     a, duty_now[1]
+01A0	380A	snz     C
+01A1	29A6	jmp     _L41
+				;323					{
+				;324						duty_now += PWM_STEP_DUTY;
+01A2	548E	inc     duty_now[0]
+01A3	3D0A	sz      Z
+01A4	548F	inc     duty_now[1]
+01A5	29B8	jmp     _L42
+				;325					}
+				;326					else
+				;327						duty_now = PWM_DUTY_MAX;
+				_L41:
+01A6	0F64	mov     a, 64H
+01A7	408E	mov     duty_now[0], a
+01A8	5F0F	clr     duty_now[1]
+01A9	29B8	jmp     _L42
+				;328				}
+				;329				else
+				;330				{
+				;331					if (duty_now  >= (PWM_DUTY_MIN + PWM_STEP_DUTY))
+				_L40:
+01AA	0F5A	mov     a, 5AH
+01AB	420E	sub     a, duty_now[0]
+01AC	0F00	mov     a, 0H
+01AD	520F	sbc     a, duty_now[1]
+01AE	3C0A	sz      C
+01AF	29B5	jmp     _L43
+				;332					{
+				;333						duty_now -=PWM_STEP_DUTY;
+01B0	0FFF	mov     a, FFH
+01B1	438E	addm    a, duty_now[0]
+01B2	0FFF	mov     a, FFH
+01B3	538F	adcm    a, duty_now[1]
+01B4	29B8	jmp     _L42
+				;334					}
+				;335					else
+				;336						duty_now = PWM_DUTY_MIN;
+				_L43:
+01B5	0F5A	mov     a, 5AH
+01B6	408E	mov     duty_now[0], a
+01B7	5F0F	clr     duty_now[1]
+				;337				}				
+				;338				Set_PWM_Duty(duty_now);
+				_L42:
+01B8	470E	mov     a, duty_now[0]
+01B9	408C	mov     duty, a
+01BA	470F	mov     a, duty_now[1]
+01BB	408D	mov     duty[1], a
+01BC	200C	call    _Set_PWM_Duty
+				;339			}		
+				;340		}
+				;341		
+				;342		_int_pri15f = 0;
+				_L39:
+01BD	3798	clr     INT_PRI15F
+				;343	    _tbf = 0;
+01BE	37A0	clr     TBF
+01BF	4707	mov     a, r23c
+01C0	008A	mov     STATUS, a
+01C1	471B	mov     a, r33c
+01C2	0083	mov     MP1L, a
+01C3	471C	mov     a, r43c
+01C4	0084	mov     MP1H, a
+01C5	471D	mov     a, r53c
+01C6	0087	mov     TBLP, a
+01C7	471E	mov     a, r63c
+01C8	0089	mov     TBHP, a
+01C9	1D05	tabrd   ACC
+01CA	4706	mov     a, r13c
+01CB	0004	reti
+				startup_value:
+				@ROMDATA_BASE .SECTION 'CODE'
+01CC	000D	dc	0000DH
+01CD	008E	mov     MP2H, a
+01CE	0000	nop
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+				@ROMDATA_BASE .SECTION 'CODE'
+01CF	0000	nop
+01D0	0000	nop
+01D1	0000	nop
+01D2	0000	nop
+01D3	FF00	lsz     [080H].6
+				;344	}
+				;345	
+				;346	/*===============================================
+				;347	1A=>10.2 @10mOhm	// OCPM setting
+				;348	1A -> 10mV * 20
+				;349	     ---------- * 255 = 10.2
+				;350	        5V
+				;351	===============================================*/
+				;352	void Comparator_Init(void)
+				;353	{
+				;354		_opoms = 0b01000011;	// Rising edge trigger, AV=20
+				;355		_opa0cal = 0b00110000; // offset cal off, normal mode
+				;356	
+				;357		_opcm = 30; // 10mOhm, 3A
+				;358		_c0en = 1; // enable OCP comparator
+				;359		_ishe = 1; // enable OCP hw protection
+				;360		_ocpse = 0; // reset PROCTECTOC			
+				;361		_ocpse = 1;			
+				;362		_ocps = 0b00101010; // low side MOS turn on if OCP
+				;363		_int_pri2e = 1;
+				;364		_int_pri2f = 0;
+				;365	}
+				;366	
+				;367	
+				;368	//===============================================
+				;369	//
+				;370	//===============================================
+				;371	void __attribute ((interrupt(0x08))) ISR_OCP(void)
+				;372	{
+				_ISR_OCP:
+				_ISR_OCP:
+0001	408B	mov     r208, a
+				@ISR_OCP_code .SECTION 'CODE'
+0008	0000	nop
+0009	408A	mov     r108, a
+000A	070A	mov     a, STATUS
+000B	2801	jmp     _ISR_OCP
+				;373		_int_pri2f = 0;
+0002	3695	clr     INT_PRI2F
+				;374		bOCP = 1;
+0003	7081	set     bDutyDir[0].1
+0004	470B	mov     a, r208
+0005	008A	mov     STATUS, a
+0006	470A	mov     a, r108
+0007	0004	reti
+				;375	}
+				;376	
+				;file D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm step\startup1_l.asm
+				;1	;;--------------------------------------------------------------;;
+				;2	;;    This file is part of the Holtek C Compiler V3 package     ;;
+				;3	;;    For the initialization of static linkage variables        ;;
+				;4	;;    Copyright (C) 2017 Holtek Semiconductor Inc.              ;;
+				;5	;;    Version: 1.07 (Above IDE3000 V7.94)                       ;;
+				;6	;;    Date:    2017/03/06                                        ;;
+				;7	;;--------------------------------------------------------------;;
+				;8	
+				;9	acc equ [05h]
+				;10	tblp equ [07h]
+				;11	tblh equ [08h]
+				;12	;;tbhp equ [09h] 
+				;13	r0 equ [00h]
+				;14	mp0 equ [01h]
+				;15	r1 equ [02h]
+				;16	mp1l equ [03h]
+				;17	mp1h equ [04h]
+				;18	z equ [0ah].2
+				;19	c equ [0ah].0
+				;20	
+				;21	ifndef tbhp
+				;22	tbhp equ [09h]
+				;23	endif
+				;24	 
+				;25	extern startup_value_1:near
+				;26	
+				;27	@start .section 'code'
+				;28	begin_startup_value:
+				;29	  mov a,low (offset startup_value_1) 
+				begin_startup_value:
+				@start .SECTION 'CODE'
+				@dummy60 .SECTION 'CODE'
+				_main_startup1:
+				@start .SECTION 'CODE'
+0040	0FCB	mov     a, CBH
+				;30	  mov tblp,a
+0041	0087	mov     TBLP, a
+				;31	  mov a,high (offset startup_value_1) 
+0042	0F01	mov     a, 1H
+				;32	  mov tbhp,a
+0043	0089	mov     TBHP, a
+				;33	next_table:
+				;34	  ;CLR WDT
+				;35	  inc tblp
+				next_table:
+0044	1487	inc     TBLP
+				;36	  sz z
+0045	3D0A	sz      Z
+				;37	  inc tbhp
+0046	1489	inc     TBHP
+				;38	ifdef USE_TABRDC
+				;39	  tabrdc mp0
+				;40	else
+				;41	  tabrd mp0
+0047	1D01	tabrd   MP0
+				;42	endif
+				;43	  sz mp0
+0048	1081	sz      MP0
+				;44	  jmp read_data
+0049	284B	jmp     read_data
+				;45	  jmp startupend1
+004A	2860	jmp     startupend1
+				;46	read_data:
+				;47	  inc tblp
+				read_data:
+004B	1487	inc     TBLP
+				;48	  sz z
+004C	3D0A	sz      Z
+				;49	  inc tbhp
+004D	1489	inc     TBHP
+				;50	ifdef USE_TABRDC
+				;51	  tabrdc mp1l
+				;52	else
+				;53	  tabrd mp1l
+004E	1D03	tabrd   MP1L
+				;54	endif
+				;55	  mov a,tblh
+004F	0708	mov     a, TBLH
+				;56	  mov mp1h,a
+0050	0084	mov     MP1H, a
+				;57	next_data:
+				;58	  inc tblp
+				next_data:
+0051	1487	inc     TBLP
+				;59	  sz z
+0052	3D0A	sz      Z
+				;60	  inc tbhp
+0053	1489	inc     TBHP
+				;61	ifdef USE_TABRDC
+				;62	  tabrdc acc
+				;63	else
+				;64	  tabrd acc
+0054	1D05	tabrd   ACC
+				;65	endif
+				;66	  mov r1,a
+0055	0082	mov     [02H], a
+				;67	  sdz mp0
+0056	1781	sdz     MP0
+				;68	  jmp $+2
+0057	2859	jmp     L0059
+				;69	  jmp next_table
+0058	2844	jmp     next_table
+				;70	  inc mp1l
+				L0059:
+0059	1483	inc     MP1L
+				;71	  mov a,tblh
+005A	0708	mov     a, TBLH
+				;72	  mov r1,a
+005B	0082	mov     [02H], a
+				;73	  inc mp1l
+005C	1483	inc     MP1L
+				;74	  sdz mp0
+005D	1781	sdz     MP0
+				;75	  jmp next_data
+005E	2851	jmp     next_data
+				;76	  jmp next_table
+005F	2844	jmp     next_table
+				;77	
+				;78	;end_startup_value:
+				;79	
+				;80	startupend1:
+				;81	ifndef Disable_Bit_Initial
+				;82		MOV A,high  bitdatasec1_start
+				startupend1:
+0060	0F00	mov     a, 0H
+				;83		MOV mp1h,a
+0061	0084	mov     MP1H, a
+				;84		MOV A,offset bitdatasec1_end
+0062	0F81	mov     a, 81H
+				;85		mov mp1l,A
+0063	0083	mov     MP1L, a
+				;86		dec mp1l
+0064	1583	dec     MP1L
+				;87		clr z
+0065	350A	clr     Z
+				;88		sub a,offset bitdatasec1_start
+0066	0A80	sub     a, 80H
+				;89		sz z
+0067	3D0A	sz      Z
+				;90		jmp startupend2
+0068	286D	jmp     startupend2
+				;91	L0005:
+				;92		set r1
+				L0005:
+0069	1F82	set     [02H]
+				;93		dec mp1l
+006A	1583	dec     MP1L
+				;94		sdz  acc
+006B	1785	sdz     ACC
+				;95		jmp L0005
+006C	2869	jmp     L0005
+				;96	
+				;97	startupend2:
+				;98		MOV A,high  bitdatasec0_start
+				startupend2:
+006D	0F00	mov     a, 0H
+				;99		MOV mp1h,a
+006E	0084	mov     MP1H, a
+				;100		MOV A,offset bitdatasec0_end
+006F	0F82	mov     a, 82H
+				;101		mov mp1l,A
+0070	0083	mov     MP1L, a
+				;102		dec mp1l
+0071	1583	dec     MP1L
+				;103		clr z
+0072	350A	clr     Z
+				;104		sub a,offset bitdatasec0_start
+0073	0A81	sub     a, 81H
+				;105		sz  z
+0074	3D0A	sz      Z
+				;106		jmp startupend3
+0075	287A	jmp     startupend3
+				;107	L0006:
+				;108		clr r1
+				L0006:
+0076	1F02	clr     [02H]
+				;109		dec mp1l
+0077	1583	dec     MP1L
+				;110		sdz  acc
+0078	1785	sdz     ACC
+				;111		jmp L0006
+0079	2876	jmp     L0006
+				;112	startupend3:
+				;113	endif		
+				;114	   
+				;115	@ROMDATA_BASE .SECTION com_l 'CODE'  
+				;116	startup_value:
+				;117	;;linker range the initial value table here
+				;118	
+				;119	@BITDATASEC1 .SECTION com_l 'DATA'  
+				;120	bitdatasec1_start:
+				;121	
+				;122	@BITDATASEC1 .SECTION com_e 'DATA'  
+				;123	bitdatasec1_end:
+				;124	
+				;125	@BITDATASEC .SECTION com_l 'DATA'  
+				;126	bitdatasec0_start:
+				;127	
+				;128	@BITDATASEC .SECTION com_e 'DATA'  
+				;129	bitdatasec0_end:
+				data .SECTION 'DATA'
+				__intc0 DB DUP (?) ; __intc0
+				__intc2 DB DUP (?) ; __intc2
+				__intc3 DB DUP (?) ; __intc3
+				__mfi5 DB DUP (?) ; __mfi5
+				__mfi7 DB DUP (?) ; __mfi7
+				__pb DB DUP (?) ; __pb
+				__pbc DB DUP (?) ; __pbc
+				__pc DB DUP (?) ; __pc
+				__pcc DB DUP (?) ; __pcc
+				__pdpu DB DUP (?) ; __pdpu
+				__pd DB DUP (?) ; __pd
+				__pdc DB DUP (?) ; __pdc
+				__ocps DB DUP (?) ; __ocps
+				__integ0 DB DUP (?) ; __integ0
+				__hdcr DB DUP (?) ; __hdcr
+				__hdcd DB DUP (?) ; __hdcd
+				__mptc1 DB DUP (?) ; __mptc1
+				__dutr3l DB DUP (?) ; __dutr3l
+				__dutr3h DB DUP (?) ; __dutr3h
+				__pwmc DB DUP (?) ; __pwmc
+				__dutr0l DB DUP (?) ; __dutr0l
+				__dutr0h DB DUP (?) ; __dutr0h
+				__prdrl DB DUP (?) ; __prdrl
+				__prdrh DB DUP (?) ; __prdrh
+				__pwmme DB DUP (?) ; __pwmme
+				__pwmmd DB DUP (?) ; __pwmmd
+				__mcf DB DUP (?) ; __mcf
+				__dts DB DUP (?) ; __dts
+				__plc DB DUP (?) ; __plc
+				__cmpc DB DUP (?) ; __cmpc
+				r12c DB DUP (?)
+				r22c DB DUP (?)
+				rb2c DB DUP (?)
+				rc2c DB DUP (?)
+				r13c DB DUP (?)
+				r23c DB DUP (?)
+				ra3c DB DUP (?)
+				rb3c DB DUP (?)
+				r108 DB DUP (?)
+				r208 DB DUP (?)
+				duty DB 2 DUP (?) ; duty
+				duty_now DB 2 DUP (?) ; duty_now
+				cnt_hall_period DB 2 DUP (?) ; cnt_hall_period
+				cnt_1ms DB 2 DUP (?) ; cnt_1ms
+				cnt_debounce DB 2 DUP (?) ; cnt_debounce
+				cnt_pwm_inc DB 2 DUP (?) ; cnt_pwm_inc
+				status_ctrl_now DB DUP (?) ; status_ctrl_now
+				status_ctrl_old DB DUP (?) ; status_ctrl_old
+				key_pressed DB DUP (?) ; key_pressed
+				r33c DB DUP (?)
+				r43c DB DUP (?)
+				r53c DB DUP (?)
+				r63c DB DUP (?)
+				__tbc DB DUP (?) ; __tbc
+				__ptm1c0 DB DUP (?) ; __ptm1c0
+				__ptm1c1 DB DUP (?) ; __ptm1c1
+				__ptm1al DB DUP (?) ; __ptm1al
+				__ptm1ah DB DUP (?) ; __ptm1ah
+				__pwmcs DB DUP (?) ; __pwmcs
+				__hdct0 DB DUP (?) ; __hdct0
+				__hdct1 DB DUP (?) ; __hdct1
+				__hdct2 DB DUP (?) ; __hdct2
+				__hdct3 DB DUP (?) ; __hdct3
+				__hdct4 DB DUP (?) ; __hdct4
+				__hdct5 DB DUP (?) ; __hdct5
+				__hdct6 DB DUP (?) ; __hdct6
+				__hdct7 DB DUP (?) ; __hdct7
+				__hdct8 DB DUP (?) ; __hdct8
+				__hdct9 DB DUP (?) ; __hdct9
+				__hdct10 DB DUP (?) ; __hdct10
+				__hdct11 DB DUP (?) ; __hdct11
+				__opoms DB DUP (?) ; __opoms
+				__opcm DB DUP (?) ; __opcm
+				__opa0cal DB DUP (?) ; __opa0cal
+				__paps0 DB DUP (?) ; __paps0
+				__pcps0 DB DUP (?) ; __pcps0
+				__pcps1 DB DUP (?) ; __pcps1
+				__pdps0 DB DUP (?) ; __pdps0
+				bPauseDutyCnt DB DUP (?) ; bPauseDutyCnt
+				bDutyDir DB DUP (?) ; bDutyDir
+				bOCP DB DUP (?) ; bOCP

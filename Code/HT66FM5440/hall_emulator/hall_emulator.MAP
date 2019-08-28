@@ -1,0 +1,185 @@
+
+Linker Version 8.7.7.181224
+Input Object File: D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\STARTUP1_L.OBJ
+Input Object File: D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ
+
+Input Library File: D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB
+Input Library File: D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\v3_lmrsc.lib
+
+
+     Bank    Start     End      Length     Class    AvgIns    Name
+     00h     0000h     0000h    0001h      CODE               @code (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     0001h     0006h    0006h      CODE               _ISR_OCP (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     0008h     000bh    0004h      CODE               @ISR_OCP_code (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     000ch     0019h    000eh      CODE               @ROMDATA_BASE (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\STARTUP1_L.OBJ)
+     00h     001ah     0028h    000fh      CODE               _IO_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     002ch     002fh    0004h      CODE               @ISR_TM1_code (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     0030h     0037h    0008h      CODE               _TimeBase_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     003ch     003fh    0004h      CODE               @ISR_TimeBase_code (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     0040h     007ah    003bh      CODE               @start (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     007bh     00d1h    0057h      CODE               _main (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     00d2h     014fh    007eh      CODE               _Hall_Period_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     0150h     0163h    0014h      CODE               _TM1_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     0164h     0276h    0113h      CODE               _ISR_TM1 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     0277h     0292h    001ch      CODE               _ISR_TimeBase (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     0080h     0080h    0001h      DATA     36        @data_ra (D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0081h     0081h    0001h      DATA     33        @data_rb (D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0082h     0082h    0001h      DATA     2         @data_rc (D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0083h     0083h    0001h      DATA     2         @data_rd (D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0084h     0084h    0001h      DATA     2         @data_r12c (isr:ra~rh)
+     00h     0085h     0085h    0001h      DATA     2         @data_r22c (isr:ra~rh)
+     00h     0086h     0086h    0001h      DATA     41        @data_ra2c (isr:ra~rh)
+     00h     0087h     0087h    0001h      DATA     41        @data_rb2c (isr:ra~rh)
+     00h     0088h     0088h    0001h      DATA     18        @data_rc2c (isr:ra~rh)
+     00h     0089h     0089h    0001h      DATA     18        @data_rd2c (isr:ra~rh)
+     00h     008ah     008ah    0001h      DATA     2         @data_r13c (isr:ra~rh)
+     00h     008bh     008bh    0001h      DATA     2         @data_r23c (isr:ra~rh)
+     00h     008ch     008ch    0001h      DATA     5         @data_ra3c (isr:ra~rh)
+     00h     008dh     008dh    0001h      DATA     5         @data_rb3c (isr:ra~rh)
+     00h     008eh     008eh    0001h      DATA     2         @data_r108 (isr:ra~rh)
+     00h     008fh     008fh    0001h      DATA     2         @data_r208 (isr:ra~rh)
+     00h     0092h     0093h    0002h      DATA     10        @HCCINIT_hall_period (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     0094h     0095h    0002h      DATA     9         @HCCINIT_cnt_hall_period (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     0096h     0097h    0002h      DATA     7         @HCCINIT_cnt_1ms (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     0098h     0099h    0002h      DATA     4         @HCCINIT_hall_120d (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     009ah     009bh    0002h      DATA     4         @HCCINIT_cnt_pwm_period (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     009ch     009dh    0002h      DATA     4         @HCCINIT_pwm_duty (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     009eh     009fh    0002h      DATA     3         @HCCINIT_hall_180d (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     00a0h     00a1h    0002h      DATA     2         @HCCINIT_hall_60d (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     00a2h     00a3h    0002h      DATA     2         @HCCINIT_hall_240d (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     00a4h     00a5h    0002h      DATA     2         @HCCINIT_hall_300d (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     00a6h     00a7h    0002h      DATA     2         @HCCINIT_pwm_period (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     00a8h     00a9h    0002h      DATA     10        @HCCINIT0_hall_state (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+
+     Local Sections
+
+     Bank    Start     End      Length     Class    AvgIns    Name
+     00h     0092h     0092h    0000h      LOCAL    0         @dummy (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     0092h     0092h    0000h      LOCAL    0         _main (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     0090h     0090h    0000h      LOCAL    0         _IO_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     0090h     0090h    0000h      LOCAL    0         _TimeBase_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     0090h     0091h    0002h      LOCAL    3         _Hall_Period_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     0090h     0090h    0000h      LOCAL    0         _TM1_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     0090h     0090h    0000h      LOCAL    0         @dummy44 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     0090h     0090h    0000h      LOCAL    0         _ISR_TM1 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     0090h     0090h    0000h      LOCAL    0         @dummy60 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     0090h     0090h    0000h      LOCAL    0         _ISR_TimeBase (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     0090h     0090h    0000h      LOCAL    0         @dummy8 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+     00h     0090h     0090h    0000h      LOCAL    0         _ISR_OCP (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ)
+
+     Public Symbols Information
+     Address            Public by Name
+     00d2h              _Hall_Period_Init
+     0090h              _Hall_Period_Init_2
+     001ah              _IO_Init
+     0001h              _ISR_OCP
+     0164h              _ISR_TM1
+     0277h              _ISR_TimeBase
+     0150h              _TM1_Init
+     0030h              _TimeBase_Init
+     0096h              _cnt_1ms
+     0094h              _cnt_hall_period
+     009ah              _cnt_pwm_period
+     0098h              _hall_120d
+     009eh              _hall_180d
+     00a2h              _hall_240d
+     00a4h              _hall_300d
+     00a0h              _hall_60d
+     0092h              _hall_period
+     00a8h              _hall_state
+     007bh              _main
+     009ch              _pwm_duty
+     00a6h              _pwm_period
+     008eh              r108
+     0084h              r12c
+     008ah              r13c
+     008fh              r208
+     0085h              r22c
+     008bh              r23c
+     0080h              ra
+     0086h              ra2c
+     008ch              ra3c
+     0081h              rb
+     0087h              rb2c
+     008dh              rb3c
+     0082h              rc
+     0088h              rc2c
+     0083h              rd
+     0089h              rd2c
+     000bh              startup_value_1
+
+     Address            Public by Value
+     0001h              _ISR_OCP
+     000bh              startup_value_1
+     001ah              _IO_Init
+     0030h              _TimeBase_Init
+     007bh              _main
+     0080h              ra
+     0081h              rb
+     0082h              rc
+     0083h              rd
+     0084h              r12c
+     0085h              r22c
+     0086h              ra2c
+     0087h              rb2c
+     0088h              rc2c
+     0089h              rd2c
+     008ah              r13c
+     008bh              r23c
+     008ch              ra3c
+     008dh              rb3c
+     008eh              r108
+     008fh              r208
+     0090h              _Hall_Period_Init_2
+     0092h              _hall_period
+     0094h              _cnt_hall_period
+     0096h              _cnt_1ms
+     0098h              _hall_120d
+     009ah              _cnt_pwm_period
+     009ch              _pwm_duty
+     009eh              _hall_180d
+     00a0h              _hall_60d
+     00a2h              _hall_240d
+     00a4h              _hall_300d
+     00a6h              _pwm_period
+     00a8h              _hall_state
+     00d2h              _Hall_Period_Init
+     0150h              _TM1_Init
+     0164h              _ISR_TM1
+     0277h              _ISR_TimeBase
+
+
+ROM Usage Statistics
+     Size      Used     Percentage
+     1000h     028bh    15%
+
+RAM Usage Statistics
+    Bank      Size      Used     Percentage
+     00h       0080h     002ah    32%
+     01h       0080h     0000h    0%
+     02h       0080h     0000h    0%
+     Total     0180h     002ah    10%
+
+Use Stack Count
+_main: 1
+_ISR_TM1: 0
+_ISR_TimeBase: 0
+_ISR_OCP: 0
+
+Call Tree
+    @dummy
+        _main (0)
+            _IO_Init (1)
+            _TimeBase_Init (1)
+            _Hall_Period_Init (1)
+            _TM1_Init (1)
+    @dummy44
+        _ISR_TM1 (0)
+    @dummy60
+        _ISR_TimeBase (0)
+    @dummy8
+        _ISR_OCP (0)
+
+HLINK: Program entry point at section '@code' (address 0) of file 'D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\hall_emulator\HALL_EMU.OBJ'
+
+Total 0 error(s), Total 0 Warning(s)

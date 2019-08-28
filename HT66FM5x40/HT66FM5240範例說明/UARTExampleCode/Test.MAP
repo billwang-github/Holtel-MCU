@@ -1,0 +1,134 @@
+
+Linker Version 8.5.1.140619
+Input Object File: F:\Project\Code\UARTExampleCode\MAIN.OBJ
+Input Object File: F:\Project\Code\UARTExampleCode\INIT.OBJ
+Input Object File: F:\Project\Code\UARTExampleCode\STARTUP1_L.OBJ
+Input Object File: F:\Project\Code\UARTExampleCode\INTERRUPT.OBJ
+
+Input Library File: C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB
+Input Library File: C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\v3_tabrd_mrsc.lib
+
+
+     Bank    Start     End      Length     Class      Name
+     00h     0000h     0000h    0001h      CODE       @code (F:\Project\Code\UARTExampleCode\MAIN.OBJ)
+     00h     0001h     0021h    0021h      CODE       @start (F:\Project\Code\UARTExampleCode\MAIN.OBJ)
+     00h     0022h     0026h    0005h      CODE       _ClockInit (F:\Project\Code\UARTExampleCode\INIT.OBJ)
+     00h     0027h     002dh    0007h      CODE       _GPIOInit (F:\Project\Code\UARTExampleCode\INIT.OBJ)
+     00h     002eh     0033h    0006h      CODE       _SystemInit (F:\Project\Code\UARTExampleCode\INIT.OBJ)
+     00h     0034h     0037h    0004h      CODE       @ISR_Uart_code (F:\Project\Code\UARTExampleCode\INTERRUPT.OBJ)
+     00h     0038h     0050h    0019h      CODE       _main (F:\Project\Code\UARTExampleCode\MAIN.OBJ)
+     00h     0051h     005dh    000dh      CODE       _UartInit (F:\Project\Code\UARTExampleCode\INIT.OBJ)
+     00h     005eh     007bh    001eh      CODE       _UartHand (F:\Project\Code\UARTExampleCode\INIT.OBJ)
+     00h     007ch     009ah    001fh      CODE       _UartPutChar (F:\Project\Code\UARTExampleCode\INIT.OBJ)
+     00h     009bh     009bh    0001h      CODE       @ROMDATA_BASE (F:\Project\Code\UARTExampleCode\STARTUP1_L.OBJ)
+     00h     009ch     00a6h    000bh      CODE       _ISR_Uart (F:\Project\Code\UARTExampleCode\INTERRUPT.OBJ)
+     00h     00a7h     00abh    0005h      CODE       _CROM2PROM (CROM2PROM)
+     00h     0080h     009ch    001dh      DATA       @HCCINIT0 (F:\Project\Code\UARTExampleCode\MAIN.OBJ)
+     00h     009dh     009dh    0001h      DATA       @data_ra (C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     009eh     009eh    0001h      DATA       @data_rb (C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+
+     Local Sections
+
+     Bank    Start     End      Length     Class      Name
+     00h     00a6h     00a6h    0000h      LOCAL      @dummy (F:\Project\Code\UARTExampleCode\MAIN.OBJ)
+     00h     00a4h     00a5h    0002h      LOCAL      _main (F:\Project\Code\UARTExampleCode\MAIN.OBJ)
+     00h     00a2h     00a2h    0000h      LOCAL      _SystemInit (F:\Project\Code\UARTExampleCode\INIT.OBJ)
+     00h     00a2h     00a2h    0000h      LOCAL      _ClockInit (F:\Project\Code\UARTExampleCode\INIT.OBJ)
+     00h     00a2h     00a2h    0000h      LOCAL      _GPIOInit (F:\Project\Code\UARTExampleCode\INIT.OBJ)
+     00h     00a2h     00a2h    0000h      LOCAL      _UartInit (F:\Project\Code\UARTExampleCode\INIT.OBJ)
+     00h     00a2h     00a2h    0001h      LOCAL      _UartHand (F:\Project\Code\UARTExampleCode\INIT.OBJ)
+     00h     00a2h     00a2h    0000h      LOCAL      _Crom2Prom (CROM2PROM)
+     00h     00a2h     00a3h    0002h      LOCAL      _UartPutChar (F:\Project\Code\UARTExampleCode\INIT.OBJ)
+     00h     00a2h     00a2h    0000h      LOCAL      @dummy52 (F:\Project\Code\UARTExampleCode\INTERRUPT.OBJ)
+     00h     009fh     00a1h    0003h      LOCAL      _ISR_Uart (F:\Project\Code\UARTExampleCode\INTERRUPT.OBJ)
+
+     Public Symbols Information
+     Address            Public by Name
+     0093h              _AdData
+     0092h              _ChannelCnt
+     0022h              _ClockInit
+     00a8h              _Crom2Prom
+     00a7h              _Crom2PromNext
+     0082h              _Flag01
+     0027h              _GPIOInit
+     009ch              _ISR_Uart
+     009fh              _ISR_Uartfs
+     0087h              _RxdBuff
+     0083h              _RxdCnt
+     0080h              _RxdData
+     002eh              _SystemInit
+     0091h              _Time1msCnt
+     009bh              _TimeCnt
+     008ch              _TxdBuff
+     0084h              _TxdCnt
+     0081h              _TxdData
+     0086h              _TxdPoint
+     0085h              _TxdPoint2
+     005eh              _UartHand
+     0051h              _UartInit
+     007ch              _UartPutChar
+     0038h              _main
+     009dh              ra
+     009eh              rb
+     009ah              startup_value_1
+
+     Address            Public by Value
+     0022h              _ClockInit
+     0027h              _GPIOInit
+     002eh              _SystemInit
+     0038h              _main
+     0051h              _UartInit
+     005eh              _UartHand
+     007ch              _UartPutChar
+     0080h              _RxdData
+     0081h              _TxdData
+     0082h              _Flag01
+     0083h              _RxdCnt
+     0084h              _TxdCnt
+     0085h              _TxdPoint2
+     0086h              _TxdPoint
+     0087h              _RxdBuff
+     008ch              _TxdBuff
+     0091h              _Time1msCnt
+     0092h              _ChannelCnt
+     0093h              _AdData
+     009ah              startup_value_1
+     009bh              _TimeCnt
+     009ch              _ISR_Uart
+     009dh              ra
+     009eh              rb
+     009fh              _ISR_Uartfs
+     00a7h              _Crom2PromNext
+     00a8h              _Crom2Prom
+
+
+ROM Usage Statistics
+     Size      Used     Percentage
+     1000h     00ach    4%
+
+RAM Usage Statistics
+    Bank      Size      Used     Percentage
+     00h       0080h     0026h    29%
+     01h       0080h     0000h    0%
+     Total     0100h     0026h    14%
+
+Use Stack Count
+_main: 2
+_ISR_Uart: 0
+
+Call Tree
+    @dummy
+        _main
+            _SystemInit
+                _ClockInit
+                _GPIOInit
+                _UartInit
+            _UartHand
+                _Crom2Prom
+            _UartPutChar
+    @dummy52
+        _ISR_Uart
+
+HLINK: Program entry point at section '@code' (address 0) of file 'F:\Project\Code\UARTExampleCode\MAIN.OBJ'
+
+Total 0 error(s), Total 0 Warning(s)

@@ -1,0 +1,138 @@
+
+Linker Version 8.5.1.140619
+Input Object File: F:\Project\Code\PTMExampleCode\MAIN.OBJ
+Input Object File: F:\Project\Code\PTMExampleCode\INIT.OBJ
+Input Object File: F:\Project\Code\PTMExampleCode\STARTUP1_L.OBJ
+Input Object File: F:\Project\Code\PTMExampleCode\INTERRUPT.OBJ
+
+Input Library File: C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB
+Input Library File: C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\v3_tabrd_mrsc.lib
+
+
+     Bank    Start     End      Length     Class      Name
+     00h     0000h     0000h    0001h      CODE       @code (F:\Project\Code\PTMExampleCode\MAIN.OBJ)
+     00h     0001h     0021h    0021h      CODE       @start (F:\Project\Code\PTMExampleCode\MAIN.OBJ)
+     00h     0022h     0026h    0005h      CODE       _ClockInit (F:\Project\Code\PTMExampleCode\INIT.OBJ)
+     00h     0027h     002ah    0004h      CODE       _GPIOInit (F:\Project\Code\PTMExampleCode\INIT.OBJ)
+     00h     002bh     002bh    0001h      CODE       @ROMDATA_BASE (F:\Project\Code\PTMExampleCode\STARTUP1_L.OBJ)
+     00h     002ch     002fh    0004h      CODE       @ISR_TIMER1_code (F:\Project\Code\PTMExampleCode\INTERRUPT.OBJ)
+     00h     0030h     005bh    002ch      CODE       _main (F:\Project\Code\PTMExampleCode\MAIN.OBJ)
+     00h     005ch     0080h    0025h      CODE       _PwmInit (F:\Project\Code\PTMExampleCode\INIT.OBJ)
+     00h     0081h     009bh    001bh      CODE       _SetDuty (F:\Project\Code\PTMExampleCode\INIT.OBJ)
+     00h     009ch     00bah    001fh      CODE       _Timer1Init (F:\Project\Code\PTMExampleCode\INIT.OBJ)
+     00h     00bbh     00c1h    0007h      CODE       _SystemInit (F:\Project\Code\PTMExampleCode\INIT.OBJ)
+     00h     00c2h     00cah    0009h      CODE       _Timer1_SetDuty (F:\Project\Code\PTMExampleCode\INIT.OBJ)
+     00h     00cbh     00f1h    0027h      CODE       _ISR_TIMER1 (F:\Project\Code\PTMExampleCode\INTERRUPT.OBJ)
+     00h     0080h     0089h    000ah      DATA       @HCCINIT0 (F:\Project\Code\PTMExampleCode\MAIN.OBJ)
+     00h     008ah     008ah    0001h      DATA       @data_ra (C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     008bh     008bh    0001h      DATA       @data_rb (C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     008ch     008ch    0001h      DATA       @data_rc (C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     008dh     008dh    0001h      DATA       @data_ra2c (isr:ra~rh)
+     00h     008eh     008eh    0001h      DATA       @data_rc2c (isr:ra~rh)
+     00h     008fh     008fh    0001h      DATA       @data_rb2c (isr:ra~rh)
+     00h     0090h     0090h    0001h      DATA       @data_rd2c (isr:ra~rh)
+     00h     0091h     0091h    0001h      DATA       @data_re2c (isr:ra~rh)
+
+     Local Sections
+
+     Bank    Start     End      Length     Class      Name
+     00h     0099h     0099h    0000h      LOCAL      @dummy (F:\Project\Code\PTMExampleCode\MAIN.OBJ)
+     00h     0099h     0099h    0000h      LOCAL      _main (F:\Project\Code\PTMExampleCode\MAIN.OBJ)
+     00h     0095h     0095h    0000h      LOCAL      _SystemInit (F:\Project\Code\PTMExampleCode\INIT.OBJ)
+     00h     0095h     0095h    0000h      LOCAL      _ClockInit (F:\Project\Code\PTMExampleCode\INIT.OBJ)
+     00h     0095h     0095h    0000h      LOCAL      _GPIOInit (F:\Project\Code\PTMExampleCode\INIT.OBJ)
+     00h     0095h     0095h    0000h      LOCAL      _PwmInit (F:\Project\Code\PTMExampleCode\INIT.OBJ)
+     00h     0095h     0095h    0000h      LOCAL      _Timer1Init (F:\Project\Code\PTMExampleCode\INIT.OBJ)
+     00h     0095h     0096h    0002h      LOCAL      _SetDuty (F:\Project\Code\PTMExampleCode\INIT.OBJ)
+     00h     0095h     0098h    0004h      LOCAL      _Timer1_SetDuty (F:\Project\Code\PTMExampleCode\INIT.OBJ)
+     00h     0095h     0095h    0000h      LOCAL      @dummy44 (F:\Project\Code\PTMExampleCode\INTERRUPT.OBJ)
+     00h     0092h     0094h    0003h      LOCAL      _ISR_TIMER1 (F:\Project\Code\PTMExampleCode\INTERRUPT.OBJ)
+
+     Public Symbols Information
+     Address            Public by Name
+     0084h              _CatchCnt
+     0022h              _ClockInit
+     0088h              _Duty
+     0027h              _GPIOInit
+     00cbh              _ISR_TIMER1
+     0092h              _ISR_TIMER1fs
+     0086h              _Period
+     0082h              _PrevCatchCnt
+     005ch              _PwmInit
+     0081h              _SetDuty
+     0095h              _SetDuty_2
+     00bbh              _SystemInit
+     0080h              _TimeCnt
+     009ch              _Timer1Init
+     00c2h              _Timer1_SetDuty
+     0097h              _Timer1_SetDuty_2
+     0030h              _main
+     008ah              ra
+     008dh              ra2c
+     008bh              rb
+     008fh              rb2c
+     008ch              rc
+     008eh              rc2c
+     0090h              rd2c
+     0091h              re2c
+     002ah              startup_value_1
+
+     Address            Public by Value
+     0022h              _ClockInit
+     0027h              _GPIOInit
+     002ah              startup_value_1
+     0030h              _main
+     005ch              _PwmInit
+     0080h              _TimeCnt
+     0081h              _SetDuty
+     0082h              _PrevCatchCnt
+     0084h              _CatchCnt
+     0086h              _Period
+     0088h              _Duty
+     008ah              ra
+     008bh              rb
+     008ch              rc
+     008dh              ra2c
+     008eh              rc2c
+     008fh              rb2c
+     0090h              rd2c
+     0091h              re2c
+     0092h              _ISR_TIMER1fs
+     0095h              _SetDuty_2
+     0097h              _Timer1_SetDuty_2
+     009ch              _Timer1Init
+     00bbh              _SystemInit
+     00c2h              _Timer1_SetDuty
+     00cbh              _ISR_TIMER1
+
+
+ROM Usage Statistics
+     Size      Used     Percentage
+     1000h     00f2h    5%
+
+RAM Usage Statistics
+    Bank      Size      Used     Percentage
+     00h       0080h     0019h    19%
+     01h       0080h     0000h    0%
+     Total     0100h     0019h    9%
+
+Use Stack Count
+_main: 2
+_ISR_TIMER1: 0
+
+Call Tree
+    @dummy
+        _main
+            _SystemInit
+                _ClockInit
+                _GPIOInit
+                _PwmInit
+                _Timer1Init
+            _SetDuty
+            _Timer1_SetDuty
+    @dummy44
+        _ISR_TIMER1
+
+HLINK: Program entry point at section '@code' (address 0) of file 'F:\Project\Code\PTMExampleCode\MAIN.OBJ'
+
+Total 0 error(s), Total 0 Warning(s)

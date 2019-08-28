@@ -1,0 +1,106 @@
+#include "HT66FM5240.h"
+#include "FuncTion.h"
+
+
+u8 MC_NewHall;
+u8 MC_PrevHall;
+
+u16 MC_ActPWM;
+u16 MC_DecPWM;
+u16 MC_HanderBarAD;
+
+const u8 PWMME[8]={0x3F,0x3B,0x2F,0x2F,0x3E,0x3B,0x3E,0x3F};
+const u8 PWMMD[8]={0x00,0x02,0x08,0x02,0x20,0x20,0x08,0x00};
+
+void HandleSpeed(void)
+{
+	MC_HanderBarAD=(MC_HanderBarAD+DRIVER_AD)>>1;
+	
+	if(bStopFlag)
+	{
+		MC_DecPWM=0;
+		MC_ActPWM=0;
+		if(MC_HanderBarAD<START_DRIVER_AD)	//600mv
+		{
+			bStopFlag=0;
+		}
+	}
+	else if(MC_HanderBarAD>=START_DRIVER_AD)
+	{
+		if(!bRunFlag)
+		{
+			bRunFlag=1;
+			MC_ActPWM=10;
+			MC_NewHall=GetHallPort();
+			MC_PrevHall=MC_NewHall;
+			_pwmme=PWMME[MC_NewHall];
+			_pwmmd=PWMMD[MC_NewHall];			
+		}
+		
+		if(MC_HanderBarAD>MAX_DRIVER_AD)
+		{
+			MC_DecPWM=MAX_PWM;
+		}
+		else
+		{
+			MC_DecPWM=((MC_HanderBarAD-START_DRIVER_AD)*7)>>5;
+		}		
+	}
+	else
+	{
+		MC_DecPWM=0;
+	}
+	
+	if(MC_DecPWM>MC_ActPWM)
+	{
+		if(MC_DecPWM>(MC_ActPWM+20))
+		{
+			MC_ActPWM+=5;
+		}
+		else if(MC_ActPWM<MAX_PWM)
+		{
+			MC_ActPWM++;
+		}
+	}
+	else
+	{
+		if(MC_ActPWM>(MC_DecPWM+20))
+		{
+			MC_ActPWM-=5;
+		}
+		else if(MC_ActPWM>0)
+		{
+			MC_ActPWM--;
+		}
+		else
+		{
+			bRunFlag=0;
+		}
+	}
+	
+	SetDuty(MC_ActPWM);
+}
+
+/********************************/
+u8 ReadHallPort(void)
+{
+	u8 i,i1,,temp,prevtemp;
+	
+	i1=8
+	prevtemp=GetHallPort();
+	for(i=4,i>0,i--)	//8
+	{
+		if(--i1==0)
+		{
+			return MC_PrevHall;
+		}
+		temp=GetHallPort();
+		if(temp!=prevtemp)
+		{
+			prevtemp=temp;
+			i=4;					//8
+		}
+	}
+		
+	return temp;
+}

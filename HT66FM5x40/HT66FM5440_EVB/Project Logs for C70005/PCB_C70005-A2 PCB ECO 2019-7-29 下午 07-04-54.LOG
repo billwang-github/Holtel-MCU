@@ -1,0 +1,11 @@
+Change Component Comment : Designator=C2 Old Comment=4.7uF New Comment=470uF
+Change Component Comment : Designator=C13 Old Comment=4.7uF New Comment=470uF
+Change Component Comment : Designator=C18 Old Comment=4.7uF New Comment=470uF
+Change Component Comment : Designator=C10 Old Comment=100uF New Comment=470uF
+Change Component Comment : Designator=C11 Old Comment=220uF New Comment=470uF
+Change Component Library : Designator=C2 Old Library=Holtek Component Library V2.SchLib New Library=C70005.SCHLIB
+Change Component Library : Designator=C9 Old Library=Holtek Component Library V2.SchLib New Library=C70005.SCHLIB
+Change Component Library : Designator=C10 Old Library=Holtek Component Library V2.SchLib New Library=C70005.SCHLIB
+Change Component Library : Designator=C11 Old Library=Holtek Component Library V2.SchLib New Library=C70005.SCHLIB
+Change Component Library : Designator=C13 Old Library=Holtek Component Library V2.SchLib New Library=C70005.SCHLIB
+Change Component Library : Designator=C18 Old Library=Holtek Component Library V2.SchLib New Library=C70005.SCHLIB

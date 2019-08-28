@@ -1,0 +1,576 @@
+				;file F:\Project\Code\PTMExampleCode\Main.c
+				;1	#include "HT66FM5240.h"
+				;2	#include "FuncTion.h"
+				;3	
+				;4	u16 Duty;
+				;5	u16 Period;
+				;6	u16 CatchCnt;
+				;7	u16 PrevCatchCnt;
+				;8	u16 TimeCnt;
+				;9	
+				;10	void main(void)
+				;11	{
+				include HT66FM5240.inc
+				@code .SECTION 'CODE'
+0000	2801	jmp     _main_startup1
+				@start .SECTION 'CODE'
+				_main_startup1:
+0001	0F2A	mov     a, 2AH
+0002	0087	mov     TBLP, a
+0003	0F00	mov     a, 0H
+0004	0089	mov     TBHP, a
+				L0005:
+0005	1487	inc     TBLP
+0006	3D0A	sz      Z
+0007	1489	inc     TBHP
+0008	1D01	tabrd   MP0
+0009	1081	sz      MP0
+000A	280C	jmp     L000C
+000B	2821	jmp     L0021
+				L000C:
+000C	1487	inc     TBLP
+000D	3D0A	sz      Z
+000E	1489	inc     TBHP
+000F	1D03	tabrd   MP1
+0010	0708	mov     a, TBLH
+0011	0084	mov     BP, a
+				L0012:
+0012	1487	inc     TBLP
+0013	3D0A	sz      Z
+0014	1489	inc     TBHP
+0015	1D05	tabrd   ACC
+0016	0082	mov     [02H], a
+0017	1781	sdz     MP0
+0018	281A	jmp     L001A
+0019	2805	jmp     L0005
+				L001A:
+001A	1483	inc     MP1
+001B	0708	mov     a, TBLH
+001C	0082	mov     [02H], a
+001D	1483	inc     MP1
+001E	1781	sdz     MP0
+001F	2812	jmp     L0012
+0020	2805	jmp     L0005
+				@start .SECTION 'CODE'
+				L0021:
+0021	2830	jmp     _main
+				_L4:
+0040	0FB8	mov     a, B8H
+0041	408B	mov     rb, a
+0042	0F0B	mov     a, BH
+0043	408C	mov     rc, a
+				;12		u16 i;
+				;13		
+				;14		DI();
+				_main:
+				_main:
+				@dummy44 .SECTION 'CODE'
+0030	3411	clr     EMI
+				;15		Duty=200;
+0031	0FC8	mov     a, C8H
+0032	4088	mov     Duty[0], a
+0033	5F09	clr     Duty[1]
+				;16		Period=1280;	
+0034	5F06	clr     Period[0]
+0035	0F05	mov     a, 5H
+0036	4087	mov     Period[1], a
+				;17		SystemInit();
+0037	20BB	call    _SystemInit
+				;18		EI();
+0038	3011	set     EMI
+				;19	
+				;20		CatchCnt=0;
+0039	5F04	clr     CatchCnt[0]
+003A	5F05	clr     CatchCnt[1]
+				;21		PrevCatchCnt=0;
+003B	5F02	clr     PrevCatchCnt[0]
+003C	5F03	clr     PrevCatchCnt[1]
+				;22		Duty=200;
+003D	0FC8	mov     a, C8H
+003E	4088	mov     Duty[0], a
+003F	5F09	clr     Duty[1]
+				;23				
+				;24		while(1)
+				;25		{
+				;26			for(i=0;i<3000;i++)
+0049	470B	mov     a, rb
+004A	450C	or      a, rc
+004B	390A	snz     Z
+004C	2844	jmp     _L3
+				;27			{
+				;28				FeedWatchDog();	//餵狗
+				_L3:
+0044	0001	clr     wdt
+0045	0FFF	mov     a, FFH
+0046	438B	addm    a, rb
+0047	0FFF	mov     a, FFH
+0048	538C	adcm    a, rc
+				;29			}
+				;30			SetDuty(256);
+004D	5F15	clr     duty
+004E	0F01	mov     a, 1H
+004F	4096	mov     [096H], a
+0050	2081	call    _SetDuty
+				;31			Timer1_SetDuty(Duty,Period);//設置占空比				
+0051	4706	mov     a, Period[0]
+0052	4097	mov     period, a
+0053	4707	mov     a, Period[1]
+0054	4098	mov     [098H], a
+0055	4708	mov     a, Duty[0]
+0056	4095	mov     duty, a
+0057	4709	mov     a, Duty[1]
+0058	4096	mov     [096H], a
+0059	20C2	call    _Timer1_SetDuty
+				;32		}
+005A	2840	jmp     _L4
+005B	285B	jmp     $
+				;33	}
+				;34	
+				;35	
+				;36	
+				;37	
+				;38	
+				;39	
+				;40	
+				;41	
+				;42	
+				;43	
+				;44	
+				;45	
+				;46	
+				;47	
+				;48	
+				;file F:\Project\Code\PTMExampleCode\Init.c
+				;1	#include "HT66FM5240.h"
+				;2	#include "FuncTion.h"
+				;3	
+				;4	
+				;5	void SystemInit(void)
+				;6	{
+				;7		ClockInit();
+				_SystemInit:
+				_SystemInit:
+00BB	2022	call    _ClockInit
+				;8		GPIOInit();
+00BC	2027	call    _GPIOInit
+				;9		PwmInit();
+00BD	205C	call    _PwmInit
+				;10		Timer1Init();
+00BE	209C	call    _Timer1Init
+				;11		WatchDogInit();	
+				;12	}
+				;13	
+				;14	
+				;15	void ClockInit(void)
+				;16	{
+				;17		_smod=0x01;	//禁止快速喚醒功能、禁止IDLE模式	Fsys=Fh=20MHZ
+				_ClockInit:
+				_ClockInit:
+0022	0F01	mov     a, 1H
+0023	008B	mov     SMOD, a
+				;18		while((_smod&0x04)==0);	//等待時鐘穩定
+				_L3:
+0024	390B	snz     HTO
+0025	2824	jmp     _L3
+0026	0003	ret
+				;19	}
+				;20	
+				;21	void GPIOInit(void)
+				;22	{
+				;23		_papu6=0;	//未上拉
+				_GPIOInit:
+				_GPIOInit:
+0027	371D	clr     PAPU6
+				;24	    _pac6=0;	//端口設為輸出模式
+0028	371F	clr     PAC6
+				;25		_pa6=1;		//端口輸出高電平	
+0029	331E	set     PA6
+002A	0003	ret
+002B	0000	nop
+				;26	}
+				;27	
+				;28	void WatchDogInit(void)
+				;29	{
+				;30		_wdtc=0x57;	//IDLE模式時維持Fsys時鐘、看門狗時間=2^18/Fs	(Fs=Fsub、Fs=Fsys/4)
+00BF	0F57	mov     a, 57H
+00C0	008E	mov     WDTC, a
+00C1	0003	ret
+				;31	}
+				;32	
+				;33	
+				;34	/****************************************/
+				;35	void PwmInit(void)
+				;36	{
+				;37		_pcps0=0xAA;	//C引腳共用功能設置	PC0-PC5設為PWM口
+				@dummy .SECTION 'CODE'
+				_PwmInit:
+				_PwmInit:
+005C	0F7C	mov     a, 7CH
+005D	0083	mov     MP1, a
+005E	0F01	mov     a, 1H
+005F	0081	mov     MP0, a
+0060	0701	mov     a, MP0
+0061	0084	mov     BP, a
+0062	0FAA	mov     a, AAH
+0063	0082	mov     [02H], a
+				;38		_pcps1=0x0A;
+0064	0F7D	mov     a, 7DH
+0065	0083	mov     MP1, a
+0066	0F01	mov     a, 1H
+0067	0081	mov     MP0, a
+0068	0701	mov     a, MP0
+0069	0084	mov     BP, a
+006A	0F0A	mov     a, AH
+006B	0082	mov     [02H], a
+				;39		
+				;40			
+				;41		_pwmc=0x81;		//中心對齊模式1、 Fpwm=20MHZ、禁止占空比中斷、允許更新 	
+006C	0F81	mov     a, 81H
+006D	00DF	mov     PWMC, a
+				;42		
+				;43		_prdrh=(u8)(PWMPERIOD>>8);	//設置週期寄出去
+006E	0F02	mov     a, 2H
+006F	00E7	mov     PRDRH, a
+				;44		_prdrl=(u8)(PWMPERIOD);
+0070	0F80	mov     a, 80H
+0071	00E6	mov     PRDRL, a
+				;45		
+				;46		_dutr0h=0x00;	//占空比寄存器
+0072	1F61	clr     DUTR0H
+				;47		_dutr0l=0x00;
+0073	1F60	clr     DUTR0L
+				;48		_dutr1h=0x00;
+0074	1F63	clr     DUTR1H
+				;49		_dutr1l=0x00;	
+0075	1F62	clr     DUTR1L
+				;50		_dutr2h=0x00;
+0076	1F65	clr     DUTR2H
+				;51		_dutr2l=0x00;
+0077	1F64	clr     DUTR2L
+				;52		
+				;53		_pwmme=0x00;	//禁止強制輸出功能
+0078	1F6A	clr     PWMME
+				;54		_pwmmd=0x00;	//強制輸出電平寄存器
+0079	1F6B	clr     PWMMD
+				;55		
+				;56		_mcf=0x85;		//S/W Mask 模式、互補輸出、PWM輸出使能、頂端PWM輸出
+007A	0F85	mov     a, 85H
+007B	00EC	mov     MCF, a
+				;57		_dts=0xA4;		//使能死區、死區時間為1us
+007C	0FA4	mov     a, A4H
+007D	00EE	mov     DTS, a
+				;58		_plc=0x00;		//極性為正相輸出
+007E	1F6F	clr     PLC
+				;59		
+				;60		_pwmc|=0x08;	//開啟PWM計數器	
+007F	31DF	set     PWMON
+0080	0003	ret
+				;61	}
+				;62	
+				;63	
+				;64	void SetDuty(u16 duty)
+				;65	{
+				_SetDuty:
+				_SetDuty:
+0081	4715	mov     a, duty[0]
+0082	408B	mov     rb, a
+0083	4716	mov     a, duty[1]
+0084	408C	mov     rc, a
+0085	0F80	mov     a, 80H
+0086	420B	sub     a, rb
+0087	0F02	mov     a, 2H
+0088	520C	sbc     a, rc
+0089	3C0A	sz      C
+008A	288F	jmp     _L9
+008B	0F80	mov     a, 80H
+008C	408B	mov     rb, a
+008D	0F02	mov     a, 2H
+008E	408C	mov     rc, a
+				;66		if(duty>PWMPERIOD)
+				;67		{
+				;68			duty=PWMPERIOD;	
+				;69		}
+				;70		_dutr0h=(u8)(duty>>8);	//設置占空比寄存器
+				_L9:
+008F	470C	mov     a, rc
+0090	00E1	mov     DUTR0H, a
+				;71		_dutr0l=(u8)(duty);
+0091	470B	mov     a, rb
+0092	00E0	mov     DUTR0L, a
+				;72		_dutr1h=(u8)(duty>>8);
+0093	470C	mov     a, rc
+0094	00E3	mov     DUTR1H, a
+				;73		_dutr1l=(u8)(duty);	
+0095	470B	mov     a, rb
+0096	00E2	mov     DUTR1L, a
+				;74		_dutr2h=(u8)(duty>>8);
+0097	470C	mov     a, rc
+0098	00E5	mov     DUTR2H, a
+				;75		_dutr2l=(u8)(duty);	
+0099	470B	mov     a, rb
+009A	00E4	mov     DUTR2L, a
+009B	0003	ret
+				;76	}
+				;77	
+				;78	
+				;79	/*****************************************/
+				;80	void Timer1Init(void)
+				;81	{
+				;82		#ifdef PWM_Mode
+				;83		_pdps0|=0x50;			//PD2、PD3設為TP1_0、TP1_1	
+				;84		_ptm1c0=0x10;			//計數時鐘選為系統時鐘=20MHZ
+				;85		_ptm1c1=0xA8;			//PWM或單脈衝模式、PWM輸出、高有效、同相		
+				;86		_ptm1rpl=(u8)(TIMER1_PWMPERIOD);	//設置週期值為1280（PWM週期為64us）
+				;87		_ptm1rph=(u8)(TIMER1_PWMPERIOD>>8);	
+				;88		_ptm1al=0x00;			//設置初始占空比為0
+				;89		_ptm1ah=0x00;	
+				;90		_ptm1c0|=0x08;			//啟動計數器
+				;91		
+				;92		#elif defined MONOPULSE_Mode
+				;93		_pdps0|=0x50;			//PD2、PD3設為TP1_0、TP1_1	
+				;94		_ptm1c0=0x10;			//計數時鐘選為系統時鐘=20MHZ
+				;95		_ptm1c1=0xB8;			//PWM或單脈衝模式、單脈衝輸出、高有效、同相		
+				;96		_ptm1al=(u8)(Duty);		//設置單脈衝的寬度
+				;97		_ptm1ah=(u8)(Duty>>8);	
+				;98		_ptm1c0|=0x08;			//啟動計數器
+				;99		
+				;100		#elif defined COMPARE_Mode
+				;101		_pdps0|=0x50;			//PD2、PD3設為TP1_0、TP1_1	
+				_Timer1Init:
+				_Timer1Init:
+009C	0F7E	mov     a, 7EH
+009D	0083	mov     MP1, a
+009E	0F01	mov     a, 1H
+009F	0081	mov     MP0, a
+00A0	0701	mov     a, MP0
+00A1	0084	mov     BP, a
+00A2	0702	mov     a, [02H]
+00A3	408A	mov     ra, a
+00A4	0F50	mov     a, 50H
+00A5	458A	orm     a, ra
+00A6	0701	mov     a, MP0
+00A7	0084	mov     BP, a
+00A8	470A	mov     a, ra
+00A9	0082	mov     [02H], a
+				;102		_ptm1c0=0x10;			//計數時鐘選為系統時鐘=20MHZ
+00AA	0F10	mov     a, 10H
+00AB	00C7	mov     PTM1C0, a
+				;103		_ptm1c1=0x34;			//比較匹配輸出模式、輸出翻轉、初始為低、反相、P比較器比較匹配時清零計數器	
+00AC	0F34	mov     a, 34H
+00AD	00C8	mov     PTM1C1, a
+				;104		_ptm1rpl=(u8)(TIMER1_PWMPERIOD);	//設置比較器P的值
+00AE	1F4D	clr     PTM1RPL
+				;105		_ptm1rph=(u8)(TIMER1_PWMPERIOD>>8);	
+00AF	0F05	mov     a, 5H
+00B0	00CE	mov     PTM1RPH, a
+				;106		_ptm1al=(u8)(Duty);					//設置比較器A的值
+00B1	4708	mov     a, Duty[0]
+00B2	00CB	mov     PTM1AL, a
+				;107		_ptm1ah=(u8)(Duty>>8);	
+00B3	4709	mov     a, Duty[1]
+00B4	00CC	mov     PTM1AH, a
+				;108		
+				;109		//_tm1af=0;				//清除比較A匹配中斷標誌位
+				;110		//_tm1ae=1;				//允許比較A匹配中斷
+				;111		_tm1pf=0;				//清除比較P匹配中斷標誌位
+00B5	361A	clr     TM1PF
+				;112		_tm1pe=1;				//允許比較P匹配中斷
+00B6	301A	set     TM1PE
+				;113		_mf5f=0;				//清除多功能5中斷標誌位
+00B7	3793	clr     MF5F
+				;114		_mf5e=1;				//允許多功能5中斷
+00B8	3193	set     MF5E
+				;115		_ptm1c0|=0x08;			//啟動計數器
+00B9	31C7	set     PT1ON
+00BA	0003	ret
+				;116		
+				;117		#elif defined EVENTCOUNT_Mode
+				;118		//_pdps0|=0x50;			//PD2、PD3設為TP1_0、TP1_1	
+				;119		_ptm1c0=0x10;			//計數時鐘選為系統時鐘=20MHZ
+				;120		_ptm1c1=0xC0;			//定時\計數器模式、P比較器比較匹配時清零計數器		
+				;121		_ptm1rpl=(u8)(TIMER1_PWMPERIOD);		//設置定時時間
+				;122		_ptm1rph=(u8)(TIMER1_PWMPERIOD>>8);
+				;123			
+				;124		//_tm1af=0;				//清除比較A匹配中斷標誌位
+				;125		//_tm1ae=1;				//允許比較A匹配中斷
+				;126		_tm1pf=0;				//清除比較P匹配中斷標誌位
+				;127		_tm1pe=1;				//允許比較P匹配中斷
+				;128		_mf5f=0;				//清除多功能5中斷標誌位
+				;129		_mf5e=1;				//允許多功能5中斷		
+				;130		_ptm1c0|=0x08;			//啟動計數器
+				;131		#elif defined CATCH_Mode
+				;132		//_pdps0|=0x50;			//PD2、PD3設為TP1_0、TP1_1	
+				;133		_ptm1c0=0x10;			//計數時鐘選為系統時鐘=20MHZ
+				;134		_ptm1c1=0x62;			//捕捉輸入模式、雙沿輸入捕捉、捕捉信號來自TCKn腳		
+				;135		_ptm1rpl=0x00;			//設置最長捕捉時間(65536*0.05us=3276us)
+				;136		_ptm1rph=0x00;
+				;137			
+				;138		_tm1af=0;				//清除比較A匹配中斷標誌位
+				;139		_tm1ae=1;				//允許比較A匹配中斷
+				;140		//_tm1pf=0;				//清除比較P匹配中斷標誌位
+				;141		//_tm1pe=1;				//允許比較P匹配中斷
+				;142		_mf5f=0;				//清除多功能5中斷標誌位
+				;143		_mf5e=1;				//允許多功能5中斷		
+				;144		_ptm1c0|=0x08;			//啟動計數器	
+				;145		#endif	
+				;146	}
+				;147	
+				;148	void Timer1_SetDuty(u16 duty,u16 period)
+				;149	{
+				;150		#ifdef PWM_Mode
+				;151		if(duty>TIMER1_PWMPERIOD)
+				;152		{
+				;153			duty=TIMER1_PWMPERIOD;	
+				;154		}		
+				;155		_ptm1al=(u8)(duty);		//設置占空比寄存器
+				;156		_ptm1ah=(u8)(duty>>8);
+				;157		#elif defined MONOPULSE_Mode
+				;158		_ptm1al=(u8)(duty);		//設置脈衝寬度
+				;159		_ptm1ah=(u8)(duty>>8);
+				;160		#elif defined COMPARE_Mode
+				;161		_ptm1al=(u8)(duty);		//設置比較寄存器A
+				_Timer1_SetDuty:
+				_Timer1_SetDuty:
+00C2	4715	mov     a, duty[0]
+00C3	00CB	mov     PTM1AL, a
+				;162		_ptm1ah=(u8)(duty>>8);
+00C4	4716	mov     a, duty[1]
+00C5	00CC	mov     PTM1AH, a
+				;163		_ptm1rpl=(u8)(period);	//設置比較寄存器P
+00C6	4717	mov     a, period[0]
+00C7	00CD	mov     PTM1RPL, a
+				;164		_ptm1rph=(u8)(period>>8);	
+00C8	4718	mov     a, period[1]
+00C9	00CE	mov     PTM1RPH, a
+00CA	0003	ret
+				;165		#elif defined EVENTCOUNT_Mode
+				;166		_ptm1rpl=(u8)(period);	//設置比較寄存器P
+				;167		_ptm1rph=(u8)(period>>8);
+				;168		#endif
+				;169	}
+				;file F:\Project\Code\PTMExampleCode\Interrupt.c
+				;1	#include "HT66FM5240.h"
+				;2	#include "FuncTion.h"
+				;3	
+				;4	//#pragma	vector ISR_TIMER1	@0x2C
+				;5	
+				;6	DEFINE_ISR(ISR_TIMER1,0x2C);
+				;7	
+				;8	/**************************************/
+				;9	void ISR_TIMER1(void)
+				;10	{
+				@ISR_TIMER1_code .SECTION 'CODE'
+002C	4092	mov     _ISR_TIMER1fs, a
+002D	0704	mov     a, BP
+002E	4093	mov     [093H], a
+002F	28CB	jmp     _ISR_TIMER1
+				_ISR_TIMER1:
+				_ISR_TIMER1:
+00CB	070A	mov     a, STATUS
+00CC	4094	mov     [094H], a
+				;11		u16 temph,templ;
+				;12		_tm1af=0;				//清除比較A匹配中斷標誌位
+00CD	369A	clr     TM1AF
+				;13		_tm1pf=0;				//清除比較P匹配中斷標誌位
+00CE	361A	clr     TM1PF
+				;14		
+				;15		_pa6=~_pa6;
+00CF	5F0D	clr     ra2c
+00D0	3B1E	snz     PA6
+00D1	730D	set     [08DH].6
+00D2	371E	clr     PA6
+00D3	470D	mov     a, ra2c
+00D4	059E	orm     a, PA
+				;16		
+				;17		temph=_ptm1ah;
+				;18		templ=_ptm1al;
+				;19	
+				;20		
+				;21		CatchCnt=(temph<<8)|templ;
+00D5	074C	mov     a, PTM1AH
+00D6	408E	mov     rc2c, a
+00D7	5F0F	clr     rb2c
+00D8	074B	mov     a, PTM1AL
+00D9	458F	orm     a, rb2c
+00DA	470F	mov     a, rb2c
+00DB	4084	mov     CatchCnt[0], a
+00DC	470E	mov     a, rc2c
+00DD	4085	mov     CatchCnt[1], a
+				;22		if(CatchCnt>PrevCatchCnt)
+				;23		{
+				;24			TimeCnt=CatchCnt-PrevCatchCnt;
+				;25		}
+				;26		else
+				;27		{
+				;28			TimeCnt=65536-PrevCatchCnt+CatchCnt;
+00DE	470F	mov     a, rb2c
+00DF	4202	sub     a, PrevCatchCnt[0]
+00E0	4090	mov     rd2c, a
+00E1	470E	mov     a, rc2c
+00E2	5203	sbc     a, PrevCatchCnt[1]
+00E3	4091	mov     re2c, a
+00E4	4710	mov     a, rd2c
+00E5	4080	mov     TimeCnt[0], a
+00E6	4711	mov     a, re2c
+00E7	4081	mov     TimeCnt[1], a
+				;29		}
+				;30		PrevCatchCnt=CatchCnt;	
+00E8	470F	mov     a, rb2c
+00E9	4082	mov     PrevCatchCnt[0], a
+00EA	470E	mov     a, rc2c
+00EB	4083	mov     PrevCatchCnt[1], a
+00EC	4713	mov     a, [093H]
+00ED	0084	mov     BP, a
+00EE	4714	mov     a, [094H]
+00EF	008A	mov     STATUS, a
+00F0	4712	mov     a, _ISR_TIMER1fs
+00F1	0004	reti
+				;31	}	
+				data .SECTION 'DATA'
+				__smod DB DUP (?) ; __smod
+				__wdtc DB DUP (?) ; __wdtc
+				__intc0 DB DUP (?) ; __intc0
+				__intc2 DB DUP (?) ; __intc2
+				__mfi5 DB DUP (?) ; __mfi5
+				__papu DB DUP (?) ; __papu
+				__pa DB DUP (?) ; __pa
+				__pac DB DUP (?) ; __pac
+				__ptm1c0 DB DUP (?) ; __ptm1c0
+				__ptm1c1 DB DUP (?) ; __ptm1c1
+				__ptm1al DB DUP (?) ; __ptm1al
+				__ptm1ah DB DUP (?) ; __ptm1ah
+				__ptm1rpl DB DUP (?) ; __ptm1rpl
+				__ptm1rph DB DUP (?) ; __ptm1rph
+				__pwmc DB DUP (?) ; __pwmc
+				__dutr0l DB DUP (?) ; __dutr0l
+				__dutr0h DB DUP (?) ; __dutr0h
+				__dutr1l DB DUP (?) ; __dutr1l
+				__dutr1h DB DUP (?) ; __dutr1h
+				__dutr2l DB DUP (?) ; __dutr2l
+				__dutr2h DB DUP (?) ; __dutr2h
+				__prdrl DB DUP (?) ; __prdrl
+				__prdrh DB DUP (?) ; __prdrh
+				__pwmme DB DUP (?) ; __pwmme
+				__pwmmd DB DUP (?) ; __pwmmd
+				__mcf DB DUP (?) ; __mcf
+				__dts DB DUP (?) ; __dts
+				__plc DB DUP (?) ; __plc
+				TimeCnt DB 2 DUP (?) ; TimeCnt
+				PrevCatchCnt DB 2 DUP (?) ; PrevCatchCnt
+				CatchCnt DB 2 DUP (?) ; CatchCnt
+				Period DB 2 DUP (?) ; Period
+				Duty DB 2 DUP (?) ; Duty
+				ra DB DUP (?)
+				rb DB DUP (?)
+				rc DB DUP (?)
+				ra2c DB DUP (?)
+				rc2c DB DUP (?)
+				rb2c DB DUP (?)
+				rd2c DB DUP (?)
+				re2c DB DUP (?)
+				_ISR_TIMER1fs DB DUP (?)
+				duty DB 2 DUP (?) ; duty
+				period DB 2 DUP (?) ; period
+				__pcps0 DB DUP (?) ; __pcps0
+				__pcps1 DB DUP (?) ; __pcps1
+				__pdps0 DB DUP (?) ; __pdps0

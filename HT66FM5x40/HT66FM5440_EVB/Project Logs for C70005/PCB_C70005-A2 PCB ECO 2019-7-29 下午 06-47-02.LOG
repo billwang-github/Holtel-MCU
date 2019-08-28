@@ -1,0 +1,13 @@
+Removed Pin From Net: NetName=NetC27_2 Pin=R42-1
+Removed Pin From Net: NetName=VSP Pin=R42-2
+Removed Pin From Net: NetName=NetC27_2 Pin=R43-2
+Added Pin To Net: NetName=+15V Pin=C10-1
+Added Pin To Net: NetName=+15V Pin=C10-1
+Added Pin To Net: NetName=5V Pin=C11-1
+Added Pin To Net: NetName=5V Pin=C11-1
+Added Pin To Net: NetName=VSP Pin=R42-1
+Added Pin To Net: NetName=NetC27_2 Pin=R42-2
+Added Pin To Net: NetName=NetC27_2 Pin=R43-1
+Added Pin To Net: NetName=NetR43_2 Pin=R43-2
+Added Pin To Net: NetName=NetR43_2 Pin=U5-2
+Added Net: Name=NetR43_2

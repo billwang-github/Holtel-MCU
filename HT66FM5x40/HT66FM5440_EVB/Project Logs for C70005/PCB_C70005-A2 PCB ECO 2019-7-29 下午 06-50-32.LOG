@@ -1,0 +1,4 @@
+Change Component Library : Designator=J3 Old Library=Holtek Component Library V2.SchLib New Library=C70005.SCHLIB
+Added Pin To Net: NetName=NetC2_2 Pin=J3-1
+Added Pin To Net: NetName=V Pin=J3-2
+Added Pin To Net: NetName=W Pin=J3-3

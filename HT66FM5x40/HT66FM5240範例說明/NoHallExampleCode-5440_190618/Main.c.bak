@@ -1,0 +1,51 @@
+#include "HT66FM5240.h"
+#include "FuncTion.h"
+
+u16 Duty;
+u16 TimeCnt;
+u16 AdData[4];
+u8  ChannelCnt;
+
+u8 TxdBuff[5];
+u8 RxdBuff[5];
+u8 TxdPoint;
+u8 TxdPoint2;
+u8 TxdCnt;
+u8 RxdCnt;
+
+Byte Flag01;
+
+void main(void)
+{		
+	DI();		
+	SystemInit();
+	ChannelCnt=0;
+	if(AdSample_1(DRIVER_CHAN)>START_DRIVER_AD)	//600mv(1-1.2mv)
+	{
+		bStopFlag=1;
+	}
+	bRunFlag=0;
+	EI();
+			
+	while(1)
+	{
+		FeedWatchDog();	
+		UartHand();	
+		HandleSpeed();					
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

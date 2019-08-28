@@ -1,0 +1,164 @@
+
+Linker Version 8.7.7.181224
+Input Object File: D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ
+Input Object File: D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\STARTUP1_L.OBJ
+
+Input Library File: D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB
+Input Library File: D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\v3_lmrsc.lib
+
+
+     Bank    Start     End      Length     Class    AvgIns    Name
+     00h     0000h     0000h    0001h      CODE               @code (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     0001h     0006h    0006h      CODE               _ISR_OCP (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     0008h     000bh    0004h      CODE               @ISR_OCP_code (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     000ch     0023h    0018h      CODE               _IO_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     0024h     002bh    0008h      CODE               _TimeBase_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     002ch     002fh    0004h      CODE               @ISR_TM1_code (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     0030h     003ah    000bh      CODE               _PWM_PD_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     003ch     003fh    0004h      CODE               @ISR_TimeBase_code (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     0040h     007ah    003bh      CODE               @start (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     007bh     00b0h    0036h      CODE               _main (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     00b1h     00c4h    0014h      CODE               _TM1_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     00c5h     0102h    003eh      CODE               _ISR_TM1 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     0103h     0144h    0042h      CODE               _ISR_TimeBase (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     0145h     014ah    0006h      CODE               @ROMDATA_BASE (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\STARTUP1_L.OBJ)
+     00h     0080h     0080h    0001h      DATA     0         @BITDATASEC (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\STARTUP1_L.OBJ)
+     00h     0081h     0081h    0001h      DATA     12        @data_ra (D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0082h     0082h    0001h      DATA     2         @data_r12c (isr:ra~rh)
+     00h     0083h     0083h    0001h      DATA     2         @data_r22c (isr:ra~rh)
+     00h     0084h     0084h    0001h      DATA     8         @data_ra2c (isr:ra~rh)
+     00h     0085h     0085h    0001h      DATA     8         @data_rb2c (isr:ra~rh)
+     00h     0086h     0086h    0001h      DATA     6         @data_rc2c (isr:ra~rh)
+     00h     0087h     0087h    0001h      DATA     6         @data_rd2c (isr:ra~rh)
+     00h     0088h     0088h    0001h      DATA     2         @data_r13c (isr:ra~rh)
+     00h     0089h     0089h    0001h      DATA     2         @data_r23c (isr:ra~rh)
+     00h     008ah     008ah    0001h      DATA     20        @data_ra3c (isr:ra~rh)
+     00h     008bh     008bh    0001h      DATA     10        @data_rb3c (isr:ra~rh)
+     00h     008ch     008ch    0001h      DATA     2         @data_r108 (isr:ra~rh)
+     00h     008dh     008dh    0001h      DATA     2         @data_r208 (isr:ra~rh)
+     00h     0092h     0093h    0002h      DATA     5         @HCCINIT_cnt_pwm_period (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     0094h     0094h    0001h      DATA     3         @HCCINIT_key_new (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     0095h     0096h    0002h      DATA     3         @HCCINIT_cnt_debounce (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     0097h     0097h    0001h      DATA     2         @HCCINIT_key_old (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     0098h     0099h    0002h      DATA     2         @HCCINIT0_pwm_period (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     009ah     009bh    0002h      DATA     2         @HCCINIT0_pwm_dly0 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     009ch     009dh    0002h      DATA     2         @HCCINIT0_pwm_dly1 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+
+     Local Sections
+
+     Bank    Start     End      Length     Class    AvgIns    Name
+     00h     0092h     0092h    0000h      LOCAL    0         @dummy (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     0092h     0092h    0000h      LOCAL    0         _main (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     008eh     0091h    0004h      LOCAL    5         _PWM_PD_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     008eh     008eh    0000h      LOCAL    0         _IO_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     008eh     008eh    0000h      LOCAL    0         _TM1_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     008eh     008eh    0000h      LOCAL    0         _TimeBase_Init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     008eh     008eh    0000h      LOCAL    0         @dummy44 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     008eh     008eh    0000h      LOCAL    0         _ISR_TM1 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     008eh     008eh    0000h      LOCAL    0         @dummy60 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     008eh     008eh    0000h      LOCAL    0         _ISR_TimeBase (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     008eh     008eh    0000h      LOCAL    0         @dummy8 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+     00h     008eh     008eh    0000h      LOCAL    0         _ISR_OCP (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ)
+
+     Public Symbols Information
+     Address            Public by Name
+     000ch              _IO_Init
+     0001h              _ISR_OCP
+     00c5h              _ISR_TM1
+     0103h              _ISR_TimeBase
+     0030h              _PWM_PD_Init
+     008eh              _PWM_PD_Init_2
+     00b1h              _TM1_Init
+     0024h              _TimeBase_Init
+     0080h[0]           _bkey_change
+     0095h              _cnt_debounce
+     0092h              _cnt_pwm_period
+     0094h              _key_new
+     0097h              _key_old
+     007bh              _main
+     009ah              _pwm_dly0
+     009ch              _pwm_dly1
+     0098h              _pwm_period
+     008ch              r108
+     0082h              r12c
+     0088h              r13c
+     008dh              r208
+     0083h              r22c
+     0089h              r23c
+     0081h              ra
+     0084h              ra2c
+     008ah              ra3c
+     0085h              rb2c
+     008bh              rb3c
+     0086h              rc2c
+     0087h              rd2c
+     0144h              startup_value_1
+
+     Address            Public by Value
+     0001h              _ISR_OCP
+     000ch              _IO_Init
+     0024h              _TimeBase_Init
+     0030h              _PWM_PD_Init
+     007bh              _main
+     0081h              ra
+     0082h              r12c
+     0083h              r22c
+     0084h              ra2c
+     0085h              rb2c
+     0086h              rc2c
+     0087h              rd2c
+     0088h              r13c
+     0089h              r23c
+     008ah              ra3c
+     008bh              rb3c
+     008ch              r108
+     008dh              r208
+     008eh              _PWM_PD_Init_2
+     0092h              _cnt_pwm_period
+     0094h              _key_new
+     0095h              _cnt_debounce
+     0097h              _key_old
+     0098h              _pwm_period
+     009ah              _pwm_dly0
+     009ch              _pwm_dly1
+     00b1h              _TM1_Init
+     00c5h              _ISR_TM1
+     0103h              _ISR_TimeBase
+     0144h              startup_value_1
+     0080h[0]           _bkey_change
+
+
+ROM Usage Statistics
+     Size      Used     Percentage
+     1000h     0149h    8%
+
+RAM Usage Statistics
+    Bank      Size      Used     Percentage
+     00h       0080h     001eh    23%
+     01h       0080h     0000h    0%
+     02h       0080h     0000h    0%
+     Total     0180h     001eh    7%
+
+Use Stack Count
+_main: 1
+_ISR_TM1: 0
+_ISR_TimeBase: 0
+_ISR_OCP: 0
+
+Call Tree
+    @dummy
+        _main (0)
+            _PWM_PD_Init (1)
+            _IO_Init (1)
+            _TM1_Init (1)
+            _TimeBase_Init (1)
+    @dummy44
+        _ISR_TM1 (0)
+    @dummy60
+        _ISR_TimeBase (0)
+    @dummy8
+        _ISR_OCP (0)
+
+HLINK: Program entry point at section '@code' (address 0) of file 'D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\pwm_HiLow_Test\PWM_STEP.OBJ'
+
+Total 0 error(s), Total 0 Warning(s)

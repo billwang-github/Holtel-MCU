@@ -1,0 +1,280 @@
+
+Linker Version 8.7.7.181224
+Input Object File: D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ
+Input Object File: D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\STARTUP0_L.OBJ
+Input Object File: D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\MDU_FUNC.OBJ
+
+Input Library File: D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB
+Input Library File: D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\v3_lmrsc.lib
+
+
+     Bank    Start     End      Length     Class    AvgIns    Name
+     00h     0000h     0000h    0001h      CODE               @code (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0001h     0005h    0005h      CODE               _Init_GPIO (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0006h     0013h    000eh      CODE               _Init_NFIN (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0014h     0022h    000fh      CODE               _Init_PTM0 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0028h     002bh    0004h      CODE               @ISR_PTM0_code (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     002ch     0033h    0008h      CODE               @crom (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0034h     0037h    0004h      CODE               @ISR_NFIN_code (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     003ch     003fh    0004h      CODE               @ISR_TimeBase_Uart_code (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0040h     008ch    004dh      CODE               @start (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     008dh     0094h    0008h      CODE               _Init_TimeBase (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0095h     00aah    0016h      CODE               _Init_Uart (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     00abh     00b5h    000bh      CODE               _ISR_NFIN (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     00b6h     00dch    0027h      CODE               _ISR_PTM0 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     00ddh     0120h    0044h      CODE               _ISR_TimeBase_Uart (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0121h     0134h    0014h      CODE               _print_string (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0135h     017eh    004ah      CODE               _byte2str10 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     017fh     0214h    0096h      CODE               _int2str10 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0215h     02fah    00e6h      CODE               _main (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     02fbh     0306h    000ch      CODE               @ROMDATA_BASE (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\STARTUP0_L.OBJ)
+     00h     0307h     031dh    0017h      CODE               _div8_8 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\MDU_FUNC.OBJ)
+     00h     031eh     037ah    005dh      CODE               _mul16x16 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\MDU_FUNC.OBJ)
+     00h     037bh     03a9h    002fh      CODE               _div16_16 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\MDU_FUNC.OBJ)
+     00h     03aah     0428h    007fh      CODE               _div32_16 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\MDU_FUNC.OBJ)
+     00h     0429h     0436h    000eh      CODE               _builtin_holtek_delay_isr00 (D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0437h     046eh    0038h      CODE               _strncpy (D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\v3_lmrsc.lib)
+     00h     046fh     047ch    000eh      CODE               _CROM2PROM (CROM2PROM)
+     00h     0080h     0080h    0001h      DATA     0         @BITDATASEC (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\STARTUP0_L.OBJ)
+     00h     0081h     0081h    0001h      DATA     60        @data_ra (D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0082h     0082h    0001h      DATA     41        @data_rb (D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0083h     0083h    0001h      DATA     18        @data_rc (D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0084h     0084h    0001h      DATA     17        @data_rd (D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0085h     0085h    0001h      DATA     17        @data_re (D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0086h     0086h    0001h      DATA     14        @data_rf (D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0087h     0087h    0001h      DATA     14        @data_rg (D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0088h     0088h    0001h      DATA     5         @data_rh (D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0089h     0089h    0001h      DATA     2         @data_r134 (isr:ra~rh)
+     00h     008ah     008ah    0001h      DATA     2         @data_r234 (isr:ra~rh)
+     00h     008bh     008bh    0001h      DATA     2         @data_r128 (isr:ra~rh)
+     00h     008ch     008ch    0001h      DATA     2         @data_r228 (isr:ra~rh)
+     00h     008dh     008dh    0001h      DATA     4         @data_rc28 (isr:ra~rh)
+     00h     008eh     008eh    0001h      DATA     4         @data_rb28 (isr:ra~rh)
+     00h     008fh     008fh    0001h      DATA     2         @data_r13c (isr:ra~rh)
+     00h     0090h     0090h    0001h      DATA     2         @data_r23c (isr:ra~rh)
+     00h     00a3h     00a4h    0002h      DATA     7         @HCCINIT_iph (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     00a5h     00a5h    0001h      DATA     5         @HCCINIT_rxcnt (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     00a6h     00a7h    0002h      DATA     5         @HCCINIT_ipl (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     00a8h     00a9h    0002h      DATA     3         @HCCINIT_cnt1_1ms (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     00aah     00aah    0001h      DATA     3         @HCCINIT_cnt_ov (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     00abh     00abh    0001h      DATA     2         @HCCINIT_duty (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     00ach     00adh    0002h      DATA     2         @HCCINIT_cnt2_1ms (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     00aeh     00aeh    0001h      DATA     0         @HCCINIT_txcnt (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     00afh     00b2h    0004h      DATA     2         @HCCINIT0_u32temp0 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     00b3h     00b8h    0006h      DATA     2         @HCCINIT0_rxbuff (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     00b9h     00bch    0004h      DATA     0.5       @HCCINIT0_u32temp (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     00bdh     00dch    0020h      DATA     0.25      @HCCINIT0_txbuff (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     00ddh     00deh    0002h      DATA     0         @HCCINIT0_u16temp1 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     00dfh     00e0h    0002h      DATA     0         @HCCINIT0_u16temp0 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     00e1h     00e1h    0001h      DATA     2         @data_r33c (isr:ra~rh)
+     00h     00e2h     00e2h    0001h      DATA     2         @data_r43c (isr:ra~rh)
+
+     Local Sections
+
+     Bank    Start     End      Length     Class    AvgIns    Name
+     00h     0091h     0091h    0000h      LOCAL    0         @dummy52 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0091h     0091h    0000h      LOCAL    0         _ISR_NFIN (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0091h     0091h    0000h      LOCAL    0         @dummy40 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0091h     0091h    0000h      LOCAL    0         _ISR_PTM0 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0091h     0091h    0000h      LOCAL    0         @dummy60 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0091h     0091h    0000h      LOCAL    0         _ISR_TimeBase_Uart (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     00a3h     00a3h    0000h      LOCAL    0         @dummy (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     00a3h     00a3h    0000h      LOCAL    0         _main (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0091h     0091h    0000h      LOCAL    0         _Init_GPIO (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0091h     0091h    0000h      LOCAL    0         _Init_NFIN (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0091h     0091h    0000h      LOCAL    0         _Init_PTM0 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0091h     0091h    0000h      LOCAL    0         _Init_TimeBase (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0091h     0091h    0000h      LOCAL    0         _Init_Uart (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0091h     0096h    0006h      LOCAL    3.6667    _strncpy (D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\v3_lmrsc.lib)
+     00h     0091h     0091h    0000h      LOCAL    0         _Crom2Prom (CROM2PROM)
+     00h     0091h     0093h    0003h      LOCAL    4         _print_string (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0091h     0091h    0001h      LOCAL    5         _builtin_holtek_delay_isr00 (D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0091h     00a0h    0010h      LOCAL    2.9375    _mul16x16 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\MDU_FUNC.OBJ)
+     00h     0091h     00a2h    0012h      LOCAL    3.3889    _div32_16 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\MDU_FUNC.OBJ)
+     00h     0097h     009bh    0005h      LOCAL    3.4       _byte2str10 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0091h     0096h    0006h      LOCAL    3         _div8_8 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\MDU_FUNC.OBJ)
+     00h     0099h     00a0h    0008h      LOCAL    4.875     _int2str10 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ)
+     00h     0091h     0098h    0008h      LOCAL    5         _div16_16 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\MDU_FUNC.OBJ)
+
+     Public Symbols Information
+     Address            Public by Name
+     046fh              _Crom2Prom
+     046fh              _Crom2PromNext
+     00abh              _ISR_NFIN
+     00b6h              _ISR_PTM0
+     00ddh              _ISR_TimeBase_Uart
+     0001h              _Init_GPIO
+     0006h              _Init_NFIN
+     0014h              _Init_PTM0
+     008dh              _Init_TimeBase
+     0095h              _Init_Uart
+     042bh              __DELAYY0_isr00
+     042bh              __DELAYY1_isr00
+     042ah              __DELAYY2_isr00
+     042ah              __DELAYY3_isr00
+     0429h              __DELAYY4_isr00
+     0429h              __DELAYY5_isr00
+     0080h[1]           _bTimeup1
+     0080h[0]           _bTimeup2
+     0135h              _byte2str10
+     0097h              _byte2str10_2
+     00a8h              _cnt1_1ms
+     00ach              _cnt2_1ms
+     00aah              _cnt_ov
+     037bh              _div16_16
+     03aah              _div32_16
+     00a1h              _div32_16_2
+     0307h              _div8_8
+     0094h              _div8_8_2
+     00abh              _duty
+     017fh              _int2str10
+     009ch              _int2str10_2
+     00a3h              _iph
+     00a6h              _ipl
+     0215h              _main
+     031eh              _mul16x16
+     0121h              _print_string
+     0091h              _print_string_2
+     00b3h              _rxbuff
+     00a5h              _rxcnt
+     0437h              _strncpy
+     00bdh              _txbuff
+     00aeh              _txcnt
+     00dfh              _u16temp0
+     00ddh              _u16temp1
+     00b9h              _u32temp
+     00afh              _u32temp0
+     008bh              r128
+     0089h              r134
+     008fh              r13c
+     008ch              r228
+     008ah              r234
+     0090h              r23c
+     00e1h              r33c
+     00e2h              r43c
+     0081h              ra
+     0082h              rb
+     008eh              rb28
+     0083h              rc
+     008dh              rc28
+     0084h              rd
+     0085h              re
+     0086h              rf
+     0087h              rg
+     0088h              rh
+     02fbh              startup_value_1
+
+     Address            Public by Value
+     0001h              _Init_GPIO
+     0006h              _Init_NFIN
+     0014h              _Init_PTM0
+     0081h              ra
+     0082h              rb
+     0083h              rc
+     0084h              rd
+     0085h              re
+     0086h              rf
+     0087h              rg
+     0088h              rh
+     0089h              r134
+     008ah              r234
+     008bh              r128
+     008ch              r228
+     008dh              rc28
+     008dh              _Init_TimeBase
+     008eh              rb28
+     008fh              r13c
+     0090h              r23c
+     0091h              _print_string_2
+     0094h              _div8_8_2
+     0095h              _Init_Uart
+     0097h              _byte2str10_2
+     009ch              _int2str10_2
+     00a1h              _div32_16_2
+     00a3h              _iph
+     00a5h              _rxcnt
+     00a6h              _ipl
+     00a8h              _cnt1_1ms
+     00aah              _cnt_ov
+     00abh              _duty
+     00abh              _ISR_NFIN
+     00ach              _cnt2_1ms
+     00aeh              _txcnt
+     00afh              _u32temp0
+     00b3h              _rxbuff
+     00b6h              _ISR_PTM0
+     00b9h              _u32temp
+     00bdh              _txbuff
+     00ddh              _ISR_TimeBase_Uart
+     00ddh              _u16temp1
+     00dfh              _u16temp0
+     00e1h              r33c
+     00e2h              r43c
+     0121h              _print_string
+     0135h              _byte2str10
+     017fh              _int2str10
+     0215h              _main
+     02fbh              startup_value_1
+     0307h              _div8_8
+     031eh              _mul16x16
+     037bh              _div16_16
+     03aah              _div32_16
+     0080h[0]           _bTimeup2
+     0080h[1]           _bTimeup1
+     0429h              __DELAYY4_isr00
+     0429h              __DELAYY5_isr00
+     042ah              __DELAYY2_isr00
+     042ah              __DELAYY3_isr00
+     042bh              __DELAYY0_isr00
+     042bh              __DELAYY1_isr00
+     0437h              _strncpy
+     046fh              _Crom2PromNext
+     046fh              _Crom2Prom
+
+
+ROM Usage Statistics
+     Size      Used     Percentage
+     1000h     0474h    27%
+
+RAM Usage Statistics
+    Bank      Size      Used     Percentage
+     00h       0080h     0063h    77%
+     01h       0080h     0000h    0%
+     02h       0080h     0000h    0%
+     Total     0180h     0063h    25%
+
+Use Stack Count
+_ISR_NFIN: 0
+_ISR_PTM0: 0
+_ISR_TimeBase_Uart: 0
+_main: 2
+
+Call Tree
+    @dummy52
+        _ISR_NFIN (0)
+    @dummy40
+        _ISR_PTM0 (0)
+    @dummy60
+        _ISR_TimeBase_Uart (0)
+    @dummy
+        _main (0)
+            _Init_GPIO (1)
+            _Init_NFIN (1)
+            _Init_PTM0 (1)
+            _Init_TimeBase (1)
+            _Init_Uart (1)
+            _strncpy (1)
+                _Crom2Prom (2)
+            _print_string (1)
+                _Crom2Prom (2)
+            _builtin_holtek_delay_isr00 (1)
+            _mul16x16 (1)
+            _div32_16 (1)
+            _byte2str10 (1)
+                _div8_8 (2)
+            _int2str10 (1)
+                _div16_16 (2)
+
+HLINK: Program entry point at section '@code' (address 0) of file 'D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\NFIN_TEST\NFIN_TEST.OBJ'
+
+Total 0 error(s), Total 0 Warning(s)

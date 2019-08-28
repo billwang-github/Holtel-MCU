@@ -1,0 +1,400 @@
+				;file F:\Project\Code\UARTExampleCode\Main.c
+				;1	#include "HT66FM5240.h"
+				;2	#include "FuncTion.h"
+				;3	
+				;4	u16 TimeCnt;
+				;5	u16 AdData[4];
+				;6	u8  ChannelCnt;
+				;7	u8  Time1msCnt;
+				;8	
+				;9	u8 TxdBuff[5];
+				;10	u8 RxdBuff[5];
+				;11	u8 TxdPoint;
+				;12	u8 TxdPoint2;
+				;13	u8 TxdCnt;
+				;14	u8 RxdCnt;
+				;15	Byte Flag01;
+				;16	
+				;17	
+				;18	u8 TxdData;
+				;19	u8 RxdData;
+				;20	
+				;21	void main(void)
+				;22	{	
+				include HT66FM5240.inc
+				@code .SECTION 'CODE'
+0000	2801	jmp     _main_startup1
+				@start .SECTION 'CODE'
+				_main_startup1:
+0001	0F9A	mov     a, 9AH
+0002	0087	mov     TBLP, a
+0003	0F00	mov     a, 0H
+0004	0089	mov     TBHP, a
+				L0005:
+0005	1487	inc     TBLP
+0006	3D0A	sz      Z
+0007	1489	inc     TBHP
+0008	1D01	tabrd   MP0
+0009	1081	sz      MP0
+000A	280C	jmp     L000C
+000B	2821	jmp     L0021
+				L000C:
+000C	1487	inc     TBLP
+000D	3D0A	sz      Z
+000E	1489	inc     TBHP
+000F	1D03	tabrd   MP1
+0010	0708	mov     a, TBLH
+0011	0084	mov     BP, a
+				L0012:
+0012	1487	inc     TBLP
+0013	3D0A	sz      Z
+0014	1489	inc     TBHP
+0015	1D05	tabrd   ACC
+0016	0082	mov     [02H], a
+0017	1781	sdz     MP0
+0018	281A	jmp     L001A
+0019	2805	jmp     L0005
+				L001A:
+001A	1483	inc     MP1
+001B	0708	mov     a, TBLH
+001C	0082	mov     [02H], a
+001D	1483	inc     MP1
+001E	1781	sdz     MP0
+001F	2812	jmp     L0012
+0020	2805	jmp     L0005
+				@start .SECTION 'CODE'
+				L0021:
+0021	2838	jmp     _main
+				;23		u16 i;	
+				;24		DI();		
+				_main:
+				_main:
+				@dummy52 .SECTION 'CODE'
+0038	3411	clr     EMI
+				;25		SystemInit();	
+0039	202E	call    _SystemInit
+				;26		EI();
+003A	3011	set     EMI
+				;27		
+				;28		TxdData=0xAA;		
+003B	0FAA	mov     a, AAH
+003C	4081	mov     TxdData[0], a
+				;29		while(1)
+				;30		{
+				;31			for(i=0;i<3000;i++)
+003D	5F24	clr     i[0]
+003E	5F25	clr     i[1]
+				_L2:
+003F	0FB7	mov     a, B7H
+0040	4224	sub     a, i[0]
+0041	0F0B	mov     a, BH
+0042	5225	sbc     a, i[1]
+0043	380A	snz     C
+0044	284B	jmp     _L6
+0047	54A4	inc     i[0]
+0048	3D0A	sz      Z
+0049	54A5	inc     i[1]
+004A	283F	jmp     _L2
+004D	5F24	clr     i[0]
+004E	5F25	clr     i[1]
+				;32			{
+				;33				FeedWatchDog();	
+				_L3:
+0045	0001	clr     wdt
+				;34				UartHand();	
+0046	205E	call    _UartHand
+				;35			}
+				;36			UartPutChar(TxdData);					
+				_L6:
+004B	4701	mov     a, TxdData[0]
+004C	207C	call    _UartPutChar
+				;37		}
+004F	2845	jmp     _L3
+0050	2850	jmp     $
+				;38	}
+				;39	
+				;40	
+				;41	
+				;42	
+				;43	
+				;44	
+				;45	
+				;46	
+				;47	
+				;48	
+				;49	
+				;50	
+				;51	
+				;52	
+				;53	
+				;file F:\Project\Code\UARTExampleCode\Init.c
+				;1	#include "HT66FM5240.h"
+				;2	#include "FuncTion.h"
+				;3	
+				;4	
+				;5	void SystemInit(void)
+				;6	{
+				;7		ClockInit();
+				_SystemInit:
+				_SystemInit:
+002E	2022	call    _ClockInit
+				;8		GPIOInit();
+002F	2027	call    _GPIOInit
+				;9		UartInit();
+0030	2051	call    _UartInit
+				;10		WatchDogInit();	
+				;11	}
+				;12	
+				;13	
+				;14	void ClockInit(void)
+				;15	{
+				;16		_smod=0x01;	//禁止快速喚醒功能、禁止IDLE模式	Fsys=Fh=20MHZ
+				_ClockInit:
+				_ClockInit:
+0022	0F01	mov     a, 1H
+0023	008B	mov     SMOD, a
+				;17		while((_smod&0x04)==0);	//等待時鐘穩定
+				_L3:
+0024	390B	snz     HTO
+0025	2824	jmp     _L3
+0026	0003	ret
+				;18	}
+				;19	
+				;20	void GPIOInit(void)
+				;21	{
+				;22		_papu6=0;	//未上拉
+				_GPIOInit:
+				_GPIOInit:
+0027	371D	clr     PAPU6
+				;23	    _pac6=0;	//端口設為輸出模式
+0028	371F	clr     PAC6
+				;24		_pa6=1;		//端口輸出高電平
+0029	331E	set     PA6
+				;25		
+				;26		_papu3=1;	//上拉
+002A	319D	set     PAPU3
+				;27		_papu4=1;	//上拉
+002B	321D	set     PAPU4
+				;28		_papu5=1;	//上拉
+002C	329D	set     PAPU5
+002D	0003	ret
+				;29			
+				;30	}
+				;31	
+				;32	void WatchDogInit(void)
+				;33	{
+				;34		_wdtc=0x57;	//IDLE模式時維持Fsys時鐘、看門狗時間=2^18/Fs	(Fs=Fsub、Fs=Fsys/4)
+0031	0F57	mov     a, 57H
+0032	008E	mov     WDTC, a
+0033	0003	ret
+				;35	}
+				;36	
+				;37	/*************************************/
+				;38	void UartInit(void)
+				;39	{
+				;40		_pb6s0=1;		//引腳共用功能設置 （設置RX）PB6--RX
+				@dummy .SECTION 'CODE'
+				_UartInit:
+				_UartInit:
+0051	333C	set     PB6S0
+				;41		_pb6s1=0;
+0052	37BC	clr     PB6S1
+				;42		_pb7s0=1;		//引腳共用功能設置 （設置TX）PB7--TX
+0053	303D	set     PB7S0
+				;43		_pb7s1=0;
+0054	34BD	clr     PB7S1
+				;44		
+				;45		_ucr1=0x80;		//使能UART、8位數據傳輸、奇偶校驗、一位停止位、無暫停字
+0055	0F80	mov     a, 80H
+0056	00F6	mov     UCR1, a
+				;46		_ucr2=0xE4; 	//發送、接收使能、選擇高速波特率、無地址檢測功能、無喚醒功能、禁止發送空閒中斷、禁止發送寄存器空中斷
+0057	0FE4	mov     a, E4H
+0058	00F7	mov     UCR2, a
+				;47		_brg=129;       //_brg=20000000/(9600*16)-1=129  (高速波特率：波特率=fSYS/[16×(N+1)]、低速波特率：波特率=fSYS/[64×(N+1)])
+0059	0F81	mov     a, 81H
+005A	00F8	mov     BRG, a
+				;48		
+				;49		_uartf=0;		//UART中斷標誌清零
+005B	3694	clr     UARTF
+				;50		_uarte=1;		//使能UART中斷
+005C	3094	set     UARTE
+005D	0003	ret
+				;51	}
+				;52	
+				;53	void UartHand(void)
+				;54	{
+				;55		if(_txif)
+				_UartHand:
+				_UartHand:
+005E	3875	snz     TXIF
+005F	287B	jmp     _L9
+				;56		{
+				;57			_txif=0;
+0060	3475	clr     TXIF
+				;58			if(TxdPoint2)	
+0061	4705	mov     a, TxdPoint2[0]
+0062	40A2	mov     value, a
+0063	50A2	sz      value
+0064	2866	jmp     _LI1
+0065	287B	jmp     _L9
+				;59			{
+				;60				TxdPoint2--;
+				_LI1:
+0066	5522	deca    value
+0067	4085	mov     TxdPoint2[0], a
+				;61				_txr_rxr=TxdBuff[TxdPoint++];	
+0068	4706	mov     a, TxdPoint[0]
+0069	409E	mov     rb, a
+006A	541E	inca    rb
+006B	409D	mov     ra, a
+006C	471D	mov     a, ra
+006D	4086	mov     TxdPoint[0], a
+006E	0F8C	mov     a, 8CH
+006F	431E	add     a, rb
+0070	0083	mov     MP1, a
+0071	0F00	mov     a, 0H
+0072	1F01	clr     MP0
+0073	1381	adcm    a, MP0
+0074	20A8	call    L00A8
+0075	00FA	mov     TXR_RXR, a
+				;62				if(TxdPoint>4)
+0076	0F04	mov     a, 4H
+0077	421D	sub     a, ra
+0078	3C0A	sz      C
+0079	287B	jmp     _L9
+				;63				{
+				;64					TxdPoint=0;
+007A	5F06	clr     TxdPoint[0]
+				_L9:
+007B	0003	ret
+				;65				}
+				;66			}
+				;67		}
+				;68	}
+				;69	
+				;70	void UartPutChar(u8 value)
+				;71	{
+				_UartPutChar:
+				_UartPutChar:
+007C	40A2	mov     value[0], a
+				;72		if(TxdPoint2<5)
+007D	4705	mov     a, TxdPoint2[0]
+007E	40A3	mov     AdData[16], a
+007F	0F04	mov     a, 4H
+0080	4223	sub     a, AdData[16]
+0081	380A	snz     C
+0082	289A	jmp     L009A
+				;73		{
+				;74			TxdPoint2++;
+0083	5423	inca    AdData[16]
+0084	4085	mov     TxdPoint2[0], a
+				;75			TxdBuff[TxdCnt++]=value;		
+0085	4704	mov     a, TxdCnt[0]
+0086	409E	mov     rb, a
+0087	541E	inca    rb
+0088	409D	mov     ra, a
+0089	471D	mov     a, ra
+008A	4084	mov     TxdCnt[0], a
+008B	0F8C	mov     a, 8CH
+008C	431E	add     a, rb
+008D	0083	mov     MP1, a
+008E	0F00	mov     a, 0H
+008F	1F01	clr     MP0
+0090	1381	adcm    a, MP0
+0091	0701	mov     a, MP0
+0092	0084	mov     BP, a
+0093	4722	mov     a, value[0]
+0094	0082	mov     [02H], a
+				;76			if(TxdCnt>4)
+0095	0F04	mov     a, 4H
+0096	421D	sub     a, ra
+0097	3C0A	sz      C
+0098	289A	jmp     L009A
+				;77			{
+				;78				TxdCnt=0;
+0099	5F04	clr     TxdCnt[0]
+				L009A:
+009A	0003	ret
+009B	0000	nop
+				;79			}
+				;80		}
+				;81	}
+				;file F:\Project\Code\UARTExampleCode\Interrupt.c
+				;1	#include "HT66FM5240.h"
+				;2	#include "FuncTion.h"
+				;3	
+				;4	DEFINE_ISR(ISR_Uart,0x34);
+				;5	
+				;6	/*****************************************/
+				;7	void ISR_Uart(void)
+				;8	{
+				@ISR_Uart_code .SECTION 'CODE'
+0034	409F	mov     _ISR_Uartfs, a
+0035	0704	mov     a, BP
+0036	40A0	mov     AdData[13], a
+0037	289C	jmp     _ISR_Uart
+				_ISR_Uart:
+				_ISR_Uart:
+009C	070A	mov     a, STATUS
+009D	40A1	mov     AdData[14], a
+				;9		//_uartf=0;		//UART中斷標誌清零
+				;10		_rxif=0;
+009E	3575	clr     RXIF
+				;11		
+				;12		RxdData=_txr_rxr;
+009F	077A	mov     a, TXR_RXR
+00A0	4080	mov     RxdData[0], a
+00A1	4720	mov     a, AdData[13]
+00A2	0084	mov     BP, a
+00A3	4721	mov     a, AdData[14]
+00A4	008A	mov     STATUS, a
+00A5	471F	mov     a, _ISR_Uartfs
+00A6	0004	reti
+00A7	1483	inc     MP1
+				L00A8:
+00A8	0701	mov     a, MP0
+00A9	0084	mov     BP, a
+00AA	0702	mov     a, [02H]
+00AB	0003	ret
+				;13		
+				;14	//	RxdBuff[RxdCnt++]=_txr_rxr;
+				;15	//	if(RxdCnt>4)
+				;16	//	{
+				;17	//		RxdCnt=0;	
+				;18	//	}	
+				;19	}
+				;20	
+				;21		
+				data .SECTION 'DATA'
+				__smod DB DUP (?) ; __smod
+				__wdtc DB DUP (?) ; __wdtc
+				__intc0 DB DUP (?) ; __intc0
+				__intc3 DB DUP (?) ; __intc3
+				__papu DB DUP (?) ; __papu
+				__pa DB DUP (?) ; __pa
+				__pac DB DUP (?) ; __pac
+				__pbps1 DB DUP (?) ; __pbps1
+				__pbps2 DB DUP (?) ; __pbps2
+				__usr DB DUP (?) ; __usr
+				__ucr1 DB DUP (?) ; __ucr1
+				__ucr2 DB DUP (?) ; __ucr2
+				__brg DB DUP (?) ; __brg
+				__txr_rxr DB DUP (?) ; __txr_rxr
+				RxdData DB DUP (?) ; RxdData
+				TxdData DB DUP (?) ; TxdData
+				Flag01 DB DUP (?) ; Flag01
+				RxdCnt DB DUP (?) ; RxdCnt
+				TxdCnt DB DUP (?) ; TxdCnt
+				TxdPoint2 DB DUP (?) ; TxdPoint2
+				TxdPoint DB DUP (?) ; TxdPoint
+				RxdBuff DB DUP (?) ; RxdBuff
+				TxdBuff DB DUP (?) ; TxdBuff
+				Time1msCnt DB DUP (?) ; Time1msCnt
+				ChannelCnt DB DUP (?) ; ChannelCnt
+				AdData DB DUP (?) ; AdData
+				TimeCnt DB 2 DUP (?) ; TimeCnt
+				ra DB DUP (?)
+				rb DB DUP (?)
+				_ISR_Uartfs DB DUP (?)
+				value DB DUP (?) ; value
+				i DB 2 DUP (?) ; i

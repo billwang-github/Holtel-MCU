@@ -1,0 +1,13 @@
+Removed Pin From Net: NetName=NetC3_1 Pin=C3-1
+Removed Pin From Net: NetName=BAT Pin=C3-2
+Removed Pin From Net: NetName=NetC3_1 Pin=C15-1
+Removed Pin From Net: NetName=BAT Pin=C15-2
+Removed Pin From Net: NetName=NetC3_1 Pin=C22-1
+Removed Pin From Net: NetName=BAT Pin=C22-2
+Added Pin To Net: NetName=BAT Pin=C3-1
+Added Pin To Net: NetName=NetC3_1 Pin=C3-2
+Added Pin To Net: NetName=BAT Pin=C15-1
+Added Pin To Net: NetName=NetC3_1 Pin=C15-2
+Added Pin To Net: NetName=BAT Pin=C22-1
+Added Pin To Net: NetName=NetC3_1 Pin=C22-2
+Change Net Name : Old Net Name=NetC3_1 New Net Name=NetC3_2

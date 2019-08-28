@@ -1,0 +1,32 @@
+
+Linker Version 8.7.7.181224
+Input Object File: D:\WORK\Project\Github\Holtel-MCU\HT66FM5x40\HT66FM5440六步有hall方波demo方案\HT66FM5440六步有HALL方波DEMO方案.OBJ
+
+Input Library File: D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB
+Input Library File: D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\v3_lmrsc.lib
+
+
+     Bank    Start     End      Length     Class    AvgIns    Name
+     00h     0000h     0118h    0119h      CODE               CS (D:\WORK\Project\Github\Holtel-MCU\HT66FM5x40\HT66FM5440六步有hall方波demo方案\HT66FM5440六步有HALL方波DEMO方案.OBJ)
+     00h     0080h     0084h    0005h      DATA     3.8       DS (D:\WORK\Project\Github\Holtel-MCU\HT66FM5x40\HT66FM5440六步有hall方波demo方案\HT66FM5440六步有HALL方波DEMO方案.OBJ)
+
+
+
+ROM Usage Statistics
+     Size      Used     Percentage
+     1000h     0119h    6%
+
+RAM Usage Statistics
+    Bank      Size      Used     Percentage
+     00h       0080h     0005h    3%
+     01h       0080h     0000h    0%
+     02h       0080h     0000h    0%
+     Total     0180h     0005h    1%
+
+Use Stack Count
+
+Call Tree
+
+HLINK: Program entry point at section 'CS' (address 0) of file 'D:\WORK\Project\Github\Holtel-MCU\HT66FM5x40\HT66FM5440六步有hall方波demo方案\HT66FM5440六步有HALL方波DEMO方案.OBJ'
+
+Total 0 error(s), Total 0 Warning(s)

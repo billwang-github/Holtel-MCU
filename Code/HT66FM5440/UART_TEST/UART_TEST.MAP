@@ -1,0 +1,122 @@
+
+Linker Version 8.7.7.181224
+Input Object File: D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\UART_TEST\UART_TEST.OBJ
+Input Object File: D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\UART_TEST\STARTUP1_L.OBJ
+
+Input Library File: D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB
+Input Library File: D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\v3_lmrsc.lib
+
+
+     Bank    Start     End      Length     Class    AvgIns    Name
+     00h     0000h     0000h    0001h      CODE               @code (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\UART_TEST\UART_TEST.OBJ)
+     00h     0001h     003bh    003bh      CODE               @start (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\UART_TEST\UART_TEST.OBJ)
+     00h     003ch     003fh    0004h      CODE               @ISR_Uart_code (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\UART_TEST\UART_TEST.OBJ)
+     00h     0040h     0042h    0003h      CODE               @crom (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\UART_TEST\UART_TEST.OBJ)
+     00h     0043h     008eh    004ch      CODE               _main (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\UART_TEST\UART_TEST.OBJ)
+     00h     008fh     00b5h    0027h      CODE               _UartInit (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\UART_TEST\UART_TEST.OBJ)
+     00h     00b6h     0109h    0054h      CODE               _ISR_Uart (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\UART_TEST\UART_TEST.OBJ)
+     00h     010ah     012bh    0022h      CODE               _print_string_const (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\UART_TEST\UART_TEST.OBJ)
+     00h     012ch     012fh    0004h      CODE               @ROMDATA_BASE (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\UART_TEST\STARTUP1_L.OBJ)
+     00h     0130h     013dh    000eh      CODE               _CROM2PROM (CROM2PROM)
+     00h     0080h     0080h    0001h      DATA     0         @BITDATASEC (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\UART_TEST\STARTUP1_L.OBJ)
+     00h     0081h     0081h    0001h      DATA     31        @data_ra (D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0082h     0082h    0001h      DATA     12        @data_rb (D:\Program Files\Holtek MCU Development Tools\HT-IDE3000V7.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0083h     0083h    0001h      DATA     2         @data_r13c (isr:ra~rh)
+     00h     0084h     0084h    0001h      DATA     2         @data_r23c (isr:ra~rh)
+     00h     0085h     0085h    0001h      DATA     21        @data_ra3c (isr:ra~rh)
+     00h     0086h     0086h    0001h      DATA     6         @data_rb3c (isr:ra~rh)
+     00h     0087h     0087h    0001h      DATA     2         @data_rc3c (isr:ra~rh)
+     00h     008dh     008dh    0001h      DATA     9         @HCCINIT_rxcnt (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\UART_TEST\UART_TEST.OBJ)
+     00h     008eh     008eh    0001h      DATA     0         @HCCINIT_txcnt (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\UART_TEST\UART_TEST.OBJ)
+     00h     008fh     0094h    0006h      DATA     0.3333    @HCCINIT0_rxbuff (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\UART_TEST\UART_TEST.OBJ)
+     00h     0095h     0095h    0001h      DATA     2         @data_r33c (isr:ra~rh)
+     00h     0096h     0096h    0001h      DATA     2         @data_r43c (isr:ra~rh)
+
+     Local Sections
+
+     Bank    Start     End      Length     Class    AvgIns    Name
+     00h     008dh     008dh    0000h      LOCAL    0         @dummy (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\UART_TEST\UART_TEST.OBJ)
+     00h     008ch     008ch    0001h      LOCAL    10        _main (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\UART_TEST\UART_TEST.OBJ)
+     00h     0089h     0089h    0001h      LOCAL    5         _UartInit (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\UART_TEST\UART_TEST.OBJ)
+     00h     0089h     008bh    0003h      LOCAL    3         _print_string_const (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\UART_TEST\UART_TEST.OBJ)
+     00h     0089h     0089h    0000h      LOCAL    0         _Crom2Prom (CROM2PROM)
+     00h     0089h     0089h    0000h      LOCAL    0         @dummy60 (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\UART_TEST\UART_TEST.OBJ)
+     00h     0088h     0088h    0001h      LOCAL    5         _ISR_Uart (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\UART_TEST\UART_TEST.OBJ)
+
+     Public Symbols Information
+     Address            Public by Name
+     0130h              _Crom2Prom
+     0130h              _Crom2PromNext
+     00b6h              _ISR_Uart
+     008fh              _UartInit
+     0080h[0]           _bRxfull
+     0043h              _main
+     010ah              _print_string_const
+     008ah              _print_string_const_2
+     008fh              _rxbuff
+     008dh              _rxcnt
+     0040h              _txbuff
+     008eh              _txcnt
+     0083h              r13c
+     0084h              r23c
+     0095h              r33c
+     0096h              r43c
+     0081h              ra
+     0085h              ra3c
+     0082h              rb
+     0086h              rb3c
+     0087h              rc3c
+     012ch              startup_value_1
+
+     Address            Public by Value
+     0040h              _txbuff
+     0043h              _main
+     0081h              ra
+     0082h              rb
+     0083h              r13c
+     0084h              r23c
+     0085h              ra3c
+     0086h              rb3c
+     0087h              rc3c
+     008ah              _print_string_const_2
+     008dh              _rxcnt
+     008eh              _txcnt
+     008fh              _UartInit
+     008fh              _rxbuff
+     0095h              r33c
+     0096h              r43c
+     00b6h              _ISR_Uart
+     010ah              _print_string_const
+     012ch              startup_value_1
+     0130h              _Crom2PromNext
+     0130h              _Crom2Prom
+     0080h[0]           _bRxfull
+
+
+ROM Usage Statistics
+     Size      Used     Percentage
+     1000h     013eh    7%
+
+RAM Usage Statistics
+    Bank      Size      Used     Percentage
+     00h       0080h     0017h    17%
+     01h       0080h     0000h    0%
+     02h       0080h     0000h    0%
+     Total     0180h     0017h    5%
+
+Use Stack Count
+_main: 2
+_ISR_Uart: 0
+
+Call Tree
+    @dummy
+        _main (0)
+            _UartInit (1)
+            _print_string_const (1)
+                _Crom2Prom (2)
+    @dummy60
+        _ISR_Uart (0)
+
+HLINK: Program entry point at section '@code' (address 0) of file 'D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\UART_TEST\UART_TEST.OBJ'
+
+Total 0 error(s), Total 0 Warning(s)

@@ -1,0 +1,230 @@
+#include "HT66FM5240.h"
+#include "FuncTion.h"
+
+
+void SystemInit(void)
+{
+	ClockInit();
+	GPIOInit();
+	PwmInit();
+	ProtectInit();
+	//ComparatorInit();	
+	ADInit();
+	UartInit();
+	WatchDogInit();	
+}
+
+
+void ClockInit(void)
+{
+	_smod=0x01;	//禁止快速喚醒功能、禁止IDLE模式	Fsys=Fh=20MHZ
+	while((_smod&0x04)==0);	//等待時鐘穩定
+}
+
+void GPIOInit(void)
+{
+	_papu6=0;	//未上拉
+    _pac6=0;	//端口設為輸出模式
+	_pa6=1;		//端口輸出高電平	
+}
+
+void WatchDogInit(void)
+{
+	_wdtc=0x57;	//IDLE模式時維持Fsys時鐘、看門狗時間=2^18/Fs	(Fs=Fsub、Fs=Fsys/4)
+}
+
+
+/****************************************/
+void PwmInit(void)
+{
+	_pcps0=0xAA;	//C引腳共用功能設置	PC0-PC5設為PWM口
+	_pcps1=0x0A;
+	
+		
+	_pwmc=0x81;		//中心對齊模式1、 Fpwm=20MHZ、禁止占空比中斷、允許更新 	
+	//_pwmc=0xC1;		//中心對齊模式2、 Fpwm=20MHZ、禁止占空比中斷、允許更新 	
+	
+	_prdrh=(u8)(PWMPERIOD>>8);	//設置週期寄出去
+	_prdrl=(u8)(PWMPERIOD);
+	
+	_dutr0h=0x00;	//占空比寄存器
+	_dutr0l=0x00;
+	_dutr1h=0x00;
+	_dutr1l=0x00;	
+	_dutr2h=0x00;
+	_dutr2l=0x00;
+	
+	_pwmme=0x00;	//禁止強制輸出功能
+	_pwmmd=0x00;	//強制輸出電平寄存器
+	
+	_mcf=0x85;		//S/W Mask 模式、互補輸出、PWM輸出使能、頂端PWM輸出
+	_dts=0xA4;		//使能死區、死區時間為1us
+	_plc=0x00;		//極性為正相輸出
+	//_plc=0x3F;		//極性為反相輸出
+	
+	_pwmc|=0x08;	//開啟PWM計數器	
+}
+
+
+void SetDuty(u16 duty)
+{
+	if(duty>MAX_PWM)	//PWMPERIOD
+	{
+		duty=MAX_PWM;	
+	}
+	_dutr0h=(u8)(duty>>8);	//設置占空比寄存器
+	_dutr0l=(u8)(duty);
+	_dutr1h=(u8)(duty>>8);
+	_dutr1l=(u8)(duty);	
+	_dutr2h=(u8)(duty>>8);
+	_dutr2l=(u8)(duty);	
+}
+
+/***************************************/
+void ComparatorInit(void)
+{
+	_pa3s1=0;	//A引腳共用功能設置	PA3設為C1P口
+	_pa3s0=1;	
+	_pa4s1=1;	//A引腳共用功能設置	PA4設為C2P口
+	_pa4s0=0;
+	_pa5s1=1;	//A引腳共用功能設置	PA5設為C3P口
+	_pa5s0=0;
+	
+	_pb3s1=0;	//B引腳共用功能設置	PB3設為C1N口
+	_pb3s0=1;
+	
+	
+	_cpc|=0xEE;		//開啟比較器1、2、3，允許比較器1、2、3遲滯功能
+	_integ0|=0x7F;	//Hall中斷源選擇比較器輸出、雙邊沿中斷
+	
+	_hallf_mf0f=0;		//清除Hall總中斷標誌
+	_halle_mf0e=1;		//允許Hall總中斷
+	
+	//_mfi0=0x07;		//允許HA、HB、HC中斷
+	_halaf=0;		//清除HA中斷標誌
+	_halbf=0;		//清除HB中斷標誌
+	_halcf=0;		//清除HC中斷標誌	
+	_halae=1;		//使能HA中斷
+	_halbe=1;		//使能HB中斷
+	_halce=1;		//使能HC中斷		
+}
+/***************************************/
+void ADInit(void)
+{
+	_pa1s0=1;		//引腳共用功能設置 （設置AD通道）PA1--AN3/AP
+	_pa1s1=0;	
+	_pd0s0=1;		//引腳共用功能設置 （設置AD通道）PD0--AN5
+	_pd0s1=0;
+	_pd1s0=1;		//引腳共用功能設置 （設置AD通道）PD1--AN4
+	_pd1s1=0;
+		
+	_adcr1=0xDC;	//選擇延遲觸發電路、使能延遲功能、PWM週期觸發AD、AD時鐘=Fsys/16、
+	//_adcr2=0x00;	//選擇PWM占空比觸發的觸發源（pwm0、pwm1、pwm2）
+	_adcr0=0x16;	//開啟AD電源、數據右對齊、初始通道選為AP（內部通道）
+	_addl=1;		//AD觸發延遲80*0.05=4us	
+
+	_adlvdl=0x00;	//設置AD值窗口限制值
+	_adlvdh=0x00;
+	_adhvdl=0xfF;
+	_adhvdh=0x0F;
+	
+	_aeocf=0;	//清除AD轉換結束標誌
+	_aeoce=1;	//允許AD轉換結束中斷
+	
+	//_alimf=0;	//清除窗口比較中斷標誌
+	//_alime=1;	//允許窗口比較中斷	
+	
+	_mf1f=0;	//清除多功能1中斷標誌
+	_mf1e=1;	//允許多功能1中斷		
+}
+
+u16 AdSample_1(u8 channel)
+{
+	u16 temp;
+	//u8 templ,temph;
+	
+	_aeoce=0;	//禁止AD轉換結束中斷
+	_adcr1 &=0x7F;	//不選擇延遲觸發電路
+		
+	_adcr0 &=0xF0;
+	_adcr0 |=channel;
+	
+	_adstr=0;
+	_adstr=1;
+	_adstr=0;	
+	while(_eocb);	//等待轉換結束
+	
+	/*
+	templ=_adrl;
+	temph=_adrh;
+	temp=(temph<<8)|templ;
+	*/	
+	temp=_addata;
+	
+	_adcr1 |=0x80;	//選擇延遲觸發電路
+	_adcr0 &=0xF0;
+	_adcr0 |=CURRENT_CHAN;
+	ChannelCnt=0;
+	_aeocf=0;	//清除AD轉換結束標誌
+	_aeoce=1;	//允許AD轉換結束中斷
+	
+	return temp;	
+}
+
+/************************************/
+void ProtectInit(void)
+{
+	_opoms=0x47;	//比較器上升沿有效、內部運放放大1倍		//0x42-10倍
+	_opcm=150;		//DA比較寄存器值過流電壓為3V
+	//_opacal=0x00;	//工作在比較器或運算放大器模式
+	
+	_c0f=0;		//清除比較中斷標誌位
+	_c0e=1;		//允許比較中斷
+	_cpc|=0x11;	//開啟比較器0、使能遲滯功能
+}
+
+/*************************************/
+void UartInit(void)
+{
+	_pb6s0=1;		//引腳共用功能設置 （設置RX）PB6--RX
+	_pb6s1=0;
+	_pb7s0=1;		//引腳共用功能設置 （設置TX）PB7--TX
+	_pb7s1=0;
+	
+	_ucr1=0x80;		//使能UART、8位數據傳輸、奇偶校驗、一位停止位、無暫停字
+	_ucr2=0xE4; 	//發送、接收使能、選擇高速波特率、無地址檢測功能、無喚醒功能、禁止發送空閒中斷、禁止發送寄存器空中斷
+	_brg=129;       //_brg=20000000/(9600*16)-1=129  (高速波特率：波特率=fSYS/[16×(N+1)]、低速波特率：波特率=fSYS/[64×(N+1)])
+	
+	_uartf=0;		//UART中斷標誌清零
+	_uarte=1;		//使能UART中斷
+}
+
+void UartHand(void)
+{
+	if(_txif)
+	{
+		_txif=0;
+		if(TxdPoint2)	
+		{
+			TxdPoint2--;
+			_txr_rxr=TxdBuff[TxdPoint++];	
+			if(TxdPoint>4)
+			{
+				TxdPoint=0;
+			}
+		}
+	}
+}
+
+void UartPutChar(u8 value)
+{
+	if(TxdPoint2<5)
+	{
+		TxdPoint2++;
+		TxdBuff[TxdCnt++]=value;		
+		if(TxdCnt>4)
+		{
+			TxdCnt=0;
+		}
+	}
+}
