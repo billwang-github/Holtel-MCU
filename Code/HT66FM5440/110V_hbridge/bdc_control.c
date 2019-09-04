@@ -102,13 +102,19 @@ int main(void)
 					{		
 						motor_state = ST_STOP;
 					}
+					if (pwmduty_now < 10)
+						pwmduty_now = 0;
+					else
+						pwmduty_now -= 50;					
 					break;
 				
-				case ST_FORWARD:
+				case ST_FORWARD:				
 					if (direction != FWD) // not forward ?
-					{
+					{							
 						motor_state = ST_BRAKE; // then brake !
 					}
+					if (pwmduty_now < 750)
+						pwmduty_now++;
 					break;
 				
 				case ST_REVERSE:
@@ -116,6 +122,8 @@ int main(void)
 					{
 						motor_state = ST_BRAKE; // then brake !
 					}
+					if (pwmduty_now < 750)
+						pwmduty_now++;				
 					break;
 				
 				default:
@@ -240,7 +248,7 @@ void pwm_init(void)
 	
 	
 	//DTS
-	_dts = 0b11100110;
+//	_dts = 0b11100110;
 //	_dtcks1 			= 1;						// fsys/8 = 2MHz, 0.5us
 //	_dtcks0 			= 1;
 //	_dte 				= 1;						// enable dead time
@@ -285,6 +293,7 @@ void __attribute ((interrupt(0x0c))) ISR_PWM(void)
 	_pwmpf = 0;
 	_int_pri3f = 0;
 	
+	SET_PWM_DUTY(pwmduty_now);
 	switch (motor_state)
 	{
 		case ST_COAST: // all off		
@@ -292,21 +301,21 @@ void __attribute ((interrupt(0x0c))) ISR_PWM(void)
 			_pcps0  = 0b00000000;   
 			_pcps1  = 0b00000000;
 			break;
-		case ST_STOP: 
-			break;
-		case ST_BRAKE: 
+		case ST_STOP: 		
 			_pc     = 0b00101000;			
 			_pcps0  = 0b00000000;   
-			_pcps1  = 0b00000000;	
+			_pcps1  = 0b00000000;		
+			break;
+		case ST_BRAKE: 			
 			break;
 		case ST_FORWARD: // BT,BB pwm, CB on, CT off
-			SET_PWM_DUTY(pwmduty_now);
+			//SET_PWM_DUTY(pwmduty_now);
 			_pc     = 0b00100000;		
 			_pcps0  = 0b10100000;   
 			_pcps1  = 0b00000000;
 			break;
 		case ST_REVERSE: // CT,CB pwm, BB on, BT off
-			SET_PWM_DUTY(pwmduty_now);
+			//SET_PWM_DUTY(pwmduty_now);
 			_pc     = 0b00001000;		
 			_pcps0  = 0b00000000;   
 			_pcps1  = 0b00001010;		
