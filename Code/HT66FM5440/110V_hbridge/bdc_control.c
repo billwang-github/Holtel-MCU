@@ -11,7 +11,26 @@ typedef unsigned long uint32;
 	_dutr0l = (x) & 0xff;\
 	_pwmsuf = 1;\
 	})
-
+#define DRV_COAST() ({\
+	_pc     = 0b00000000;\
+	_pcps0  = 0b00000000;\
+	_pcps1  = 0b00000000;\
+	})
+#define DRV_BRAKE() ({\
+	_pc     = 0b00101000;\
+	_pcps0  = 0b00000000;\
+	_pcps1  = 0b00000000;\
+	})
+#define DRV_FWD() ({\
+	_pc     = 0b00100000;\
+	_pcps0  = 0b10100000;\
+	_pcps1  = 0b00000000;\
+	})
+#define DRV_REV() ({\
+	_pc     = 0b00001000;\
+	_pcps0  = 0b00000000;\
+	_pcps1  = 0b00001010;\
+	})		
 /* IO definition */
 #define PIN_FWD _pb0
 #define PIN_REV _pb1
@@ -105,7 +124,7 @@ int main(void)
 					if (pwmduty_now < 10)
 						pwmduty_now = 0;
 					else
-						pwmduty_now -= 50;					
+						pwmduty_now -= 10;					
 					break;
 				
 				case ST_FORWARD:				
@@ -114,7 +133,7 @@ int main(void)
 						motor_state = ST_BRAKE; // then brake !
 					}
 					if (pwmduty_now < 750)
-						pwmduty_now++;
+						pwmduty_now += 5;
 					break;
 				
 				case ST_REVERSE:
@@ -123,7 +142,7 @@ int main(void)
 						motor_state = ST_BRAKE; // then brake !
 					}
 					if (pwmduty_now < 750)
-						pwmduty_now++;				
+						pwmduty_now += 5;				
 					break;
 				
 				default:
@@ -297,28 +316,30 @@ void __attribute ((interrupt(0x0c))) ISR_PWM(void)
 	switch (motor_state)
 	{
 		case ST_COAST: // all off		
-			_pc     = 0b00000000;			
-			_pcps0  = 0b00000000;   
-			_pcps1  = 0b00000000;
+			DRV_COAST();
+//			_pc     = 0b00000000;			
+//			_pcps0  = 0b00000000;   
+//			_pcps1  = 0b00000000;
 			break;
-		case ST_STOP: 		
-			_pc     = 0b00101000;			
-			_pcps0  = 0b00000000;   
-			_pcps1  = 0b00000000;		
+		case ST_STOP: // low side on		
+			DRV_BRAKE();
+//			_pc     = 0b00101000;			
+//			_pcps0  = 0b00000000;   
+//			_pcps1  = 0b00000000;		
 			break;
 		case ST_BRAKE: 			
 			break;
 		case ST_FORWARD: // BT,BB pwm, CB on, CT off
-			//SET_PWM_DUTY(pwmduty_now);
-			_pc     = 0b00100000;		
-			_pcps0  = 0b10100000;   
-			_pcps1  = 0b00000000;
+			DRV_FWD();
+//			_pc     = 0b00100000;		
+//			_pcps0  = 0b10100000;   
+//			_pcps1  = 0b00000000;
 			break;
 		case ST_REVERSE: // CT,CB pwm, BB on, BT off
-			//SET_PWM_DUTY(pwmduty_now);
-			_pc     = 0b00001000;		
-			_pcps0  = 0b00000000;   
-			_pcps1  = 0b00001010;		
+			DRV_REV();
+//			_pc     = 0b00001000;		
+//			_pcps0  = 0b00000000;   
+//			_pcps1  = 0b00001010;		
 			break;
 	}
 }
