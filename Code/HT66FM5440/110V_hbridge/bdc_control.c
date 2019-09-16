@@ -135,7 +135,7 @@ int main(void)
 //
 //						break;
 //					}
-					pwmduty_temp = 1; // duty delta
+					pwmduty_temp = 2; // duty delta
 					if (pwmduty_now < pwmduty_temp)
 					{
 						pwmduty_now = 0;
@@ -148,7 +148,7 @@ int main(void)
 				case ST_FORWARD:							
 					if (direction != FWD) // not forward ?
 					{					
-						pwmduty_now = (PWM_DUTY_MAX >> 3);		
+						pwmduty_now = 400;		
 						motor_state = ST_BRAKE; // then brake !
 						break;
 					}
@@ -161,7 +161,8 @@ int main(void)
 				
 				case ST_REVERSE:				
 					if (direction != REV) // not reverse ?
-					{								
+					{			
+						pwmduty_now = 400;						
 						motor_state = ST_BRAKE; // then brake !
 						break;
 					}
@@ -294,7 +295,7 @@ void pwm_init(void)
 	
 	
 	//DTS
-//	_dts = 0b11100110;
+	_dts = 0b11100110;
 //	_dtcks1 			= 1;						// fsys/8 = 2MHz, 0.5us
 //	_dtcks0 			= 1;
 //	_dte 				= 1;						// enable dead time
