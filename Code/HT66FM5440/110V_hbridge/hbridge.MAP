@@ -16,25 +16,25 @@ Input Library File: C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V8.x
      00h     0024h     0037h    0014h      CODE               _adc_sample (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
      00h     003ch     003fh    0004h      CODE               @ISR_TimeBase_Uart_code (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
      00h     0040h     008ch    004dh      CODE               @start (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
-     00h     008dh     01d1h    0145h      CODE               _main (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
-     00h     01d2h     0228h    0057h      CODE               _handle_key (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
-     00h     0229h     0244h    001ch      CODE               _gpio_init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
-     00h     0245h     0280h    003ch      CODE               _pwm_init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
-     00h     0281h     035eh    00deh      CODE               _ISR_PWM (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
-     00h     035fh     038ah    002ch      CODE               _adc_init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
-     00h     038bh     03bah    0030h      CODE               _ISR_Adc (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
-     00h     03bbh     03e1h    0027h      CODE               _uart_init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
-     00h     03e2h     03e9h    0008h      CODE               _timeBase_init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
-     00h     03eah     046ch    0083h      CODE               _ISR_TimeBase_Uart (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
+     00h     008dh     027ch    01f0h      CODE               _main (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
+     00h     027dh     02d3h    0057h      CODE               _handle_key (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
+     00h     02d4h     02efh    001ch      CODE               _gpio_init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
+     00h     02f0h     032bh    003ch      CODE               _pwm_init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
+     00h     032ch     0465h    013ah      CODE               _ISR_PWM (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
+     00h     0466h     0491h    002ch      CODE               _adc_init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
+     00h     0492h     04c1h    0030h      CODE               _ISR_Adc (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
+     00h     04c2h     04e8h    0027h      CODE               _uart_init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
+     00h     04e9h     04f0h    0008h      CODE               _timeBase_init (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
+     00h     04f1h     0573h    0083h      CODE               _ISR_TimeBase_Uart (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
      00h     0080h     0080h    0001h      DATA     0         @BITDATASEC (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\STARTUP0_L.OBJ)
-     00h     0081h     0081h    0001h      DATA     150       @data_ra (C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V8.x\LIB\LIBHOLTEKGCC.LIB)
-     00h     0082h     0082h    0001h      DATA     76        @data_rb (C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V8.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0081h     0081h    0001h      DATA     187       @data_ra (C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V8.x\LIB\LIBHOLTEKGCC.LIB)
+     00h     0082h     0082h    0001h      DATA     98        @data_rb (C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V8.x\LIB\LIBHOLTEKGCC.LIB)
      00h     0083h     0083h    0001h      DATA     6         @data_rc (C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V8.x\LIB\LIBHOLTEKGCC.LIB)
      00h     0084h     0084h    0001h      DATA     4         @data_rd (C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V8.x\LIB\LIBHOLTEKGCC.LIB)
      00h     0085h     0085h    0001h      DATA     2         @data_r10c (isr:ra~rh)
      00h     0086h     0086h    0001h      DATA     2         @data_r20c (isr:ra~rh)
-     00h     0087h     0087h    0001h      DATA     76        @data_ra0c (isr:ra~rh)
-     00h     0088h     0088h    0001h      DATA     26        @data_rb0c (isr:ra~rh)
+     00h     0087h     0087h    0001h      DATA     107       @data_ra0c (isr:ra~rh)
+     00h     0088h     0088h    0001h      DATA     37        @data_rb0c (isr:ra~rh)
      00h     0089h     0089h    0001h      DATA     2         @data_r120 (isr:ra~rh)
      00h     008ah     008ah    0001h      DATA     2         @data_r220 (isr:ra~rh)
      00h     008bh     008bh    0001h      DATA     13        @data_ra20 (isr:ra~rh)
@@ -46,18 +46,18 @@ Input Library File: C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V8.x
      00h     0091h     0091h    0001h      DATA     36        @data_ra3c (isr:ra~rh)
      00h     0092h     0092h    0001h      DATA     10        @data_rb3c (isr:ra~rh)
      00h     0093h     0093h    0001h      DATA     2         @data_rc3c (isr:ra~rh)
-     00h     0096h     0097h    0002h      DATA     24        @HCCINIT_pwmduty_now (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
-     00h     0098h     0098h    0001h      DATA     6         @HCCINIT_rxcnt (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
-     00h     0099h     009ah    0002h      DATA     5         @HCCINIT_cnt_ms (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
+     00h     0096h     0097h    0002h      DATA     36        @HCCINIT_pwmduty_now (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
+     00h     0098h     0099h    0002h      DATA     6         @HCCINIT_cnt_ms (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
+     00h     009ah     009ah    0001h      DATA     6         @HCCINIT_rxcnt (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
      00h     009bh     009bh    0001h      DATA     3         @HCCINIT_cnt_10ms (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
      00h     009ch     009ch    0001h      DATA     3         @HCCINIT_cnt_200ms (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
-     00h     009dh     009eh    0002h      DATA     2         @HCCINIT_vdet (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
-     00h     009fh     00a0h    0002h      DATA     1         @HCCINIT_motor_current (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
-     00h     00a1h     00a2h    0002h      DATA     1         @HCCINIT_iavg (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
+     00h     009dh     009eh    0002h      DATA     1         @HCCINIT_motor_current (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
+     00h     009fh     00a0h    0002h      DATA     1         @HCCINIT_iavg (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
+     00h     00a1h     00a2h    0002h      DATA     1         @HCCINIT_vdet (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
      00h     00a3h     00a3h    0001h      DATA     0         @HCCINIT_txcnt (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
-     00h     00a4h     00a4h    0001h      DATA     10        @HCCINIT0_motor_state (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
-     00h     00a5h     00a6h    0002h      DATA     9         @HCCINIT0_pwmduty_temp (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
-     00h     00a7h     00a8h    0002h      DATA     8         @HCCINIT0_direction (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
+     00h     00a4h     00a4h    0001h      DATA     19        @HCCINIT0_motor_state (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
+     00h     00a5h     00a6h    0002h      DATA     15        @HCCINIT0_pwmduty_temp (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
+     00h     00a7h     00a8h    0002h      DATA     7         @HCCINIT0_direction (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
      00h     00a9h     00aah    0002h      DATA     6         @HCCINIT0_direction_test (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
      00h     00abh     00b0h    0006h      DATA     0         @HCCINIT0_txbuff (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
      00h     00b1h     00b6h    0006h      DATA     0         @HCCINIT0_rxbuff (D:\WORK\Project\Github\Holtel-MCU\Code\HT66FM5440\110V_hbridge\BDC_CONTROL.OBJ)
@@ -85,15 +85,15 @@ Input Library File: C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V8.x
 
      Public Symbols Information
      Address            Public by Name
-     038bh              _ISR_Adc
-     0281h              _ISR_PWM
-     03eah              _ISR_TimeBase_Uart
-     035fh              _adc_init
+     0492h              _ISR_Adc
+     032ch              _ISR_PWM
+     04f1h              _ISR_TimeBase_Uart
+     0466h              _adc_init
      0024h              _adc_sample
      0001h              _ascii
      009bh              _cnt_10ms
      009ch              _cnt_200ms
-     0099h              _cnt_ms
+     0098h              _cnt_ms
      00a7h              _direction
      00a9h              _direction_test
      0080h[1]           _f_10ms
@@ -101,22 +101,22 @@ Input Library File: C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V8.x
      0080h[3]           _f_adc_ch
      0080h[0]           _f_ms
      0080h[4]           _f_testmode
-     0229h              _gpio_init
-     01d2h              _handle_key
-     00a1h              _iavg
+     02d4h              _gpio_init
+     027dh              _handle_key
+     009fh              _iavg
      008dh              _main
-     009fh              _motor_current
+     009dh              _motor_current
      00a4h              _motor_state
-     0245h              _pwm_init
+     02f0h              _pwm_init
      0096h              _pwmduty_now
      00a5h              _pwmduty_temp
      00b1h              _rxbuff
-     0098h              _rxcnt
-     03e2h              _timeBase_init
+     009ah              _rxcnt
+     04e9h              _timeBase_init
      00abh              _txbuff
      00a3h              _txcnt
-     03bbh              _uart_init
-     009dh              _vdet
+     04c2h              _uart_init
+     00a1h              _vdet
      0085h              r10c
      0089h              r120
      008fh              r13c
@@ -165,13 +165,13 @@ Input Library File: C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V8.x
      0092h              rb3c
      0093h              rc3c
      0096h              _pwmduty_now
-     0098h              _rxcnt
-     0099h              _cnt_ms
+     0098h              _cnt_ms
+     009ah              _rxcnt
      009bh              _cnt_10ms
      009ch              _cnt_200ms
-     009dh              _vdet
-     009fh              _motor_current
-     00a1h              _iavg
+     009dh              _motor_current
+     009fh              _iavg
+     00a1h              _vdet
      00a3h              _txcnt
      00a4h              _motor_state
      00a5h              _pwmduty_temp
@@ -181,25 +181,25 @@ Input Library File: C:\Program Files\Holtek MCU Development Tools\HT-IDE3000V8.x
      00b1h              _rxbuff
      00b7h              r33c
      00b8h              r43c
-     01d2h              _handle_key
-     0229h              _gpio_init
-     0245h              _pwm_init
-     0281h              _ISR_PWM
-     035fh              _adc_init
-     038bh              _ISR_Adc
-     03bbh              _uart_init
-     03e2h              _timeBase_init
-     03eah              _ISR_TimeBase_Uart
+     027dh              _handle_key
+     02d4h              _gpio_init
+     02f0h              _pwm_init
+     032ch              _ISR_PWM
      0080h[0]           _f_ms
      0080h[1]           _f_10ms
      0080h[2]           _f_200ms
      0080h[3]           _f_adc_ch
      0080h[4]           _f_testmode
+     0466h              _adc_init
+     0492h              _ISR_Adc
+     04c2h              _uart_init
+     04e9h              _timeBase_init
+     04f1h              _ISR_TimeBase_Uart
 
 
 ROM Usage Statistics
      Size      Used     Percentage
-     1000h     0464h    27%
+     1000h     056bh    33%
 
 RAM Usage Statistics
     Bank      Size      Used     Percentage

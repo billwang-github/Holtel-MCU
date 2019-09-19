@@ -27,6 +27,9 @@ volatile bit f_ms = 0, f_10ms = 0, f_200ms = 0;
 #define ST_BRAKE 2 // motor is braking
 #define ST_UP 3 // motor runs in forward direction
 #define ST_DOWN 4 // motor runs in reverse direction
+#define ST_T_DIRSW 5
+#define ST_T_UP 6
+#define ST_T_DOWN 7
 enum DIR {UP, DWN, STP} direction, direction_test;
 volatile uint16 motor_current = 0;
 volatile uint8 motor_state;
@@ -108,6 +111,7 @@ int main(void)
 {
 	pwmduty_now = 0;
 	motor_state = ST_BRAKE;
+	direction_test = UP;
 
 	gpio_init();
 	adc_init(B12); // 12 
@@ -125,26 +129,41 @@ int main(void)
 	{
 		FEED_WATCHDOG();
 	}
-	direction_test = UP;
+	
 						
 	while(1)
 	{						
 		FEED_WATCHDOG();
 		
-		if (vdet >= 3300) // check VM OVP
-			PIN_TESTO2 = 1;
-		else
-			PIN_TESTO2 = 0;
-		//PIN_TESTO2 = ~PIN_TESTO2;
+//		if (vdet >= 3300) // check VM OVP
+//			PIN_TESTO2 = 1;
+//		else
+//			PIN_TESTO2 = 0;
 			
 		if (motor_current > MAX_Im) // Check motor current
 			motor_state = ST_COAST;
+					
 		
 		if (f_10ms) // every 10 mseconds
 		{
 			f_10ms = 0; // reset flag
 			handle_key(); // ckeck key status
-			
+
+			if ((motor_state & 0x01) == 0x01)
+				PIN_TESTO0 = 1;
+			else
+				PIN_TESTO0 = 0;
+				
+			if ((motor_state & 0x02) == 0x02)
+				PIN_TESTO1 = 1;
+			else
+				PIN_TESTO1 = 0;	
+				
+			if ((motor_state & 0x04) == 0x04)
+				PIN_TESTO2 = 1;
+			else
+				PIN_TESTO2 = 0;		
+						
 			if (f_adc_ch == 0) // adc sample voltage and current
 			{	
 				f_adc_ch = 1;
@@ -156,25 +175,25 @@ int main(void)
 				adc_sample(CH_IAVG);		
 			}		
 				
-			if (f_testmode == 1)// self test mode
-			{
-				if (f_ms == 1)	
-				{					
-					if (direction_test != UP)
-					{
-						direction_test = UP;
-						cnt_ms = 2000;
-					}
-					else if (direction_test != DWN)
-					{
-						direction_test =  DWN;
-						cnt_ms = 2000;
-					}
-					f_ms = 0;
-				
-				}	
-				direction = direction_test;	// update test direction				
-			}
+//			if (f_testmode == 1)// self test mode
+//			{
+//				if (f_ms == 1)	
+//				{					
+//					if (direction_test != UP)
+//					{
+//						direction_test = UP;
+//						cnt_ms = 5000;
+//					}
+//					else if (direction_test != DWN)
+//					{
+//						direction_test =  DWN;
+//						cnt_ms = 5000;
+//					}
+//					f_ms = 0;
+//				
+//				}	
+//				direction = direction_test;	// update test direction				
+//			}
 						
 			switch (motor_state)  // handle motor state
 			{
@@ -183,18 +202,71 @@ int main(void)
 					break;
 				
 				case ST_STOP:
-					if (direction == DWN) // reverse ?
-						motor_state = ST_DOWN;
-					else if (direction == UP) // Forward ?
-						motor_state = ST_UP;
+					if (f_testmode == 0)
+						direction_test = UP;
+					if ((f_testmode == 1) && (f_ms == 1))
+					{
+						motor_state = ST_T_DIRSW;
+					}
+					else
+					{						
+						if (direction == DWN) // reverse ?
+							motor_state = ST_DOWN;
+						else if (direction == UP) // Forward ?
+							motor_state = ST_UP;
+					}
 					break;
-				
+				case ST_T_DIRSW:
+					cnt_ms = 2000;
+					f_ms = 0;
+					if (direction_test == UP)
+					{
+						direction_test = DWN;
+						motor_state = ST_T_DOWN;						
+					}
+					else if (direction_test == DWN)
+					{
+						direction_test = UP;
+						motor_state = ST_T_UP;						
+					}
+					else
+						motor_state = ST_BRAKE;								
+					break;
+				case ST_T_UP:
+					if ((f_testmode == 0) || (f_ms == 1))
+					{
+						cnt_ms = 3000;
+						f_ms = 0;
+						pwmduty_now = 400;		//è¶Šå°å‰è»Šè¶Šå¿«	
+						motor_state = ST_BRAKE; // then brake !
+					}
+					else
+					{
+						pwmduty_temp = pwmduty_now + 10;  // ramp up pwm duty and check over max
+						if (pwmduty_temp > PWM_DUTY_MAX)
+							pwmduty_now = PWM_DUTY_MAX;
+						else						
+							pwmduty_now = pwmduty_temp;
+					}						
+					break;
+				case ST_T_DOWN:
+					if ((f_testmode == 0) || (f_ms == 1))
+					{
+						cnt_ms = 3000;
+						f_ms = 0;
+						pwmduty_now = 400;		//è¶Šå°å‰è»Šè¶Šå¿«	
+						motor_state = ST_BRAKE; // then brake !
+					}
+					else
+					{
+						pwmduty_temp = pwmduty_now + 10;  // ramp up pwm duty and check over max
+						if (pwmduty_temp > PWM_DUTY_MAX)
+							pwmduty_now = PWM_DUTY_MAX;
+						else						
+							pwmduty_now = pwmduty_temp;
+					}						
+					break;		
 				case ST_BRAKE:			
-//					if (pwmduty_now == 0) // wait till motor has stopped
-//					{		
-//
-//						break;
-//					}
 					pwmduty_temp = 5; // duty delta
 					if (pwmduty_now < pwmduty_temp)
 					{
@@ -208,29 +280,33 @@ int main(void)
 				case ST_UP:							
 					if (direction != UP) // not forward ?
 					{					
-						pwmduty_now = 400;		//¶V¤p«b¨®¶V§Ö	
+						pwmduty_now = 400;		//è¶Šå°å‰è»Šè¶Šå¿«	
 						motor_state = ST_BRAKE; // then brake !
-						break;
 					}
-					pwmduty_temp = pwmduty_now + 5;  // ramp up pwm duty and check over max
-					if (pwmduty_temp > PWM_DUTY_MAX)
-						pwmduty_now = PWM_DUTY_MAX;
-					else						
-						pwmduty_now = pwmduty_temp;
+					else
+					{
+						pwmduty_temp = pwmduty_now + 10;  // ramp up pwm duty and check over max
+						if (pwmduty_temp > PWM_DUTY_MAX)
+							pwmduty_now = PWM_DUTY_MAX;
+						else						
+							pwmduty_now = pwmduty_temp;
+					}
 					break;
 				
 				case ST_DOWN:				
-					if (direction != DWN) // not reverse ?
-					{			
-						pwmduty_now = 300;	//¶V¤p«b¨®¶V§Ö					
+					if (direction != DWN) // not forward ?
+					{					
+						pwmduty_now = 400;		//è¶Šå°å‰è»Šè¶Šå¿«	
 						motor_state = ST_BRAKE; // then brake !
-						break;
 					}
-					pwmduty_temp = pwmduty_now + 3; // ramp up pwm duty and check over max
-					if (pwmduty_temp > PWM_DUTY_MAX)
-						pwmduty_now = PWM_DUTY_MAX;
-					else						
-						pwmduty_now = pwmduty_temp;			
+					else
+					{
+						pwmduty_temp = pwmduty_now + 10;  // ramp up pwm duty and check over max
+						if (pwmduty_temp > PWM_DUTY_MAX)
+							pwmduty_now = PWM_DUTY_MAX;
+						else						
+							pwmduty_now = pwmduty_temp;
+					}
 					break;
 				
 				default:
@@ -424,6 +500,18 @@ void __attribute ((interrupt(0x0c))) ISR_PWM(void)
 			SET_PWM_DUTY(pwmduty_now);					
 			DRV_DWN();	
 			break;
+		case ST_T_UP: // BT,BB pwm, CB on, CT off
+			SET_PWM_DUTY(pwmduty_now);					
+			DRV_UP();
+			break;
+		case ST_T_DOWN: // CT,CB pwm, BB on, BT off
+			SET_PWM_DUTY(pwmduty_now);					
+			DRV_DWN();	
+			break;	
+		case ST_T_DIRSW:
+			break;		
+		default:
+			break;
 	}
 }
 
@@ -507,7 +595,7 @@ void __attribute ((interrupt(0x20))) ISR_Adc(void)
 //1000: AN7
 uint16 adc_sample(uint8 ch)
 {
-	uint16 result;
+//	uint16 result;
 	_adcr0 &= 0xF0;
 	_adcr0 |= ch; // select channel
 	_adstr = 0; // start conversion
@@ -525,17 +613,17 @@ void uart_init(void)
 {
 	uint8 i;
 		
-	_pb6s0=1;		//¤Ş¸}¦@¥Î¥\¯à³]¸m ¡]³]¸mRX¡^PB6--RX
+	_pb6s0=1;		//å¼•è…³å…±ç”¨åŠŸèƒ½è¨­ç½® ï¼ˆè¨­ç½®RXï¼‰PB6--RX
 	_pb6s1=0;
-	_pb7s0=1;		//¤Ş¸}¦@¥Î¥\¯à³]¸m ¡]³]¸mTX¡^PB7--TX
+	_pb7s0=1;		//å¼•è…³å…±ç”¨åŠŸèƒ½è¨­ç½® ï¼ˆè¨­ç½®TXï¼‰PB7--TX
 	_pb7s1=0;
 	
-	_ucr1=0x80;		//¨Ï¯àUART¡B8¦ì¼Æ¾Ú¶Ç¿é¡B©_°¸®ÕÅç¡B¤@¦ì°±¤î¦ì¡BµL¼È°±¦r
-	_ucr2=0xE4; 	//µo°e¡B±µ¦¬¨Ï¯à¡B¿ï¾Ü°ª³tªi¯S²v¡BµL¦a§}ÀË´ú¥\¯à¡BµL³ê¿ô¥\¯à¡B¸T¤îµo°eªÅ¶¢¤¤Â_¡B¸T¤îµo°e±H¦s¾¹ªÅ¤¤Â_
-	_brg=103;       //_brg=16000000/(9600*16)-1=129  (°ª³tªi¯S²v¡Gªi¯S²v=fSYS/[16¡Ñ(N+1)]¡B§C³tªi¯S²v¡Gªi¯S²v=fSYS/[64¡Ñ(N+1)])
+	_ucr1=0x80;		//ä½¿èƒ½UARTã€8ä½æ•¸æ“šå‚³è¼¸ã€å¥‡å¶æ ¡é©—ã€ä¸€ä½åœæ­¢ä½ã€ç„¡æš«åœå­—
+	_ucr2=0xE4; 	//ç™¼é€ã€æ¥æ”¶ä½¿èƒ½ã€é¸æ“‡é«˜é€Ÿæ³¢ç‰¹ç‡ã€ç„¡åœ°å€æª¢æ¸¬åŠŸèƒ½ã€ç„¡å–šé†’åŠŸèƒ½ã€ç¦æ­¢ç™¼é€ç©ºé–’ä¸­æ–·ã€ç¦æ­¢ç™¼é€å¯„å­˜å™¨ç©ºä¸­æ–·
+	_brg=103;       //_brg=16000000/(9600*16)-1=129  (é«˜é€Ÿæ³¢ç‰¹ç‡ï¼šæ³¢ç‰¹ç‡=fSYS/[16Ã—(N+1)]ã€ä½é€Ÿæ³¢ç‰¹ç‡ï¼šæ³¢ç‰¹ç‡=fSYS/[64Ã—(N+1)])
 	
-	_uartf=0;		//UART¤¤Â_¼Ğ»x²M¹s
-	_uarte=1;		//¨Ï¯àUART¤¤Â_
+	_uartf=0;		//UARTä¸­æ–·æ¨™èªŒæ¸…é›¶
+	_uarte=1;		//ä½¿èƒ½UARTä¸­æ–·
 	
 	_int_pri15f = 0;
 	_int_pri15e = 1;
