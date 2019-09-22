@@ -1,3 +1,9 @@
+/*  =============================================================================
+   馬達紅線接V     
+	DWN(PB0): GB PWM 
+	UP(PB1) : GC PWM	 
+	TEST(PB2)
+===================================================================================*/
 #include "HT66FM5440.h"
 typedef unsigned char uint8;
 typedef unsigned short uint16;
@@ -17,6 +23,10 @@ typedef unsigned long uint32;
 #define PIN_TESTO2 _pa5
 
 // timer
+#define TIME_TEST_UP_ON 2000
+#define TIME_TEST_UP_OFF 3000
+#define TIME_TEST_DWN_ON 2000
+#define TIME_TEST_DWM_OFF 3000
 volatile uint16 cnt_ms =0;
 volatile uint8 cnt_10ms = 0, cnt_200ms = 0;
 volatile bit f_ms = 0, f_10ms = 0, f_200ms = 0;
@@ -83,7 +93,9 @@ uint16 pwmduty_temp;
 #define B12 0
 #define B10 1
 volatile bit f_adc_ch = 0;
-volatile uint16 iavg = 0, vdet = 0;
+volatile uint16 iavg = 0, vdc[4], vdet;
+volatile uint8 vdc_index = 0;
+volatile uint16 vdc_sum = 0;
 
 //UART
 uint8 txbuff[6];
@@ -134,11 +146,11 @@ int main(void)
 	while(1)
 	{						
 		FEED_WATCHDOG();
-		
-//		if (vdet >= 3300) // check VM OVP
-//			PIN_TESTO2 = 1;
-//		else
-//			PIN_TESTO2 = 0;
+					
+		if (vdet >= 3470) // check VM OVP
+			PIN_TESTO2 = 1;
+		else if (vdet <= 3465)
+			PIN_TESTO2 = 0;
 			
 		if (motor_current > MAX_Im) // Check motor current
 			motor_state = ST_COAST;
@@ -147,60 +159,26 @@ int main(void)
 		if (f_10ms) // every 10 mseconds
 		{
 			f_10ms = 0; // reset flag
-			handle_key(); // ckeck key status
-
-			if ((motor_state & 0x01) == 0x01)
-				PIN_TESTO0 = 1;
-			else
-				PIN_TESTO0 = 0;
-				
-			if ((motor_state & 0x02) == 0x02)
-				PIN_TESTO1 = 1;
-			else
-				PIN_TESTO1 = 0;	
-				
-			if ((motor_state & 0x04) == 0x04)
-				PIN_TESTO2 = 1;
-			else
-				PIN_TESTO2 = 0;		
-						
-			if (f_adc_ch == 0) // adc sample voltage and current
-			{	
-				f_adc_ch = 1;
-				adc_sample(CH_VDET);	
-			}
-			else
-			{
-				f_adc_ch = 0;
-				adc_sample(CH_IAVG);		
-			}		
-				
-//			if (f_testmode == 1)// self test mode
-//			{
-//				if (f_ms == 1)	
-//				{					
-//					if (direction_test != UP)
-//					{
-//						direction_test = UP;
-//						cnt_ms = 5000;
-//					}
-//					else if (direction_test != DWN)
-//					{
-//						direction_test =  DWN;
-//						cnt_ms = 5000;
-//					}
-//					f_ms = 0;
-//				
-//				}	
-//				direction = direction_test;	// update test direction				
-//			}
-						
+			handle_key(); // ckeck key status	
+							
+									
 			switch (motor_state)  // handle motor state
 			{
 				case ST_COAST: // wait for a system reset			
 					pwmduty_now = 0;	
 					break;
-				
+
+				case ST_BRAKE:			
+					pwmduty_temp = 5; // break pwm delta
+					if (pwmduty_now < pwmduty_temp)
+					{
+						pwmduty_now = 0;
+						motor_state = ST_STOP;
+					}						
+					else
+						pwmduty_now -= pwmduty_temp;				
+					break;
+									
 				case ST_STOP:
 					if (f_testmode == 0)
 						direction_test = UP;
@@ -216,26 +194,27 @@ int main(void)
 							motor_state = ST_UP;
 					}
 					break;
-				case ST_T_DIRSW:
-					cnt_ms = 2000;
-					f_ms = 0;
+				case ST_T_DIRSW:					
 					if (direction_test == UP)
 					{
+						cnt_ms = TIME_TEST_DWN_ON; // down on time 
 						direction_test = DWN;
 						motor_state = ST_T_DOWN;						
 					}
 					else if (direction_test == DWN)
 					{
+						cnt_ms = TIME_TEST_UP_ON; // up on time
 						direction_test = UP;
 						motor_state = ST_T_UP;						
 					}
 					else
-						motor_state = ST_BRAKE;								
+						motor_state = ST_BRAKE;	
+					f_ms = 0;							
 					break;
 				case ST_T_UP:
 					if ((f_testmode == 0) || (f_ms == 1))
 					{
-						cnt_ms = 3000;
+						cnt_ms = TIME_TEST_UP_OFF; // up off time
 						f_ms = 0;
 						pwmduty_now = 400;		//越小剎車越快	
 						motor_state = ST_BRAKE; // then brake !
@@ -252,7 +231,7 @@ int main(void)
 				case ST_T_DOWN:
 					if ((f_testmode == 0) || (f_ms == 1))
 					{
-						cnt_ms = 3000;
+						cnt_ms = TIME_TEST_DWM_OFF; // down off time
 						f_ms = 0;
 						pwmduty_now = 400;		//越小剎車越快	
 						motor_state = ST_BRAKE; // then brake !
@@ -266,16 +245,6 @@ int main(void)
 							pwmduty_now = pwmduty_temp;
 					}						
 					break;		
-				case ST_BRAKE:			
-					pwmduty_temp = 5; // duty delta
-					if (pwmduty_now < pwmduty_temp)
-					{
-						pwmduty_now = 0;
-						motor_state = ST_STOP;
-					}						
-					else
-						pwmduty_now -= pwmduty_temp;				
-					break;
 				
 				case ST_UP:							
 					if (direction != UP) // not forward ?
@@ -531,7 +500,7 @@ void adc_init(uint8 res) //resolution 0: 12 1: 10
 	//	101: fSYS/32
 	//	110: fSYS/64		
 	_adck2				= 1;					
-	_adck1				= 1;
+	_adck1				= 0;
 	_adck0				= 0;
 	//	Step 2
 	//	Enable the A/D converter by clearing the ADOFF bit in the ADCR0 register to zero.	
@@ -575,9 +544,19 @@ void adc_init(uint8 res) //resolution 0: 12 1: 10
 
 void __attribute ((interrupt(0x20))) ISR_Adc(void) 
 {
+	uint16 vdc_temp;
 	FEED_WATCHDOG();	
 	if (f_adc_ch == 1)
-		vdet = (_adrh << 8) | _adrl;
+	{
+		vdc_temp= (_adrh << 8) | _adrl;
+		vdc_temp &= 0x0fff;
+		vdc_sum -= vdc[vdc_index];
+		vdc_sum += vdc_temp;
+		vdc[vdc_index] = vdc_temp;
+		vdc_index ++;
+		vdc_index &= 3;
+		vdet = (vdc_sum >> 2);
+	}
 	else
 		iavg = (_adrh << 8) | _adrl;
 	_aeocf = 0;
@@ -678,6 +657,17 @@ void __attribute ((interrupt(0x3c))) ISR_TimeBase_Uart(void)
 	
 	if (_tbf)
 	{
+		if (f_adc_ch == 0) // adc sample voltage and current
+		{	
+			f_adc_ch = 1;
+			adc_sample(CH_VDET);	
+		}
+		else
+		{
+			f_adc_ch = 0;
+			adc_sample(CH_IAVG);		
+		}	
+				
 		if (--cnt_ms == 0)
 		{
 			f_ms = 1; // toggles every 200 mseconds
